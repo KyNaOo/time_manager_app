@@ -2,8 +2,8 @@ import Config
 
 # Configure your database
 config :time_tracker, TimeTracker.Repo,
-  username: "postgres",
-  password: "postgres",
+  username: "massi",
+  password: "massi",
   hostname: "localhost",
   database: "time_tracker_dev",
   stacktrace: true,
