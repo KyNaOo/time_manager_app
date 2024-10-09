@@ -28,3 +28,5 @@ time_tracker-*.tar
 .elixir_ls
 /config/dev.exs
 time_tracker.iml
+
+dev.exs
