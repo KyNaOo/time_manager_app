@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import FetchTest from "@/components/FetchTest.vue";
+import Users from "@/components/Users.vue";
 </script>
 
 
 <template>
   <div class="users">
     <h1>This is the users page</h1>
-    <FetchTest/>
+    <Users/>
     <RouterLink to="/">Home</RouterLink>
   </div>
 </template>

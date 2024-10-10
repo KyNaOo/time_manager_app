@@ -1,17 +1,15 @@
-<template>
-    <div class="user-view">
-        <h1>User Information</h1>
-        <p><strong>ID:</strong> {{ user.id }}</p>
-        <p><strong>Username:</strong> {{ user.username }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-    </div>
-</template>
 
 <script setup lang="ts">
 import { ref, onBeforeMount } from 'vue'
 import axios from 'axios'
 
-const user = ref(null)
+interface User {
+  id: number;
+  username: string;
+  email: string;
+}
+
+const user = ref<User | null>(null)
 
 import { useRoute } from 'vue-router'
 
@@ -27,6 +25,16 @@ onBeforeMount(async () => {
     }
 })
 </script>
+
+<template>
+    <div class="user-view" v-if="user">
+        <h1>User Information</h1>
+        <p><strong>ID:</strong> {{ user.id }}</p>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+    </div>
+</template>
+
 
 <style scoped>
 .user-view {
