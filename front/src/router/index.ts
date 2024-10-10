@@ -16,14 +16,18 @@ const router = createRouter({
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/UsersView.vue'),
-      children: [
-        {
-          path: '/:id',
-          name: 'user',
-          component: UserView
-        },
-      ]
-    }
+    },
+    {
+      path: '/user/:id',
+      name: 'user',
+      component: UserView
+    },
+    {
+      path: '/user',
+      name: 'userEdition',
+      component: UserView
+    },
+
   ]
 })
 
