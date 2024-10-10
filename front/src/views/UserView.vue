@@ -4,6 +4,7 @@ import { ref, onBeforeMount, computed } from 'vue'
 import axios from 'axios'
 import { useRoute } from 'vue-router'
 import Form from '@/components/Form.vue'
+import WorkingTimes from '@/components/WorkingTimes.vue';
 
 interface User {
   id?: number ;
@@ -14,13 +15,8 @@ interface User {
 const user = ref<User | null>(null)
 const route = useRoute()
 const userId = ref(route.params.id)
-console.log('Full Route :', route.fullPath)
-console.log('Route params:', route.query)
 
 const mode = computed(() => route.query.create ? 'create' : 'edition');
-
-console.log('Form mode:', mode.value)
-
 
 const modifyUser = async() => {
 try {
@@ -84,19 +80,22 @@ onBeforeMount(async () => {
 
 <template>
     <div class="user-view" v-if="user" >
-        <h1>{{mode}} User</h1>
-
-        <Form :user="user" :mode="mode" @submit="action" />
+        <div class="form-user">
+            <h1>{{mode}} User</h1>
+            <Form :user="user" :mode="mode" @submit="action" />
+        </div>
+        <WorkingTimes :user="user" />
     </div>
     <div v-else>
         <p>User not found</p>
     </div>
- 
 </template>
 
 
 <style scoped>
 .user-view {
     padding: 20px;
+    display: flex;
+    width: 100%;
 }
 </style>
