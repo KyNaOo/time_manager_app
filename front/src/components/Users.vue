@@ -65,7 +65,9 @@ onBeforeMount(async () => {
     </tbody>
   </table>
 </div>
-<div v-else>No users</div>
+<div v-else>No users
+  <RouterLink to="/user?create=true" >Create User</RouterLink>
+</div>
 </template>
 
 <style scoped>
