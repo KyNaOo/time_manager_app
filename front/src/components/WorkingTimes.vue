@@ -2,23 +2,7 @@
 import axios from "axios";
 import {onBeforeMount, ref} from "vue";
 import moment from "moment";
-
-interface WorkingTime {
-  id: number;
-  start: string;
-  end: string;
-}
-interface Clock {
-  id: number;
-  time: string;
-  status: boolean;
-}
-
-interface User {
-  id?: number ;
-  username: string;
-  email: string;
-}
+import type { User,WorkingTime, Clock } from "@/types/crudTypes";
 
 interface Props {
     user: User ;
@@ -69,47 +53,45 @@ function fetchLastWorkingTime() {
 }
 
 
-async function clockIn(now :string, midnight :string) {
+async function clockIn(now :string) {
 
-     // Creation of clock in
-     const clock = await axios.post(`http://localhost:4000/api/clocks/${props.user.id}`,
-    {
-        time: now,
-        status: true,
-    }
-    );
+    try {
+      // Creation of clock in
+      await axios.post(`http://localhost:4000/api/clocks/${props.user.id}`, {
+      time: now,
+      status: true,
+      });
 
-    // Creation of working time
-        const workingTime = await axios.post(`http://localhost:4000/api/workingtime/${props.user.id}`,
-    {
-        start: now,
-        end: midnight
+      // Creation of working time
+      await axios.post(`http://localhost:4000/api/workingtime/${props.user.id}`, {
+      start: now,
+      end: now
+      });
+    } catch (e) {
+      console.log("Error clocking in:", e);
     }
-    );
 }
 
 async function clockOut(now : string){
-     // Creation of clock in
-     const clock = await axios.post(`http://localhost:4000/api/clocks/${props.user.id}`,
-    {
+    try {
+      // Creation of clock out
+      await axios.post(`http://localhost:4000/api/clocks/${props.user.id}`, {
         time: now,
         status: false,
+      });
+
+      const lastWorkingTime = fetchLastWorkingTime();
+      console.log("Last working time:", lastWorkingTime);
+
+      if (lastWorkingTime) {
+        // Update the end time of the last working time
+        await axios.put(`http://localhost:4000/api/workingtime/${lastWorkingTime.id}`, {
+          workingtime: { end: now }
+        });
+      }
+    } catch (e) {
+      console.log("Error clocking out:", e);
     }
-    );
-
-    const lastWorkingTime = fetchLastWorkingTime();
-    console.log("Last working time:", lastWorkingTime);
-
-    if (lastWorkingTime ) {
-        // Creation of working time
-        const workingTime = await axios.put(`http://localhost:4000/api/workingtime/${lastWorkingTime.id}`,
-        {
-           workingtime:{ end: now}
-        }
-        );
-        return;
-    }
-
 
 }
 
@@ -117,7 +99,6 @@ async function clock() {
   try {
     
     const now = moment().format('YYYY-MM-DD HH:mm:ss');
-    const midnight = moment().endOf('day').format('YYYY-MM-DD HH:mm:ss');
 
     clocks.value = await getClocks();
 
@@ -134,7 +115,7 @@ async function clock() {
 
     } else {
         // clock in
-        await clockIn(now, midnight);
+        await clockIn(now);
         working.value = true;
     }
 
@@ -178,7 +159,7 @@ onBeforeMount(async () => {
 
 <template>
 <div v-if="workingTimes">
-  <h3>Working Times</h3>
+  <h2>Working Times</h2>
   <!-- <RouterLink to="/workingtime/create" >Create Working Time</RouterLink> -->
   <table>
     <thead>
@@ -187,6 +168,7 @@ onBeforeMount(async () => {
         <th>User Id</th>
         <th>Start</th>
         <th>End</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -195,7 +177,10 @@ onBeforeMount(async () => {
         <td>{{ user.id }}</td>
         <td>{{ workingTime.start }}</td>
         <td>{{ workingTime.end }}</td>
-      </tr>
+        <RouterLink :to="`/workingtime/${user.id}/${workingTime.id}`">See</RouterLink>
+    </tr>
+
+
       <nav>
             <button :class="working ? 'clockOut' : 'clockIn'" @click="clock()">{{ working ? 'Clock Out' : 'Clock In' }}</button>
             <!-- <button @click="clock(new Date)">Clock Out</button> -->
@@ -208,7 +193,10 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+h3 {
+  margin: 10px;
 
+}
 
 button {
   margin: 10px;
