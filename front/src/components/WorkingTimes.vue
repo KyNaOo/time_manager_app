@@ -31,6 +31,8 @@ const clocks = ref<Clock[] | null>(null);
 
 const clicked = ref(false);
 
+const working = ref(false);
+
 
 // Get all clocks from user
 async function getClocks() {
@@ -40,6 +42,16 @@ async function getClocks() {
         return res.data.data;
     } catch (e) {
         console.log("Error fetching clocks:", e);
+    }
+}
+
+async function getWorkingTimes() {
+    try {
+        // get all working times from user
+        const res =  await axios.get(`http://localhost:4000/api/workingtime/${props.user.id}`);
+        return res.data.data;
+    } catch (e) {
+        console.log("Error fetching working times:", e);
     }
 }
 
@@ -111,20 +123,24 @@ async function clock() {
 
     console.log("All clocks:", clocks.value)
 
-    const lastClock = fetchLastClock();
+    let lastClock = fetchLastClock();
 
     console.log("Last clock:", lastClock)
 
     if (lastClock && lastClock.status) {
         // clock out
-        clockOut(now);
+        await clockOut(now);
+        working.value = false;
+
     } else {
         // clock in
-        clockIn(now, midnight);
+        await clockIn(now, midnight);
+        working.value = true;
     }
 
-    // Reload the page
-    // window.location.reload();
+    // Reload the data
+    workingTimes.value =  await getWorkingTimes();
+    console.log("NEW workingtimes:", workingTimes.value);
 
     clicked.value = !clicked.value;
 
@@ -135,11 +151,23 @@ async function clock() {
 
 }
 
+
 onBeforeMount(async () => {
   try {
-    const apiResp = await axios.get(`http://localhost:4000/api/workingtime/${props.user.id}`);
-    workingTimes.value = apiResp.data.data;
-    console.log("workingtimes:", workingTimes.value)
+    workingTimes.value =  await getWorkingTimes();
+    console.log("workingtimes:", workingTimes.value);
+
+    clocks.value = await getClocks();
+
+    const lastClock = fetchLastClock();
+    console.log("Last clock:", lastClock);
+    if (lastClock && lastClock.status) {
+        console.log("User is working !!");
+        working.value = true;
+    }else {
+        console.log("User is not working !!");
+        working.value = false;
+    }
   } catch (e) {
     console.log("Error fetching workingtimes:", e)
   }
@@ -169,7 +197,7 @@ onBeforeMount(async () => {
         <td>{{ workingTime.end }}</td>
       </tr>
       <nav>
-            <button @click="clock()">{{ clicked ? 'Clock Out' : 'Clock In' }}</button>
+            <button :class="working ? 'clockOut' : 'clockIn'" @click="clock()">{{ working ? 'Clock Out' : 'Clock In' }}</button>
             <!-- <button @click="clock(new Date)">Clock Out</button> -->
         </nav>
     </tbody>
@@ -180,5 +208,22 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
+
+
+button {
+  margin: 10px;
+  padding: 10px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+}
+.clockIn {
+  background-color: #4CAF50;
+}
+  .clockOut {
+    background-color: #f44336;
+  }
 
 </style>

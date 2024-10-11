@@ -79,23 +79,35 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-    <div class="user-view" v-if="user" >
+    <div class="user-view" v-if="user">
+        <button @click="$router.back()">Back</button>
+
         <div class="form-user">
             <h1>{{mode}} User</h1>
             <Form :user="user" :mode="mode" @submit="action" />
         </div>
-        <WorkingTimes :user="user" />
+        <WorkingTimes v-if="mode === 'edition'" :user="user" />
     </div>
     <div v-else>
         <p>User not found</p>
+        <button @click="$router.back()">Back</button>
     </div>
 </template>
 
 
-<style scoped>
+<style scoped >
 .user-view {
     padding: 20px;
     display: flex;
     width: 100%;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
 }
 </style>
