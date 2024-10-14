@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterView } from 'vue-router'
+import AppLayout from './components/layout/AppLayout.vue';
 </script>
 
 <template>
   <main>
     <router-view v-slot="{ Component }">
       <transition name="fade" mode="out-in">
-        <component :is="Component" />
+        <AppLayout>
+          <component :is="Component" />
+        </AppLayout>
       </transition>
     </router-view>
   </main>
@@ -15,5 +17,9 @@ import HelloWorld from './components/HelloWorld.vue'
 </template>
 
 <style scoped>
-
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
 </style>
