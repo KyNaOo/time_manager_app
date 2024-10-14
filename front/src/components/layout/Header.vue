@@ -1,5 +1,20 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router';
+import { store } from '../../api/store';
+const router = useRouter();
+const route = useRoute();
+const logout = async () => {
+  localStorage.clear();
+  store.updateHasLogin(false);
+  store.updateName(null);
+  router.push("/login");
+};
+
+const isLogged = () => {
+    console.log('isLogged:', store.hasLogin);
+  return store.hasLogin;
+};
 
 </script>
 
@@ -9,8 +24,11 @@ import { RouterLink } from 'vue-router'
         <nav>
             <ul>
                 <li><router-link to="/">Home</router-link></li>
-                <li><router-link to="/login">Login</router-link></li>
-                <li><router-link to="/register">Register</router-link></li>
+                <template v-if="!isLogged()">
+                    <li><router-link to="/login">Login</router-link></li>
+                    <li><router-link to="/register">Register</router-link></li>
+                </template>
+                <li v-if="isLogged()" @click="logout">Logout</li>
             </ul>
         </nav>
     </header>

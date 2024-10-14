@@ -7,66 +7,28 @@ import Form from '@/components/Form.vue'
 import WorkingTimes from '@/components/WorkingTimes.vue';
 import ChartManager from '@/components/ChartManager.vue';
 import type { User, WorkingTime } from '@/types/crudTypes'
+import { useApi } from '@/api';
 
 const user = ref<User | null>(null)
 const route = useRoute()
 const userId = ref(route.params.id);
 const workingTimes = ref<WorkingTime[] | null>(null);
-const graphMode = ref('bar');
 const mode = computed(() => route.query.create ? 'create' : 'edition');
 
-const modifyUser = async() => {
-try {
-    console.log(`Modify user with ID:`, userId.value);
-    const resp = await axios.put(`http://localhost:4000/api/users/${userId.value}`, {
-        user: {
-            username: user.value?.username,
-            email: user.value?.email
-        }
-    });
-    console.log(`Modified user with ID: ${userId.value}`);
-    // Add your logic to handle the response here
-} catch (e) {
-    console.log(`Error modifying user with ID: ${userId.value}`, e);
-}
-};
-
-const createUser = async() => {
-try {
-    console.log(`Create user`);
-    const resp = await axios.post(`http://localhost:4000/api/users`, {
-        user: {
-            username: user.value?.username,
-            email: user.value?.email
-        }
-    });
-    console.log(`Created user : ${resp.data.data}`);
-    // Add your logic to handle the response here
-} catch (e) {
-    console.log(`Error creating user: ${userId.value}`, e);
-}
-};
-
-
+const api = useApi();
 
 const action = async() => {
-if (mode.value === 'create') {
-    await createUser()
-} else {
-    await modifyUser()
-}
+    if (user.value === null) {
+        console.error('User is null')
+        return
+    }
+    if (mode.value === 'create') {
+        await api.createUser(user.value)
+    } else {
+        await api.modifyUser(user.value)
+    }
 };
 
-
-async function getWorkingTimes(user : User) {
-    try {
-        // get all working times from user
-        const res =  await axios.get(`http://localhost:4000/api/workingtime/${user.id}`);
-        return res.data.data;
-    } catch (e) {
-        console.log("Error fetching working times:", e);
-    }
-}
 
 onBeforeMount(async () => {
     try {
@@ -82,7 +44,7 @@ onBeforeMount(async () => {
         console.log('User data:', response.data)
         user.value = response.data.data;
         if (user.value){
-            workingTimes.value = await getWorkingTimes(user.value);
+            workingTimes.value = await api.getWorkingTimes(user.value);
             console.log('User '+ user.value.username+' working times:', workingTimes.value)
 
         }
@@ -103,12 +65,8 @@ onBeforeMount(async () => {
             <WorkingTimes v-if="mode === 'edition'" :user="user" />            
         </div>
         <div class="graphWrapper">
-            <select v-model="graphMode">
-                <option value="bar">Bar</option>
-                <option value="doughnut">Doughnut</option>
-                <option value="pie">Pie</option>
-            </select> 
-        <ChartManager v-if="workingTimes" :workingTimes="workingTimes" :graphMode="graphMode" />
+
+        <ChartManager v-if="workingTimes" :workingTimes="workingTimes"/>
         </div>
 
     </div>

@@ -177,7 +177,7 @@ onBeforeMount(async () => {
         <td>{{ user.id }}</td>
         <td>{{ workingTime.start }}</td>
         <td>{{ workingTime.end }}</td>
-        <RouterLink :to="`/workingtime/${user.id}/${workingTime.id}`">See</RouterLink>
+        <RouterLink :to="`/app/workingtime/${user.id}/${workingTime.id}`">See</RouterLink>
     </tr>
 
 

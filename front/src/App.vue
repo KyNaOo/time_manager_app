@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import AppLayout from './components/layout/AppLayout.vue';
+
 </script>
 
 <template>
   <main>
     <router-view v-slot="{ Component }">
-      <transition name="fade" mode="out-in">
-        <AppLayout>
+      <AppLayout>
+        <transition name="fade" mode="out-in">
           <component :is="Component" />
+
+        </transition>
         </AppLayout>
-      </transition>
+
     </router-view>
   </main>
   <!-- <RouterView /> -->
@@ -22,4 +25,12 @@ main {
   flex-direction: column;
   height: 100vh;
 }
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.7s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+
 </style>
