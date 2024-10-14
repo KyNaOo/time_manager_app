@@ -16,28 +16,3 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
   * Docs: https://hexdocs.pm/phoenix
   * Forum: https://elixirforum.com/c/phoenix-forum
   * Source: https://github.com/phoenixframework/phoenix
-
-
-
-# docker
-
-docker ps
-docker images
-
-docker build --tag 'image_name' .
-docker run --name 'name' --network=back -d 'image'
-docker exec -it [container-id] bash 
-
-docker network connect [network] [container]
-
-
-docker rm -v -f $(docker ps -qa)
-
-
-https://stackoverflow.com/questions/36075525/how-do-i-run-a-docker-instance-from-a-dockerfile
-
-[network](https://docs.docker.com/reference/cli/docker/network/connect/)
-
-https://stackoverflow.com/questions/20932357/how-to-enter-in-a-docker-container-already-running-with-a-new-tty
-
-https://stackoverflow.com/questions/46917831/how-to-load-several-environment-variables-without-cluttering-the-dockerfile

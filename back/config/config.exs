@@ -7,11 +7,6 @@
 # General application configuration
 import Config
 
-#if Mix.env() == :dev do
-#  config :dotenv,
-#    path: ".env"
-#end
-
 config :time_tracker,
   ecto_repos: [TimeTracker.Repo],
   generators: [timestamp_type: :utc_datetime]
