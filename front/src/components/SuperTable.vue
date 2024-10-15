@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { toRefs, defineProps } from 'vue';
+import { useApi } from '@/api';
+
+const api = useApi();
 
 const props = defineProps({
     tableHeaders: {
@@ -17,8 +20,12 @@ const props = defineProps({
 });
 
 
-const handleDelete = (rowIndex: number) => {
-    console.log(`Delete row at index: ${rowIndex}`);
+const handleDelete = async (id: number) => {
+    console.log(`Delete row at index: ${id}`);
+    const deleteResult = await api.deleteWorkingTime(id);
+    if (deleteResult) {
+        window.location.reload();
+    }
     // Add your delete logic here
 };
 
@@ -47,7 +54,7 @@ console.log(tableHeaders.value, tableData.value[0]);
                     <td v-if="showActions" class="actionCell">
                         <RouterLink :to="`/app/workingtime/${tableData[0].user_id}/${tableData[rowIndex].id}`">See</RouterLink>
                         <!-- Add your action buttons or elements here -->
-                        <button class="deleteBtn" @click="handleDelete(rowIndex)">Delete</button>
+                        <button class="deleteBtn" @click="handleDelete(tableData[rowIndex].id)">Delete</button>
                     </td>
                 </tr>
             </tbody>

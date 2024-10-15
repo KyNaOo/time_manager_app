@@ -43,14 +43,14 @@ onBeforeMount(async () => {
             }
             return
         }
-        const response = await axios.get(`http://localhost:4000/api/users/${userId.value}`)
-        console.log('User data:', response.data)
-        user.value = response.data.data;
-        if (user.value){
+        // const response = await axios.get(`http://localhost:4000/api/users/${userId.value}`)
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            user.value = JSON.parse(storedUser) as User;
             workingTimes.value = await api.getWorkingTimes(user.value);
             console.log('User '+ user.value.username+' working times:', workingTimes.value)
-
         }
+      
     } catch (error) {
         console.error('Error fetching user data:', error)
     }
@@ -82,10 +82,6 @@ onBeforeMount(async () => {
 
 <style scoped >
 .UserView {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
 }
 
 .flexWrapper {

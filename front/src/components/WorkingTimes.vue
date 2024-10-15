@@ -6,6 +6,7 @@ import type { User,WorkingTime, Clock } from "@/types/crudTypes";
 import { useApi } from "@/api";
 import {usefulFunctions} from "@/api/useful";
 import SuperTable from "./SuperTable.vue";
+import { ClockIcon } from '@heroicons/vue/24/solid'
 
 interface Props {
     user: User ;
@@ -50,8 +51,11 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-<div v-if="workingTimes">
-  <h2>All working Times</h2>
+<div class="WorkingTimes" v-if="workingTimes">
+  <div class="workingTimesTitle">
+    <h2>All working Times</h2>
+    <ClockIcon class="icon" />
+  </div>
   <SuperTable :tableHeaders="tableHeaders" :tableData="workingTimes" showActions />
 </div>
 <div v-else>No Working Times Yet
@@ -59,25 +63,17 @@ onBeforeMount(async () => {
 </template>
 
 <style scoped>
-h3 {
-  margin: 10px;
-
+.WorkingTimes {
+  margin: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.workingTimesTitle {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-button {
-  margin: 10px;
-  padding: 10px;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-
-}
-.clockIn {
-  background-color: #4CAF50;
-}
-  .clockOut {
-    background-color: #f44336;
-  }
 
 </style>

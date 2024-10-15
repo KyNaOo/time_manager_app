@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.1.5",
     "@types/dotenv": "^6.1.1",
     "axios": "^1.7.7",
     "chart.js": "^4.4.4",

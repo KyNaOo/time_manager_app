@@ -2,6 +2,7 @@
 import { RouterLink } from 'vue-router'
 import { useRouter, useRoute } from 'vue-router';
 import { store } from '../../api/store';
+import { BeakerIcon, UserIcon } from '@heroicons/vue/24/solid'
 const router = useRouter();
 const route = useRoute();
 const logout = async () => {
@@ -23,13 +24,13 @@ const isLogged = () => {
         <h1>Timetracker</h1>
         <nav>
             <ul class="navList loggedOut" v-if="!isLogged()">
-                <li><router-link to="/">Home</router-link></li>
-                <li><router-link to="/login">Login</router-link></li>
-                <li><router-link to="/register">Register</router-link></li>
+                <li><router-link to="/"><BeakerIcon class="icon"/> <span>Home</span></router-link></li>
+                <li><router-link to="/login"><BeakerIcon class="icon"/> <span>Login</span></router-link></li>
+                <li><router-link to="/register"><BeakerIcon class="icon"/> <span>Register</span></router-link></li>
             </ul>
             <ul class="navList loggedIn" v-else>
-                <li><router-link to="/app/profile">Profile</router-link></li>
-                <li class="logout"@click="logout">Logout</li>
+                <li><router-link to="/app/profile"><BeakerIcon class="icon"/> <span>Profile</span></router-link></li>
+                <li class="logout" @click="logout"><UserIcon class="icon"/> <span>Logout</span></li>
             </ul>
         </nav>
     </header>
@@ -52,6 +53,11 @@ const isLogged = () => {
     margin: 0;
 }
 
+.header .icon {
+    width: 20px;
+}
+
+
 .navList {
     list-style: none;
     display: flex;
@@ -65,20 +71,32 @@ const isLogged = () => {
     color: white;
     text-decoration: none;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+ 
 }
 
-.header nav ul li a:hover {
-    text-decoration: underline;
-}
-
-.logout {
-    color: white;
-    background-color: #ff4d4d;
+.header nav ul li a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     padding: 0.5rem 1rem;
     border: none;
     border-radius: 5px;
     transition: background-color 0.3s ease;
-    }
+}
+
+
+.logout {
+    color: white;
+    background-color: #ff4d4d;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    padding: 0.5rem 1rem;
+
+}
 
     .logout:hover {
         background-color: #ff1a1a;

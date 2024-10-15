@@ -73,6 +73,21 @@ async function getWorkingTimes(user: User): Promise<WorkingTime[]> {
   }
 }
 
+// Delete working time
+async function deleteWorkingTime(id: number): Promise<boolean> {
+  try {
+      console.log(`Delete working time with ID:`, id);
+      // Delete working time
+      await axios.delete(`http://localhost:4000/api/workingtime/${id}`);
+      console.log(`Deleted working time with ID: ${id}`);
+      return true;
+  } catch (e) {
+      console.log(`Error deleting working time with ID: ${id}`, e);
+      return false;
+  }
+}
+
+
 // Get user by id
 async function getUser(id: number) {
   try {
@@ -100,12 +115,21 @@ async function getClocks(user: User) {
 async function modifyUser (user: User) {
   try {
       console.log(`Modify user with ID:`, user.id);
+      // Change in the database
       const resp = await axios.put(`http://localhost:4000/api/users/${user.id}`, {
           user: {
               username: user?.username,
               email: user?.email
           }
       });
+      if (resp.data.data) {
+          // Change in local storage
+          store.updateUser(resp.data.data);
+          localStorage.setItem("user", JSON.stringify(resp.data.data));
+          // Show success message in frontend
+          alert("User modified successfully");
+          
+      }
       console.log(`Modified user with ID: ${user.id}`);
       // Add your logic to handle the response here
   } catch (e) {
@@ -144,6 +168,7 @@ export const useApi = () => {
     authenticate,
     // Working time
     getWorkingTimes,
+    deleteWorkingTime,
     // Users
     getUser,
     modifyUser,

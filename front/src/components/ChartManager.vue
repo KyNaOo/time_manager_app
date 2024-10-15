@@ -3,6 +3,7 @@ import { onBeforeMount, ref, watchEffect } from 'vue';
 import { computed } from 'vue';
 import { Bar, Pie, Doughnut } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale,ArcElement, PointElement } from 'chart.js';
+import { CalendarDaysIcon } from '@heroicons/vue/24/solid'
 
 import type { WorkingTime } from '@/types/crudTypes';
 
@@ -100,7 +101,11 @@ watchEffect(() => {
 <template>
     <div class="ChartManagerWrapper">
         <div class="chartControls">
-            <h2>Your last 5 days</h2>
+            <div class="chartTitle">
+                <h2>Your last 5 days</h2>
+                <CalendarDaysIcon class="icon" />
+            </div>
+            
             <div class="chartSelector">
                 <select v-model="graphMode">
                     <option value="bar">Bar</option>
@@ -125,8 +130,24 @@ watchEffect(() => {
     flex-direction: column;
     gap: 20px;
 }
+
+.chartTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .chartControls {
     display: flex;
     justify-content: space-between;
+}
+select{
+    padding: 10px;
+    border-radius: 5px;
+    /* border: 1px solid #ccc; */
+    cursor: pointer ;
+    width: 100px;
+}
+.icon {
+    width: 30px;
 }
 </style>
