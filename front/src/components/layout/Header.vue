@@ -7,7 +7,7 @@ const route = useRoute();
 const logout = async () => {
   localStorage.clear();
   store.updateHasLogin(false);
-  store.updateName(null);
+  store.updateUser(null);
   router.push("/login");
 };
 
@@ -22,13 +22,14 @@ const isLogged = () => {
     <header class="header">
         <h1>Timetracker</h1>
         <nav>
-            <ul>
+            <ul class="navList loggedOut" v-if="!isLogged()">
                 <li><router-link to="/">Home</router-link></li>
-                <template v-if="!isLogged()">
-                    <li><router-link to="/login">Login</router-link></li>
-                    <li><router-link to="/register">Register</router-link></li>
-                </template>
-                <li v-if="isLogged()" @click="logout">Logout</li>
+                <li><router-link to="/login">Login</router-link></li>
+                <li><router-link to="/register">Register</router-link></li>
+            </ul>
+            <ul class="navList loggedIn" v-else>
+                <li><router-link to="/app/profile">Profile</router-link></li>
+                <li class="logout"@click="logout">Logout</li>
             </ul>
         </nav>
     </header>
@@ -51,20 +52,35 @@ const isLogged = () => {
     margin: 0;
 }
 
-.header nav ul {
+.navList {
     list-style: none;
     display: flex;
     gap: 1rem;
     padding: 0;
     margin: 0;
+    align-items: center;
 }
 
-.header nav ul li a {
+.navList li{
     color: white;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .header nav ul li a:hover {
     text-decoration: underline;
+}
+
+.logout {
+    color: white;
+    background-color: #ff4d4d;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    }
+
+    .logout:hover {
+        background-color: #ff1a1a;
 }
 </style>

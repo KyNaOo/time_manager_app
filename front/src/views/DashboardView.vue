@@ -1,36 +1,97 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { User, WorkingTime } from '@/types/crudTypes';
-
 import ChartManager from '@/components/ChartManager.vue';
 import { onBeforeMount } from 'vue';
 import axios from 'axios';
 import { useRoute } from 'vue-router';
 import {useApi} from '@/api/index';
+import { store } from "../api/store";
+import type { User,WorkingTime, Clock } from "@/types/crudTypes";
+import {usefulFunctions} from "@/api/useful";
+import moment from 'moment';
 
 const route = useRoute();
 const api = useApi();
-const workingTimes = ref<WorkingTime[] | null>(null);
+const useful = usefulFunctions();
 
+const workingTimes = ref<WorkingTime[] | null>(null);
+const clocks = ref<Clock[] | null>(null);
 const user = ref<User | null>(null);
 const working = ref(false);
 
-onBeforeMount (async () => {
+
+async function clock() {
+  try {
+    
+    if (!user.value) {
+        console.error('User is null')
+        return
+    }
+    const now = moment().format('YYYY-MM-DD HH:mm:ss');
+
+    clocks.value = await api.getClocks(user.value);
+
+    console.log("All clocks:", clocks.value)
+
+    let lastClock = useful.fetchLastClock(clocks.value!);
+
+    console.log("Last clock:", lastClock)
+
+    if (lastClock && lastClock.status) {
+        // clock out
+        await useful.clockOut(now, workingTimes.value!, user.value);
+        working.value = false;
+
+    } else {
+        // clock in
+        await useful.clockIn(now, user.value);
+        working.value = true;
+    }
+
+    // Reload the data
+    workingTimes.value =  await api.getWorkingTimes(user.value);
+    console.log("NEW workingtimes:", workingTimes.value);
+
+      } catch (e) {
+    console.log("Error clocking:", e)
+  }
+
+
+}
+
+onBeforeMount(async () => {
     try {
-        user.value = await api.getUser(1);
+        user.value = store.user;
+        console.log("Store user:", user.value);
+
         if (user.value) {
-            console.log("User:", user.value);
-        
-            const response = await api.getWorkingTimes(user.value);
-            if (response) {
-                console.log("Working times:", response);
-                workingTimes.value = response;
+            await api.authenticate(`/api/users`, user.value);
+
+            const [workingTimesResponse, clocksResponse] = await Promise.all([
+                api.getWorkingTimes(user.value),
+                api.getClocks(user.value)
+            ]);
+
+            if (workingTimesResponse) {
+                console.log("Working times:", workingTimesResponse);
+                workingTimes.value = workingTimesResponse;
+            }
+
+            if (clocksResponse) {
+                console.log("All clocks:", clocksResponse);
+                clocks.value = clocksResponse;
+
+                const lastClock = useful.fetchLastClock(clocks.value!);
+                console.log("Last clock:", lastClock);
+
+                working.value = lastClock && lastClock.status ? true : false;
+                console.log(`User is ${working.value ? 'working' : 'not working'} !!`);
             }
         }
     } catch (e) {
-        console.log("Error fetching workingTimes:", e)
+        console.log("Error fetching workingTimes or clocks:", e);
     }
-})
+});
 
 </script>
 
@@ -60,12 +121,9 @@ onBeforeMount (async () => {
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
 }
 
-.block {
-    flex:1;
-}
 
 .block-one {
     display: flex;
@@ -75,19 +133,16 @@ onBeforeMount (async () => {
 
 .flex-item {
     flex: 1;
-
-    padding: 20px;
-    text-align: center;
- 
+    padding: 20px; 
+    align-content: center;
 }
 
 .block-two {
-    background-color: #d0d0d0;
     padding: 20px;
     text-align: center;
-    border: 1px solid #bbb;
     border-radius: 4px;
     margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .grid-container {

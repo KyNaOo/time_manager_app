@@ -1,19 +1,30 @@
 import axios from "./axios";
 import { ref , shallowRef} from "vue";
-import { store } from "./store";
-
+import { store } from "./store"
 import type { User, WorkingTime } from "@/types/crudTypes";
-const hasErrorOccured = ref(false);
-const errorMessage = ref(null);
-const emailError = ref(false);
-const passwordError = ref(false);
-const passwordErrorMessge = ref(null);
-const usernameError = ref(false);
+
+
+const hasErrorOccured = ref<boolean>(false);
+const errorMessage = ref<string | null>(null);
+const emailError = ref<boolean>(false);
+const passwordError = ref<boolean>(false);
+const passwordErrorMessge = ref<string | null>(null);
+const usernameError = ref<boolean>(false);
 
 const authenticate = async (path: string, userData: any) => {
   try {
+    // This is the API call to search the user by email and username
+    path = `${path}?email=${userData.email}&username=${userData.username}`;
     const response = await axios.get(path, userData);
-    localStorage.setItem("token", response.data.email);
+    if (response.data.data == null) {
+      hasErrorOccured.value = true;
+      errorMessage.value = "User not found";
+      return;
+    }
+    console.log("Autentication response: ", response.data.data);
+    // This will be changed with the response token
+    localStorage.setItem("user", response.data.data);
+    store.user = response.data.data;
     store.updateHasLogin(true);
   } catch (err: any) {
     console.log("error: ", err.response.data);
@@ -41,6 +52,7 @@ const turnOffError = () => {
   hasErrorOccured.value = false;
 };
 
+// Get all working times from user
 async function getWorkingTimes(user: User): Promise<WorkingTime[]> {
   try {
       // get all working times from user
@@ -52,6 +64,7 @@ async function getWorkingTimes(user: User): Promise<WorkingTime[]> {
   }
 }
 
+// Get user by id
 async function getUser(id: number) {
   try {
       // get user by id
@@ -66,16 +79,17 @@ async function getUser(id: number) {
 
 
 // Get all clocks from user
-async function getClocks() {
+async function getClocks(user: User) {
   try {
       // get all clocks from user
-      const res =  await axios.get(`http://localhost:4000/api/clocks/${props.user.id}`);
+      const res =  await axios.get(`http://localhost:4000/api/clocks/${user.id}`);
       return res.data.data;
   } catch (e) {
       console.log("Error fetching clocks:", e);
   }
 }
 
+// Modify user
 async function modifyUser (user: User) {
   try {
       console.log(`Modify user with ID:`, user.id);
@@ -92,6 +106,8 @@ async function modifyUser (user: User) {
   }
   };
   
+
+  // Create user
   async function createUser (user: User) {
     try {
       console.log(`Create user`);

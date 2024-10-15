@@ -1,16 +1,14 @@
 
-<script setup lang="ts"> 
+<script setup lang="ts">
+import UserView from './UserView.vue';
+
+ 
 
 </script>
 
 <template>
     <div class="profile">
-        <h1>User Profile</h1>
-        <div class="profile-details">
-            <p><strong>Name:</strong> John Doe</p>
-            <p><strong>Email:</strong> john.doe@example.com</p>
-            <p><strong>Location:</strong> Paris, France</p>
-        </div>
+        <UserView />
     </div>
 </template>
 

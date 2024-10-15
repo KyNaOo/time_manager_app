@@ -26,9 +26,10 @@ const hideAllErrors = () => {
 
 const handleAuth = async () => {
   try {
-    await api.authenticate(`/api/users/`, user.value);
+    await api.authenticate(`/api/users`, user.value);
     router.push("/app");
   } catch (err) {
+    console.log('USer not authenticated', user.value);
     console.log(err);
   }
 };
@@ -48,7 +49,7 @@ const goTo = () => {
       <h2 class="title">
         {{ props?.authName === 'login' ? 'Login' : 'Register' || "Authentication" }}
       </h2>
-      <div class="input-group" v-if="props?.authName == 'register'">
+      <div class="input-group" >
         <label for="username" class="input-label"
           >Username
           <span v-show="api.usernameError.value" :class="{ error: api.usernameError.value }"
