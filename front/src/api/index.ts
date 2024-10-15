@@ -1,7 +1,7 @@
 import axios from "./axios";
 import { ref , shallowRef} from "vue";
 import { store } from "./store"
-import type { User, WorkingTime } from "@/types/crudTypes";
+import type { User, WorkingTime, AuthMode } from "@/types/crudTypes";
 
 
 const hasErrorOccured = ref<boolean>(false);
@@ -11,21 +11,30 @@ const passwordError = ref<boolean>(false);
 const passwordErrorMessge = ref<string | null>(null);
 const usernameError = ref<boolean>(false);
 
-const authenticate = async (path: string, userData: any) => {
+const authenticate = async (path: string, userData: any, authMode:AuthMode) => {
   try {
-    // This is the API call to search the user by email and username
-    path = `${path}?email=${userData.email}&username=${userData.username}`;
-    const response = await axios.get(path, userData);
+
+    const response = authMode === 'register'
+      ? await axios.post(path, {
+        user: {
+          email: userData.email,
+          username: userData.username,
+        }
+      })
+      : await axios.get(`${path}?email=${userData.email}&username=${userData.username}`);
+
+      console.log(`${authMode === 'register' ? 'Register' : 'Login'} response: `, response.data.data);
+
+
     if (response.data.data == null) {
       hasErrorOccured.value = true;
       errorMessage.value = "User not found";
-      return;
+    } else {
+      localStorage.setItem("user", JSON.stringify(response.data.data as User));
+      store.user = response.data.data;
+      store.updateHasLogin(true);
     }
-    console.log("Autentication response: ", response.data.data);
-    // This will be changed with the response token
-    localStorage.setItem("user", response.data.data);
-    store.user = response.data.data;
-    store.updateHasLogin(true);
+    
   } catch (err: any) {
     console.log("error: ", err.response.data);
     if (err.response.data.error == "Username field is required") {
@@ -74,9 +83,7 @@ async function getUser(id: number) {
   } catch (e) {
       console.log("Error fetching user:", e);
   }
-
 }
-
 
 // Get all clocks from user
 async function getClocks(user: User) {

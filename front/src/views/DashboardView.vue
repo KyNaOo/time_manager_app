@@ -9,7 +9,7 @@ import { store } from "../api/store";
 import type { User,WorkingTime, Clock } from "@/types/crudTypes";
 import {usefulFunctions} from "@/api/useful";
 import moment from 'moment';
-
+import WorkingTimes from '@/components/WorkingTimes.vue';
 const route = useRoute();
 const api = useApi();
 const useful = usefulFunctions();
@@ -50,6 +50,12 @@ async function clock() {
 
     // Reload the data
     workingTimes.value =  await api.getWorkingTimes(user.value);
+    clocks.value = await api.getClocks(user.value);
+
+    // Reload page
+    window.location.reload();
+
+
     console.log("NEW workingtimes:", workingTimes.value);
 
       } catch (e) {
@@ -61,12 +67,14 @@ async function clock() {
 
 onBeforeMount(async () => {
     try {
-        user.value = store.user;
+        // user.value = store.user;
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            user.value = JSON.parse(storedUser) as User;
+        }
         console.log("Store user:", user.value);
 
         if (user.value) {
-            await api.authenticate(`/api/users`, user.value);
-
             const [workingTimesResponse, clocksResponse] = await Promise.all([
                 api.getWorkingTimes(user.value),
                 api.getClocks(user.value)
@@ -89,7 +97,7 @@ onBeforeMount(async () => {
             }
         }
     } catch (e) {
-        console.log("Error fetching workingTimes or clocks:", e);
+        console.log("Error mounting Dashboard:", e);
     }
 });
 
@@ -97,53 +105,76 @@ onBeforeMount(async () => {
 
 <template>
     <div class="Dashboard">
-        <div class="block block-one">
+        <div class="block user">
             <div class="flex-item user">
                 <h2>  Hello {{ user?.username }}</h2>
               </div>
-            <div class="flex-item">
-                <h2> Action </h2>
-                <nav>
-                    <button :class="working ? 'clockOut' : 'clockIn'" @click="clock()">{{ working ? 'Clock Out' : 'Clock In' }}</button>
-                </nav>
+            <div class="flex-item clockBlock">
+                <div v-if="working && workingTimes" class="workingBlock">
+                    <h3> You are currently working: </h3>
+                    <div class="lastWorkingTime">
+                        <div class="timeWrapper">
+                            <h3>Started at:</h3>
+                            <span class="time startTime">{{ workingTimes[workingTimes.length - 1].start }}</span>
+                        </div>
+                        <div class="timeWrapper">
+                            <h3>End (not real):</h3>
+                            <span class="time endTime">{{ workingTimes[workingTimes.length - 1].end }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="notWorkingBlock">
+                    <h3> Clock In to start working </h3>
+                </div>
+                <button :class="working ? 'clockOut' : 'clockIn'" @click="clock()">{{ working ? 'Clock Out' : 'Clock In' }}</button>
             </div>
         </div>
-        <div class="block block-two">
+        <div class="block chart">
             <ChartManager v-if="workingTimes" :workingTimes="workingTimes" />
         </div>
+        <div class="block currentClockWrapper">
+            <WorkingTimes v-if="workingTimes && user" :user="user" />
+        </div>
+       
     </div>
 </template>
 
 <style scoped>
+
+h2 {
+    margin: 10px 0;
+    font-size: 30px;
+}
 .Dashboard {
-    padding: 20px;
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: start;
+    gap: 20px;
 }
 
+.block{
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 8px;
 
-.block-one {
+}
+
+.clockBlock{
     display: flex;
+    flex-direction: column;
     gap: 10px;
     margin-bottom: 20px;
+
+    align-items: self-start;
 }
 
 .flex-item {
     flex: 1;
-    padding: 20px; 
     align-content: center;
 }
 
-.block-two {
-    padding: 20px;
-    text-align: center;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
 .grid-container {
     display: grid;
@@ -153,9 +184,63 @@ onBeforeMount(async () => {
 
 .grid-item {
     background-color: #f0f0f0;
-    padding: 20px;
     text-align: center;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
+
+.workingBlock {
+    width: 100%
+}
+.lastWorkingTime {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 20px;
+}
+
+.timeWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.time {
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 10px 5px;
+}
+
+.startTime {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.endTime {
+    background-color: lightgray;
+    color: white;
+}
+
+.clockIn {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    width: fit-content;
+    font-size: medium;
+}
+
+.clockOut {
+    padding: 10px;
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    width: fit-content;
+}
+
 </style>

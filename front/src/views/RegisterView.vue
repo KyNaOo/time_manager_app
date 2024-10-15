@@ -5,7 +5,7 @@ import AuthForm from '@/components/AuthForm.vue';
 
 <template>
     <div class="registerView">
-        <AuthForm authName="register" />
+        <AuthForm :authMode="'register'" />
     </div>
 </template>
 

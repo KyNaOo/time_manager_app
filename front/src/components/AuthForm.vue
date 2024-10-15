@@ -3,12 +3,16 @@ import { shallowRef, computed } from "vue";
 import { useRouter } from "vue-router";
 import {useApi} from "../api/index";
 import { store } from "../api/store";
+import type { AuthMode } from "@/types/crudTypes";
 
 
 const api = useApi();
 console.log(api);
 const props = defineProps({
-  authName: String,
+  authMode: {
+    type: String as () => AuthMode,
+    required: true,
+  },
 });
 
 const user = shallowRef({
@@ -26,7 +30,7 @@ const hideAllErrors = () => {
 
 const handleAuth = async () => {
   try {
-    await api.authenticate(`/api/users`, user.value);
+    await api.authenticate(`/api/users`, user.value, props.authMode);
     router.push("/app");
   } catch (err) {
     console.log('USer not authenticated', user.value);
@@ -35,7 +39,7 @@ const handleAuth = async () => {
 };
 
 const goTo = () => {
-  if(props.authName == 'login') router.push("/register");
+  if(props.authMode == 'login') router.push("/register");
   else router.push("/login")
 };
 
@@ -47,7 +51,7 @@ const goTo = () => {
         {{ api.errorMessage }}
       </p>
       <h2 class="title">
-        {{ props?.authName === 'login' ? 'Login' : 'Register' || "Authentication" }}
+        {{ props?.authMode === 'login' ? 'Login' : 'Register' }}
       </h2>
       <div class="input-group" >
         <label for="username" class="input-label"
@@ -103,8 +107,8 @@ const goTo = () => {
             {{ showPassword ? "Hide" : "Show" }}
         </span>
       </div>
-      <button type="submit" class="auth-button">{{props.authName == 'register' ? 'Register' : 'Login'}}</button>
-      <p class="auth-link">Click <a @click="goTo">here</a> to {{props?.authName == 'register' ? 'login' : 'register'}}</p>
+      <button type="submit" class="auth-button">{{props.authMode == 'register' ? 'Register' : 'Login'}}</button>
+      <p class="auth-link">Click <a @click="goTo">here</a> to {{props?.authMode == 'register' ? 'login' : 'register'}}</p>
     </form>
   </div>
 </template>

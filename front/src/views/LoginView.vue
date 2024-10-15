@@ -4,7 +4,7 @@ import AuthForm from '@/components/AuthForm.vue';
 
 <template>
     <div class="loginView">
-        <AuthForm authName="login" />
+        <AuthForm :authMode="'login'" />
     </div>
 </template>
 

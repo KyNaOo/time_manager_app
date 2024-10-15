@@ -22,3 +22,5 @@ export interface Clock {
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+export type AuthMode = 'login' | 'register';

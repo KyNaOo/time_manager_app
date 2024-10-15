@@ -8,10 +8,13 @@ import WorkingTimes from '@/components/WorkingTimes.vue';
 import ChartManager from '@/components/ChartManager.vue';
 import type { User, WorkingTime } from '@/types/crudTypes'
 import { useApi } from '@/api';
+import { store } from '@/api/store';
 
 const user = ref<User | null>(null)
 const route = useRoute()
-const userId = ref(route.params.id);
+const userId = ref(route.params ? route.params.id : store.user.id);
+console.log('User ID:', userId.value)
+
 const workingTimes = ref<WorkingTime[] | null>(null);
 const mode = computed(() => route.query.create ? 'create' : 'edition');
 

@@ -5,6 +5,7 @@ import moment from "moment";
 import type { User,WorkingTime, Clock } from "@/types/crudTypes";
 import { useApi } from "@/api";
 import {usefulFunctions} from "@/api/useful";
+import SuperTable from "./SuperTable.vue";
 
 interface Props {
     user: User ;
@@ -15,12 +16,13 @@ const workingTimes = ref<WorkingTime[] | null>(null);
 
 const clocks = ref<Clock[] | null>(null);
 
-
 const working = ref(false);
 
 const api = useApi();
 
 const useful = usefulFunctions();
+
+const tableHeaders = ['ID','Start', 'End', 'User Id', 'Actions'];
 
 
 onBeforeMount(async () => {
@@ -49,28 +51,8 @@ onBeforeMount(async () => {
 
 <template>
 <div v-if="workingTimes">
-  <h2>Working Times</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>User Id</th>
-        <th>Start</th>
-        <th>End</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="workingTime in workingTimes" :key="workingTime.id">
-        <td>{{ workingTime.id }}</td>
-        <td>{{ user.id }}</td>
-        <td>{{ workingTime.start }}</td>
-        <td>{{ workingTime.end }}</td>
-        <RouterLink :to="`/app/workingtime/${user.id}/${workingTime.id}`">See</RouterLink>
-    </tr>
-    </tbody>
-  </table>
-
+  <h2>All working Times</h2>
+  <SuperTable :tableHeaders="tableHeaders" :tableData="workingTimes" showActions />
 </div>
 <div v-else>No Working Times Yet
 </div>
