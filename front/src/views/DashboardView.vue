@@ -107,24 +107,24 @@ onBeforeMount(async () => {
     <div class="Dashboard">
         <div class="block user">
             <div class="flex-item user">
-                <h2>  Hello {{ user?.username }}</h2>
+                <h2>  Hello {{ user?.username }} !</h2>
               </div>
             <div class="flex-item clockBlock">
                 <div v-if="working && workingTimes" class="workingBlock">
-                    <h3> You are currently working: </h3>
+                    <h3> You are currently working 🤓 </h3>
                     <div class="lastWorkingTime">
                         <div class="timeWrapper">
-                            <h3>Started at:</h3>
+                            <h4 >Started at:</h4>
                             <span class="time startTime">{{ workingTimes[workingTimes.length - 1].start }}</span>
                         </div>
                         <div class="timeWrapper">
-                            <h3>End (not real):</h3>
+                            <h4>End (not real):</h4>
                             <span class="time endTime">{{ workingTimes[workingTimes.length - 1].end }}</span>
                         </div>
                     </div>
                 </div>
                 <div v-else class="notWorkingBlock">
-                    <h3> Clock In to start working </h3>
+                    <h3> Clock In to start working 😮‍💨</h3>
                 </div>
                 <button :class="working ? 'clockOut' : 'clockIn'" @click="clock()">{{ working ? 'Clock Out' : 'Clock In' }}</button>
             </div>
@@ -142,8 +142,10 @@ onBeforeMount(async () => {
 <style scoped>
 
 h2 {
-    margin: 10px 0;
     font-size: 30px;
+}
+h4 {
+    font-weight: bold;
 }
 .Dashboard {
     width: 100%;
@@ -173,6 +175,7 @@ h2 {
 .flex-item {
     flex: 1;
     align-content: center;
+    margin: 20px 0;
 }
 
 

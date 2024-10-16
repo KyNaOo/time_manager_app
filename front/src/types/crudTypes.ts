@@ -10,8 +10,8 @@ export interface User {
 
 export interface WorkingTime {
     id: number;
-    start: Date;
-    end: Date;
+    start: Date | string;
+    end: Date | string;
     createdAt?: Date;
     updatedAt?: Date;
 }

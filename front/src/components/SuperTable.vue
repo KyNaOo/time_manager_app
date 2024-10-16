@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { toRefs, defineProps } from 'vue';
 import { useApi } from '@/api';
-
+import moment from 'moment';
 const api = useApi();
 
 const props = defineProps({
+    tableType: {
+        type: String,
+        required: true
+    },
     tableHeaders: {
         type: Array as () => (string | number)[],
         required: true
@@ -37,6 +41,10 @@ const handleSee = (rowIndex: number) => {
 const { tableHeaders, tableData } = toRefs(props);
 
 console.log(tableHeaders.value, tableData.value[0]);   
+
+function formatDate(date: Date) {
+    return moment(date).format('MMMM Do YYYY, h:mm:ss a')
+}
 </script>
 
 
@@ -50,9 +58,11 @@ console.log(tableHeaders.value, tableData.value[0]);
             </thead>
             <tbody>
                 <tr v-for="(row, rowIndex) in tableData" :key="rowIndex">
-                    <td v-for="(cell, cellIndex) in row" :key="cellIndex">{{ cell }}</td>
+                    <td v-for="(cell, cellIndex) in row" :key="cellIndex">
+                        {{ cell instanceof Date ? formatDate(cell): cell }}
+                    </td>
                     <td v-if="showActions" class="actionCell">
-                        <RouterLink :to="`/app/workingtime/${tableData[0].user_id}/${tableData[rowIndex].id}`">See</RouterLink>
+                        <RouterLink :to="`/app/${tableType}/${tableData[0].user_id}/${tableData[rowIndex].id}`">See</RouterLink>
                         <!-- Add your action buttons or elements here -->
                         <button class="deleteBtn" @click="handleDelete(tableData[rowIndex].id)">Delete</button>
                     </td>
