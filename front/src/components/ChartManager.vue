@@ -3,20 +3,19 @@ import { onBeforeMount, ref, watchEffect } from 'vue';
 import { computed } from 'vue';
 import { Bar, Pie, Doughnut } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale,ArcElement, PointElement } from 'chart.js';
+import { CalendarDaysIcon } from '@heroicons/vue/24/solid'
 
 import type { WorkingTime } from '@/types/crudTypes';
 
 
 interface Props {
     workingTimes: WorkingTime[],
-    graphMode: string;
 }
 
 
 const props = defineProps<Props>();
 
-const graphMode = computed(() => props.graphMode);
-console.log("graphMode", graphMode);
+const graphMode = ref('bar');
 
 const labels :any= ref([])
 const durations :any = ref([])
@@ -39,7 +38,7 @@ function getWorkingTimesDuration(lastFiveWorkingTimes: WorkingTime[]) {
             const start = moment(workingTime.start);
             const end = moment(workingTime.end);
             const duration = end.diff(start, 'seconds');
-            labels.value.push(start.format('DD/MM/YYYY'));
+            labels.value.push(start.format('dddd, D'));
             durations.value.push(duration) ;
         });
 
@@ -69,18 +68,10 @@ const chartOptions = computed(() => {
                 }
             }
         };
-    } else if (graphMode.value === 'bubble') {
+    } else if (graphMode.value === 'pie') {
         return {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                x: {
-                    beginAtZero: true,
-                },
-                y: {
-                    beginAtZero: true
-                }
-            }
         };
     } else if (graphMode.value === 'doughnut') {
         return {
@@ -98,20 +89,65 @@ onBeforeMount(() => {
 });
 
 watchEffect(() => {
-    if (props.graphMode === 'bar') {
+    if (graphMode.value === 'bar') {
         ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
-    } else if (props.graphMode === 'pie') {
+    } else if (graphMode.value  === 'pie') {
         ChartJS.register(ArcElement, Tooltip, Legend)
-    } else if (props.graphMode === 'doughnut') {
+    } else if (graphMode.value  === 'doughnut') {
         ChartJS.register(ArcElement, Tooltip, Legend)    }
 });
 </script>
 
 <template>
+    <div class="ChartManagerWrapper">
+        <div class="chartControls">
+            <div class="chartTitle">
+                <h2>Your last 5 days</h2>
+                <CalendarDaysIcon class="icon" />
+            </div>
+            
+            <div class="chartSelector">
+                <select v-model="graphMode">
+                    <option value="bar">Bar</option>
+                    <option value="doughnut">Doughnut</option>
+                    <option value="pie">Pie</option>
+                </select> 
+            </div>
+        </div>
     <div class="ChartManager">
         <Bar v-if="graphMode === 'bar'" :data="chartData" :options="chartOptions" />
         <Pie v-if="graphMode === 'pie'" :data="chartData" :options="chartOptions" />
         <Doughnut v-if="graphMode === 'doughnut'" :data="chartData" :options="chartOptions" />
     </div>
+    </div>
+
 
 </template>
+
+<style scoped>
+.ChartManagerWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.chartTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.chartControls {
+    display: flex;
+    justify-content: space-between;
+}
+select{
+    padding: 10px;
+    border-radius: 5px;
+    /* border: 1px solid #ccc; */
+    cursor: pointer ;
+    width: 100px;
+}
+.icon {
+    width: 30px;
+}
+</style>

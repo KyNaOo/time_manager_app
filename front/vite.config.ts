@@ -1,10 +1,11 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-
+import { config } from 'dotenv'
 // https://vitejs.dev/config/
+config()
+
 export default defineConfig({
   plugins: [
     vue(),
@@ -13,9 +14,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:4000/',
+        target: process.env.API_URL,
         changeOrigin: true,
-
       }
     }
   },

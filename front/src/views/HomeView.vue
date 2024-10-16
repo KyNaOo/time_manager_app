@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import HelloWorld from '@/components/HelloWorld.vue'
+
 </script>
 
 <template>
-  <main>
-    <header>
+  <div class="Home">
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
     <div class="wrapper">
       <HelloWorld msg="Time Manager" />
       <nav>
-        <RouterLink to="/users">Users</RouterLink>
+        <RouterLink to="/login">Login</RouterLink>
+        <RouterLink to="/register">Register</RouterLink>
       </nav>
     </div>
-  </header>
-  </main>
-</template>
+  </div>
+  </template>
 
 <style scoped>
 header {
