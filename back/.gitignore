@@ -26,5 +26,4 @@ erl_crash.dump
 time_tracker-*.tar
 /.idea/
 .elixir_ls
-/config/dev.exs
-#dev.exs
+#/config/dev.exs
