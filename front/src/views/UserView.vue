@@ -12,12 +12,9 @@ import { store } from '@/api/store';
 
 const user = ref<User | null>(null)
 const route = useRoute()
-const userId = ref(route.params ? route.params.id : store.user.id);
-console.log('User ID:', userId.value)
-
+const userId = ref(route.params ? route.params.id : store.user ? store.user.id : null);
 const workingTimes = ref<WorkingTime[] | null>(null);
 const mode = computed(() => route.query.create ? 'create' : 'edition');
-
 const api = useApi();
 
 const action = async() => {
@@ -43,10 +40,9 @@ onBeforeMount(async () => {
             }
             return
         }
-        // const response = await axios.get(`http://localhost:4000/api/users/${userId.value}`)
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            user.value = JSON.parse(storedUser) as User;
+        user.value = store.user;
+        console.log('Stored User:', user.value)
+        if (user.value) {
             workingTimes.value = await api.getWorkingTimes(user.value);
             console.log('User '+ user.value.username+' working times:', workingTimes.value)
         }

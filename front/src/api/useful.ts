@@ -1,8 +1,9 @@
 import type { Clock, WorkingTime, User } from '@/types/crudTypes';
 import axios from 'axios';
+import { useApi } from '@/api/index';
 
 
-
+const api = useApi();
 
 
 function fetchLastClock(clocks : Clock[]) {
@@ -21,16 +22,11 @@ function fetchLastWorkingTime(workingTimes : WorkingTime[]) {
 async function clockIn(now: string, user: User) {
     try {
         // Creation of clock in
-        await axios.post(`http://localhost:4000/api/clocks/${user.id}`, {
-            time: now,
-            status: true,
-        });
+        await api.createClock(user, now, true);
 
         // Creation of working time
-        await axios.post(`http://localhost:4000/api/workingtime/${user.id}`, {
-            start: now,
-            end: now
-        });
+        await api.createWorkingTime(user, now);
+
     } catch (e) {
         console.log("Error clocking in:", e);
     }
@@ -39,10 +35,8 @@ async function clockIn(now: string, user: User) {
 async function clockOut(now: string, workingTimes: WorkingTime[], user: User) {
     try {
         // Creation of clock out
-        await axios.post(`http://localhost:4000/api/clocks/${user.id}`, {
-            time: now,
-            status: false,
-        });
+        await api.createClock(user, now, false);
+
 
         const lastWorkingTime = fetchLastWorkingTime(workingTimes);
         console.log("Last working time:", lastWorkingTime);

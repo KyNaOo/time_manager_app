@@ -3,19 +3,21 @@ import { RouterLink } from 'vue-router'
 import { useRouter, useRoute } from 'vue-router';
 import { store } from '../../api/store';
 import { BeakerIcon, UserIcon } from '@heroicons/vue/24/solid'
+import { computed } from 'vue';
+
 const router = useRouter();
 const route = useRoute();
 const logout = async () => {
   localStorage.clear();
-  store.updateHasLogin(false);
-  store.updateUser(null);
   router.push("/login");
 };
 
-const isLogged = () => {
+
+const isLogged = computed(() => {
+    console.log('Runccomputed:');
     console.log('isLogged:', store.hasLogin);
-  return store.hasLogin;
-};
+    return store.hasLogin;
+});
 
 </script>
 
@@ -23,7 +25,7 @@ const isLogged = () => {
     <header class="header">
         <h1>Timetracker</h1>
         <nav>
-            <ul class="navList loggedOut" v-if="!isLogged()">
+            <ul class="navList loggedOut" v-if="!isLogged">
                 <li><router-link to="/"><BeakerIcon class="icon"/> <span>Home</span></router-link></li>
                 <li><router-link to="/login"><BeakerIcon class="icon"/> <span>Login</span></router-link></li>
                 <li><router-link to="/register"><BeakerIcon class="icon"/> <span>Register</span></router-link></li>

@@ -25,14 +25,11 @@ const authenticate = async (path: string, userData: any, authMode:AuthMode) => {
 
       console.log(`${authMode === 'register' ? 'Register' : 'Login'} response: `, response.data.data);
 
-
     if (response.data.data == null) {
       hasErrorOccured.value = true;
       errorMessage.value = "User not found";
     } else {
       localStorage.setItem("user", JSON.stringify(response.data.data as User));
-      store.user = response.data.data;
-      store.updateHasLogin(true);
     }
     
   } catch (err: any) {
@@ -61,82 +58,8 @@ const turnOffError = () => {
   hasErrorOccured.value = false;
 };
 
-// Get all working times from user
-async function getWorkingTimes(user: User): Promise<WorkingTime[]> {
-  try {
-      // get all working times from user
-      const res = await axios.get(`http://localhost:4000/api/workingtime/${user.id}`);
-      return res.data.data;
-  } catch (e) {
-      console.log("Error fetching working times:", e);
-      throw e; // rethrow the error to handle it outside if needed
-  }
-}
 
-// Delete working time
-async function deleteWorkingTime(id: number): Promise<boolean> {
-  try {
-      console.log(`Delete working time with ID:`, id);
-      // Delete working time
-      await axios.delete(`http://localhost:4000/api/workingtime/${id}`);
-      console.log(`Deleted working time with ID: ${id}`);
-      return true;
-  } catch (e) {
-      console.log(`Error deleting working time with ID: ${id}`, e);
-      return false;
-  }
-}
-
-
-// Get user by id
-async function getUser(id: number) {
-  try {
-      // get user by id
-      const response = await axios.get(`http://localhost:4000/api/users/${id}`)
-        console.log('User data:', response.data)
-        return response.data.data;
-  } catch (e) {
-      console.log("Error fetching user:", e);
-  }
-}
-
-// Get all clocks from user
-async function getClocks(user: User) {
-  try {
-      // get all clocks from user
-      const res =  await axios.get(`http://localhost:4000/api/clocks/${user.id}`);
-      return res.data.data;
-  } catch (e) {
-      console.log("Error fetching clocks:", e);
-  }
-}
-
-// Modify user
-async function modifyUser (user: User) {
-  try {
-      console.log(`Modify user with ID:`, user.id);
-      // Change in the database
-      const resp = await axios.put(`http://localhost:4000/api/users/${user.id}`, {
-          user: {
-              username: user?.username,
-              email: user?.email
-          }
-      });
-      if (resp.data.data) {
-          // Change in local storage
-          store.updateUser(resp.data.data);
-          localStorage.setItem("user", JSON.stringify(resp.data.data));
-          // Show success message in frontend
-          alert("User modified successfully");
-          
-      }
-      console.log(`Modified user with ID: ${user.id}`);
-      // Add your logic to handle the response here
-  } catch (e) {
-      console.log(`Error modifying user with ID: ${user.id}`, e);
-  }
-  };
-  
+///////////////////// USERS ///////////////////////
 
   // Create user
   async function createUser (user: User) {
@@ -155,6 +78,145 @@ async function modifyUser (user: User) {
     }
   };
 
+// Get user by id
+async function getUser(id: number) {
+  try {
+      // get user by id
+      const response = await axios.get(`http://localhost:4000/api/users/${id}`)
+        console.log('User data:', response.data)
+        return response.data.data;
+  } catch (e) {
+      console.log("Error fetching user:", e);
+  }
+}
+
+// Modify user
+async function modifyUser (user: User) {
+  try {
+      console.log(`Modify user with ID:`, user.id);
+      // Change in the database
+      const resp = await axios.put(`http://localhost:4000/api/users/${user.id}`, {
+          user: {
+              username: user?.username,
+              email: user?.email
+          }
+      });
+      if (resp.data.data) {
+          // Change in local storage
+          localStorage.setItem("user", JSON.stringify(resp.data.data));
+          // Show success message in frontend
+          alert("User modified successfully");
+          
+      }
+      console.log(`Modified user with ID: ${user.id}`);
+      // Add your logic to handle the response here
+  } catch (e) {
+      console.log(`Error modifying user with ID: ${user.id}`, e);
+  }
+  };
+
+// Delete user
+async function deleteUser(user: User) {
+  try {
+      console.log(`Delete user with ID:`, user.id);
+      // Delete user
+      await axios.delete(`http://localhost:4000/api/users/${user.id}`);
+      console.log(`Deleted user with ID: ${user.id}`);
+  } catch (e) {
+      console.log(`Error deleting user with ID: ${user.id}`, e);
+  }
+}
+
+///////////////////// WORKING TIMES ///////////////////////
+
+// Create working time
+async function createWorkingTime(user: User, now: string) {
+  try {
+      console.log(`Create working time`);
+      // Create working time
+      await axios.post(`http://localhost:4000/api/workingtime/${user.id}`, {
+        start: now,
+        end: now
+    });
+      console.log(`Created working time`);
+  } catch (e) {
+      console.log(`Error creating working time`, e);
+  }
+}
+
+
+
+// Get all working times from user
+async function getWorkingTimes(user: User): Promise<WorkingTime[]> {
+  try {
+      // get all working times from user
+      const res = await axios.get(`http://localhost:4000/api/workingtime/${user.id}`);
+      return res.data.data;
+  } catch (e) {
+      console.log("Error fetching working times:", e);
+      throw e; // rethrow the error to handle it outside if needed
+  }
+}
+
+// Modifuy modifyWorkingTime  
+async function modifyWorkingTime(now: string, lastWorkingTime: WorkingTime) {
+  try {
+      console.log(`Modify Woking time`);
+      // Modify clock
+      await axios.put(`http://localhost:4000/api/workingtime/${lastWorkingTime.id}`, {
+        workingtime: { end: now }
+    });
+      console.log(`Modified Woking time`);
+  } catch (e) {
+      console.log(`Error modifying Woking time`, e);
+  }
+}
+
+// Delete working time
+async function deleteWorkingTime(id: number): Promise<boolean> {
+  try {
+      console.log(`Delete working time with ID:`, id);
+      // Delete working time
+      await axios.delete(`http://localhost:4000/api/workingtime/${id}`);
+      console.log(`Deleted working time with ID: ${id}`);
+      return true;
+  } catch (e) {
+      console.log(`Error deleting working time with ID: ${id}`, e);
+      return false;
+  }
+}
+
+///////////////// CLOCKS////////////////////
+// Get all clocks from user
+async function getClocks(user: User) {
+  try {
+      // get all clocks from user
+      const res =  await axios.get(`http://localhost:4000/api/clocks/${user.id}`);
+      return res.data.data;
+  } catch (e) {
+      console.log("Error fetching clocks:", e);
+  }
+}
+
+// Create clock
+async function createClock(user: User, now: string, status: boolean) {
+  try {
+      console.log(`Create clock`);
+      // Create clock
+      await axios.post(`http://localhost:4000/api/clocks/${user.id}`, {
+            time: now,
+            status: status,
+        });
+      console.log(`Created clock`);
+  } catch (e) {
+      console.log(`Error creating clock`, e);
+  }
+}
+
+
+
+
+
 
 export const useApi = () => {
   return {
@@ -167,13 +229,18 @@ export const useApi = () => {
     turnOffError,
     authenticate,
     // Working time
+    createWorkingTime,
     getWorkingTimes,
+    modifyWorkingTime,
     deleteWorkingTime,
     // Users
     getUser,
     modifyUser,
     createUser,
+    deleteUser,
     // Clocks
-    getClocks
+    getClocks,
+    createClock,
+    
   };
 };

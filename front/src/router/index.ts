@@ -75,13 +75,10 @@ router.beforeEach(async (to, from) => {
     const authenticated = await is_authenticated();
     if (to.meta.requiresAuth && !authenticated) {
       // User is not authenticated, redirect to login
-      console.log('User is not authenticated');
       return { path: "/login" };
     }
-    if ((to.path === "/login" || to.path === "/register") && authenticated) {
+    if ((to.path === "/login" || to.path === "/register" || to.path === "/") && authenticated) {
       // User is authenticated and trying to access login, redirect to dashboard
-      console.log('User is authenticated');
-      console.log('USer token: ', localStorage.getItem('user'));
       return { path: "/app" };
     }
 
@@ -92,13 +89,7 @@ router.beforeEach(async (to, from) => {
 
 async function is_authenticated() {
   try {
-    // Here will check if the user is authenticated or not
-    if (localStorage.getItem('user') !== null) {
-      console.log('is_authenticated: ', store.hasLogin);
-      store.updateHasLogin(true)
-      return store.hasLogin;
-
-    }  
+    return store.hasLogin;
   } catch (err) {
     return false;
   }
