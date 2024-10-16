@@ -2,7 +2,7 @@
 import { RouterLink } from 'vue-router'
 import { useRouter, useRoute } from 'vue-router';
 import { store } from '../../api/store';
-import { BeakerIcon, UserIcon } from '@heroicons/vue/24/solid'
+import { BeakerIcon, UserIcon , ArrowLongRightIcon } from '@heroicons/vue/24/solid'
 import { computed } from 'vue';
 
 const router = useRouter();
@@ -27,12 +27,12 @@ const isLogged = computed(() => {
         <nav>
             <ul class="navList loggedOut" v-if="!isLogged">
                 <li><router-link to="/"><BeakerIcon class="icon"/> <span>Home</span></router-link></li>
-                <li><router-link to="/login"><BeakerIcon class="icon"/> <span>Login</span></router-link></li>
+                <li><router-link to="/login"><UserIcon class="icon"/> <span>Login</span></router-link></li>
                 <li><router-link to="/register"><BeakerIcon class="icon"/> <span>Register</span></router-link></li>
             </ul>
             <ul class="navList loggedIn" v-else>
-                <li><router-link to="/app/profile"><BeakerIcon class="icon"/> <span>Profile</span></router-link></li>
-                <li class="logout" @click="logout"><UserIcon class="icon"/> <span>Logout</span></li>
+                <li><router-link to="/app/profile"><UserIcon class="icon"/> <span>Profile</span></router-link></li>
+                <li class="logout" @click="logout"> <span>Logout</span><ArrowLongRightIcon class="icon"/></li>
             </ul>
         </nav>
     </header>
@@ -49,6 +49,8 @@ const isLogged = computed(() => {
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    position: sticky;
+    top: 0;
 }
 
 .header h1 {

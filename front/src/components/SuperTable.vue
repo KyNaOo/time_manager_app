@@ -2,6 +2,11 @@
 import { toRefs, defineProps } from 'vue';
 import { useApi } from '@/api';
 import moment from 'moment';
+import { ref } from 'vue';
+import type { Modal } from '@/types/crudTypes';
+import ModalAction from './modals/ModalAction.vue';
+import { store } from '@/api/store';
+
 const api = useApi();
 
 const props = defineProps({
@@ -23,19 +28,28 @@ const props = defineProps({
     }
 });
 
+const modal = ref<Modal>({
+    isVisible: false,
+    title: '',
+    message: ''
+});
 
-const handleDelete = async (id: number) => {
-    console.log(`Delete row at index: ${id}`);
-    const deleteResult = await api.deleteWorkingTime(id);
-    if (deleteResult) {
-        window.location.reload();
-    }
-    // Add your delete logic here
-};
+async function reallyDelete(id: number) {
+        try {
+            await api.deleteWorkingTime(id);
+            store.showModal({message: 'Item deleted successfully', title: 'Success'});
+        } catch (error) {
+            console.error('Failed to delete item:', error);
+        }
+    };
 
-const handleSee = (rowIndex: number) => {
-    console.log(`See row at index: ${rowIndex}`);
-    // Add your see logic here
+const handleDelete = async () => {
+    console.log(`Delete row`);``
+    modal.value = {
+        isVisible: true,
+        title: 'User deletion?',
+        message: 'Are you sure you want to delete this item?'
+    };
 };
 
 const { tableHeaders, tableData } = toRefs(props);
@@ -64,9 +78,12 @@ function formatDate(date: Date) {
                     <td v-if="showActions" class="actionCell">
                         <RouterLink :to="`/app/${tableType}/${tableData[0].user_id}/${tableData[rowIndex].id}`">See</RouterLink>
                         <!-- Add your action buttons or elements here -->
-                        <button class="deleteBtn" @click="handleDelete(tableData[rowIndex].id)">Delete</button>
+                        <button class="deleteBtn" @click="handleDelete()">Delete</button>
+                        <ModalAction v-if="modal.isVisible" :title=modal.title :message="modal.message" 
+                        @confirm="reallyDelete(tableData[rowIndex].id)" @close="modal.isVisible = false" />
                     </td>
                 </tr>
+
             </tbody>
         </table>
     </div>

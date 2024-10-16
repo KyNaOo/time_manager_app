@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from "axios";
-import {onBeforeMount, ref} from "vue";
+import {computed, onBeforeMount, ref} from "vue";
 import moment from "moment";
 import type { User,WorkingTime, Clock } from "@/types/crudTypes";
 import { useApi } from "@/api";
@@ -23,7 +23,17 @@ const api = useApi();
 
 const useful = usefulFunctions();
 
-const tableHeaders = ['ID','Start', 'End', 'User Id', 'Actions'];
+const tableHeaders = computed(() => {
+  const headers = ['ID', 'Start', 'End', 'User Id'];
+  if (showActions.value) {
+    headers.push('Actions');
+  }
+  return headers;
+});
+
+const showActions = computed(() => {
+  return props.user.role === 'admin';
+});
 
 
 onBeforeMount(async () => {
@@ -65,7 +75,7 @@ onBeforeMount(async () => {
     <h2>All working Times</h2>
     <ClockIcon class="icon" />
   </div>
-  <SuperTable :tableType="'workingtime'" :tableHeaders="tableHeaders" :tableData="workingTimes" showActions />
+  <SuperTable :tableType="'workingtime'" :tableHeaders="tableHeaders" :tableData="workingTimes" :showActions="showActions" />
 </div>
 <div v-else>No Working Times Yet
 </div>

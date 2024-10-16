@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import AppLayout from './components/layout/AppLayout.vue';
-
+import Modal from './components/modals/ModalMessage.vue';
+import { store } from './api/store';
 </script>
 
 <template>
@@ -15,6 +16,7 @@ import AppLayout from './components/layout/AppLayout.vue';
         </AppLayout>
 
     </router-view>
+    <Modal v-if="store.modal !== null" :message="store.modal.message" />
   </main>
   <!-- <RouterView /> -->
 </template>

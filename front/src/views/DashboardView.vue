@@ -10,6 +10,7 @@ import type { User,WorkingTime, Clock } from "@/types/crudTypes";
 import {usefulFunctions} from "@/api/useful";
 import moment from 'moment';
 import WorkingTimes from '@/components/WorkingTimes.vue';
+import Users from "@/components/Users.vue";
 const route = useRoute();
 const api = useApi();
 const useful = usefulFunctions();
@@ -131,9 +132,16 @@ onBeforeMount(async () => {
         </div>
         <div class="block chart">
             <ChartManager v-if="workingTimes" :workingTimes="workingTimes" />
+            <span v-else>Loading...</span>
         </div>
         <div class="block currentClockWrapper">
             <WorkingTimes v-if="workingTimes && user" :user="user" />
+            <span v-else>Loading...</span>
+        </div>
+
+        <!-- v-if="user?.role === 'manager'"  -->
+        <div class="block allUsers">
+            <Users/>
         </div>
        
     </div>

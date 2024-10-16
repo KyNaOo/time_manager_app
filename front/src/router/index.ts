@@ -9,7 +9,7 @@ import DashboardView from '@/views/DashboardView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 
 import axios from '@/api/axios'
-import { store } from '@/api/store'
+import { store } from '@/api/store';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,7 +51,11 @@ const router = createRouter({
       path: '/app/user/:id',
       name: 'user',
       component: UserView,
-      meta: { requiresAuth: true }
+      meta: { 
+        requiresAuth: true,
+        onlyAdmin: true
+      
+      }
     },
     {
       path: '/app/user',
@@ -80,6 +84,12 @@ router.beforeEach(async (to, from) => {
     if ((to.path === "/login" || to.path === "/register" || to.path === "/") && authenticated) {
       // User is authenticated and trying to access login, redirect to dashboard
       return { path: "/app" };
+    }
+
+    if (to.meta.onlyAdmin && store.user!.role !== 'admin') {
+      console.log('User is not admin');
+      store.showModal({ message: 'You are not authorized to access this page 🥴' });
+      return { path: from.path };
     }
 
   } catch (err) {

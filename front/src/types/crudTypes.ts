@@ -41,6 +41,13 @@ export interface TeamUser {
     updatedAt?: Date;
 }
 
+export interface Modal {
+    isVisible: boolean;
+    title: string;
+    message: string;
+}
+
+
 
 export type Role = 'user' | 'manager' | 'admin';
 export type AuthMode = 'login' | 'register';

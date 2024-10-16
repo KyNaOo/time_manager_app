@@ -1,26 +1,28 @@
 <script setup lang="ts">
 import axios from "axios";
-import {onBeforeMount, ref} from "vue";
+import {computed, onBeforeMount, ref} from "vue";
+import SuperTable from "../components/SuperTable.vue";
+import { store } from "../api/store";
+import { UserGroupIcon } from '@heroicons/vue/24/solid'
 
 interface User {
   id: number;
   username: string;
   email: string;
 }
-const response = ref<User[] | null>(null)
+const response = ref<User[] | null>(null);
 
-const deleteUser = async (userId: number) => {
-  try {
-    console.log(`Delete user with ID: ${userId}`);
-    await axios.delete(`http://localhost:4000/api/users/${userId}`);
-    response.value = response.value?.filter(user => user.id !== userId) || null;
-    console.log(`Deleted user with ID: ${userId}`);
-    // Redirect to the users page
-    // window.location.href = '/users';
-  } catch (e) {
-    console.log(`Error deleting user with ID: ${userId}`, e);
+const userisAdmin = computed(() => {
+  return store.user?.role === 'admin';
+});
+
+const tableHeaders = computed(() => {
+  const headers = ['ID', 'Username', 'Email']
+  if (userisAdmin.value) {
+    headers.push('Actions');
   }
-};
+  return headers;
+});
 
 onBeforeMount(async () => {
   try {
@@ -39,9 +41,12 @@ onBeforeMount(async () => {
 
 <template>
 <div v-if="response">
-  <h3>Users</h3>
-  <RouterLink to="/app/user?create=true" >Create User</RouterLink>
-  <table>
+  <div class="usersTitle">
+      <h2>Users</h2>
+      <UserGroupIcon class="icon"/>
+  </div>
+  <RouterLink v-if="userisAdmin" to="/app/user?create=true" >Create User</RouterLink>
+  <!-- <table>
     <thead>
       <tr>
         <th>ID</th>
@@ -63,13 +68,19 @@ onBeforeMount(async () => {
         </td>
       </tr>
     </tbody>
-  </table>
+  </table> -->
+  <SuperTable v-if="response" :tableData="response" tableType="users" :tableHeaders="tableHeaders" />
 </div>
 <div v-else>No users
   <RouterLink to="/app/user?create=true" >Create User</RouterLink>
 </div>
 </template>
 
-<style scoped>
-
+<style >
+.usersTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
 </style>
