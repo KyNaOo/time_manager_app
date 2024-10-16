@@ -18,5 +18,7 @@ COPY . .
 # construit l'app pour la production en la minifiant
 RUN npm run build
 
-EXPOSE 8082
-CMD [ "http-server", "dist","--host","0.0.0.0","--port","8082" ]
+EXPOSE 5173
+CMD [ "http-server", "dist","--host","0.0.0.0","--port","5173" ]
+
+
