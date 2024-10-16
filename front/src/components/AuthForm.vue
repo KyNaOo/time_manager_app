@@ -4,6 +4,8 @@ import { useRouter } from "vue-router";
 import {useApi} from "../api/index";
 import { store } from "../api/store";
 import type { AuthMode } from "@/types/crudTypes";
+import InputField from "./forms/InputField.vue";
+import PasswordField from "./forms/PasswordField.vue";
 
 
 const api = useApi();
@@ -19,6 +21,7 @@ const user = shallowRef({
   username: null,
   email: null,
   password: null,
+  confirmPassword: null,
 });
 
 const router = useRouter();
@@ -53,59 +56,19 @@ const goTo = () => {
       <h2 class="title">
         {{ props?.authMode === 'login' ? 'Login' : 'Register' }}
       </h2>
-      <div class="input-group" >
-        <label for="username" class="input-label"
-          >Username
-          <span v-show="api.usernameError.value" :class="{ error: api.usernameError.value }"
-            >required</span
-          ></label
-        >
-        <input
-          type="text"
-          id="username"
-          name="username"
-          v-model="user.username"
-          class="input-field"
-          autocomplete="name"
-          :class="{ inpError: api.usernameError.value }"
-        />
+      <div v-if="props.authMode == 'register'" class="input-group" >
+        <InputField :name="'username'" :type="'text'" :label="'Username'" required/>
       </div>
       <div class="input-group">
-        <label for="email" class="input-label"
-          >Email
-          <span v-show="api.emailError.value" :class="{ error: api.emailError.value }"
-            >required</span
-          ></label
-        >
-        <input
-          type="email"
-          id="email"
-          name="email"
-          v-model="user.email"
-          class="input-field"
-          autocomplete="email"
-          :class="{ inpError: api.emailError.value }"
-        />
+        <div class="input-group" >
+        <InputField :name="'email'" :type="'text'" :label="'Email'" required/>
+        </div>
       </div>
       <div class="input-group">
-        <label for="password" class="input-label"
-          >Password
-          <span v-show="api.passwordError" :class="{ error: api.passwordError }">{{
-            api.passwordErrorMessge ? api.passwordErrorMessge.value : "required"
-          }}</span></label
-        >
-        <input
-          :type="showPassword ? 'text' : 'password'"
-          id="password"
-          name="password"
-          v-model="user.password"
-          class="input-field"
-          autocomplete="current-password"
-          :class="{ inpError: api.passwordError.value }"
-        />
-        <span class="password-toggle" @click="showPassword = !showPassword">
-            {{ showPassword ? "Hide" : "Show" }}
-        </span>
+        <PasswordField :name="'password'" :label="'Password'" required/>
+      </div>
+      <div v-if="props.authMode == 'register'" class="input-group">
+        <PasswordField :name="'confirmPassword'" :label="'Confirm Password'" required/>
       </div>
       <button type="submit" class="auth-button">{{props.authMode == 'register' ? 'Register' : 'Login'}}</button>
       <p class="auth-link">Click <a @click="goTo">here</a> to {{props?.authMode == 'register' ? 'login' : 'register'}}</p>
@@ -120,7 +83,7 @@ const goTo = () => {
   justify-content: center;
   height: auto;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
+  width: 400px;
 }
 
 .form {
@@ -132,47 +95,20 @@ const goTo = () => {
   border-radius: 8px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
+  width: 100%;
 }
 
 .title {
   font-size: 24px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .input-group {
   width: 100%;
-  margin-bottom: 15px;
   position: relative;
 }
 
-.password-toggle {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  color: #93c5fd;
-}
 
-.password-toggle:hover {
-  cursor: pointer;
-}
-
-.input-label {
-  font-size: 16px;
-}
-
-.input-field {
-  box-sizing: border-box;
-  width: 100%;
-  height: 40px;
-  border: 1px solid #93c5fd;
-  border-radius: 4px;
-  font-size: 16px;
-  padding: 5px;
-}
-
-.input-field:focus {
-  outline: currentColor;
-}
 
 .auth-button {
   width: 100%;

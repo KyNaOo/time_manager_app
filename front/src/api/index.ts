@@ -8,7 +8,9 @@ const hasErrorOccured = ref<boolean>(false);
 const errorMessage = ref<string | null>(null);
 const emailError = ref<boolean>(false);
 const passwordError = ref<boolean>(false);
+const confirmPasswordError = ref<boolean>(false);
 const passwordErrorMessge = ref<string | null>(null);
+const confirmPasswordErrorMessge = ref<string | null>(null);
 const usernameError = ref<boolean>(false);
 
 const authenticate = async (path: string, userData: any, authMode:AuthMode) => {
@@ -265,7 +267,9 @@ export const useApi = () => {
     errorMessage,
     emailError,
     passwordError,
+    confirmPasswordError,
     passwordErrorMessge,
+    confirmPasswordErrorMessge,
     usernameError,
     turnOffError,
     authenticate,
