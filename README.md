@@ -24,15 +24,25 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 docker ps
 docker images
 
-docker build --tag 'image_name' .
+docker run -it -p 5173:5173 --name website vuejs 
+
+http-server dist --host 0.0.0.0 --port 5173
+
+docker build -t 'image_name' .
 docker run --name 'name' --network=back -d 'image'
-docker exec -it [container-id] bash 
+docker exec -it [container-id] sh 
+
+
+
+docker exec -it 6fe5667971ad sh
 
 docker network connect [network] [container]
 
 
 docker rm -v -f $(docker ps -qa)
 
+
+psql -h localhost -p 5432 -U postgres time_tracker_dev
 
 https://stackoverflow.com/questions/36075525/how-do-i-run-a-docker-instance-from-a-dockerfile
 
