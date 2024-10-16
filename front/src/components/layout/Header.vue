@@ -2,7 +2,7 @@
 import { RouterLink } from 'vue-router'
 import { useRouter, useRoute } from 'vue-router';
 import { store } from '../../api/store';
-import { BeakerIcon, UserIcon , ArrowLongRightIcon } from '@heroicons/vue/24/solid'
+import { BeakerIcon, UserIcon , ArrowLongRightIcon, HomeIcon } from '@heroicons/vue/24/solid'
 import { computed } from 'vue';
 
 const router = useRouter();
@@ -23,16 +23,16 @@ const isLogged = computed(() => {
 
 <template>
     <header class="header">
-        <h1>Timetracker</h1>
+        <h1 class="logo" @click="router.push('/')">Timetracker</h1>
         <nav>
             <ul class="navList loggedOut" v-if="!isLogged">
-                <li><router-link to="/"><BeakerIcon class="icon"/> <span>Home</span></router-link></li>
-                <li><router-link to="/login"><UserIcon class="icon"/> <span>Login</span></router-link></li>
-                <li><router-link to="/register"><BeakerIcon class="icon"/> <span>Register</span></router-link></li>
+                <li><router-link to="/"><HomeIcon class="icon"/> <span class="navText">Home</span></router-link></li>
+                <li><router-link to="/login"><UserIcon class="icon"/> <span class="navText">Login</span></router-link></li>
+                <li><router-link to="/register"><BeakerIcon class="icon"/> <span class="navText">Register</span></router-link></li>
             </ul>
             <ul class="navList loggedIn" v-else>
-                <li><router-link to="/app/profile"><UserIcon class="icon"/> <span>Profile</span></router-link></li>
-                <li class="logout" @click="logout"> <span>Logout</span><ArrowLongRightIcon class="icon"/></li>
+                <li><router-link to="/app/profile"><UserIcon class="icon"/> <span class="navText">Profile</span></router-link></li>
+                <li class="logout" @click="logout"> <span class="navText">Logout</span><ArrowLongRightIcon class="icon"/></li>
             </ul>
         </nav>
     </header>
@@ -52,7 +52,10 @@ const isLogged = computed(() => {
     position: sticky;
     top: 0;
 }
-
+.logo{
+    cursor: pointer;
+    margin: 0;
+}
 .header h1 {
     margin: 0;
 }
@@ -78,7 +81,6 @@ const isLogged = computed(() => {
     display: flex;
     align-items: center;
     gap: 0.5rem;
- 
 }
 
 .header nav ul li a {
@@ -91,6 +93,9 @@ const isLogged = computed(() => {
     transition: background-color 0.3s ease;
 }
 
+.navText {
+    color: white;
+}
 
 .logout {
     color: white;

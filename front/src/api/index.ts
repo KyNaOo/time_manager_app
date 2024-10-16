@@ -115,6 +115,17 @@ async function modifyUser (user: User) {
   }
   };
 
+// Get userTeams
+async function getUserTeams(user: User) {
+  try {
+      // get all teams from user
+      const res = await axios.get(`http://localhost:4000/api/teams/${user.id}`);
+      return res.data.data;
+  } catch (e) {
+      console.log("Error fetching teams:", e);
+  }
+}
+
 // Delete user
 async function deleteUser(user: User) {
   try {
@@ -124,6 +135,36 @@ async function deleteUser(user: User) {
       console.log(`Deleted user with ID: ${user.id}`);
   } catch (e) {
       console.log(`Error deleting user with ID: ${user.id}`, e);
+  }
+}
+
+//////////////////// TEAMS ///////////////////////
+
+// Get all teams
+async function getTeams() {
+  try {
+      // get all teams
+      const res = await axios.get(`http://localhost:4000/api/teams`);
+      return res.data.data;
+  } catch (e) {
+      console.log("Error fetching teams:", e);
+  }
+}
+
+// Create team
+async function createTeam(name: string, managerId: number) {
+  try {
+      console.log(`Create team`);
+      // Create team
+      await axios.post(`http://localhost:4000/api/teams`, {
+        team: {
+          name: name,
+          managerId: managerId
+      }
+      });
+      console.log(`Created team`);
+  } catch (e) {
+      console.log(`Error creating team`, e);
   }
 }
 
