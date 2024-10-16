@@ -5,7 +5,7 @@ defmodule TimeTracker.Accounts.User do
   schema "users" do
     field :email, :string
     field :username, :string
-
+    has_many :team_members, TonApp.Accounts.TeamMember
     timestamps(type: :utc_datetime)
   end
 
@@ -15,4 +15,7 @@ defmodule TimeTracker.Accounts.User do
     |> cast(attrs, [:username, :email])
     |> validate_required([:username, :email])
   end
+
+
+
 end
