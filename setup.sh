@@ -22,14 +22,14 @@ do_database() {
 do_backend() {
     image=$1
     name=$2
-    docker build -t elixir .\back\
+    docker build -t elixir ./back/
     docker run --name backend --network=back --network=front -p 4000:4000 -d elixir
 }
 
 do_frontend() {
     image=$1
     name=$2
-    docker build -t vuejs .\front\
+    docker build -t vuejs ./front/
     docker run --name frontend --network=front -p 5173:5173 -d vuejs
 }
 
@@ -63,10 +63,10 @@ install_test_tool() {
     #psql -h database -p 5432 -U postgres time_tracker_dev
 }
 
-container_process() {
+#container_process() {
     #lsof -i :<PORT>
     #kill -9 <PID>
-}
+#}
 
 do_all() {
     delete_all
