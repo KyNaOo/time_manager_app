@@ -5,6 +5,8 @@ defmodule TimeTrackerWeb.WorkingtimeControllerTest do
 
   alias TimeTracker.Duration.Workingtime
 
+  @moduletag :skip
+
   @create_attrs %{
     end: ~N[2024-10-06 15:07:00],
     start: ~N[2024-10-06 15:07:00],

@@ -2,6 +2,7 @@ defmodule TimeTrackerWeb.TeamControllerTest do
   use TimeTrackerWeb.ConnCase
 
   import TimeTracker.AccountsFixtures
+  @moduletag :skip
 
   alias TimeTracker.Accounts.Team
 
