@@ -22,6 +22,19 @@ defmodule TimeTrackerWeb.Router do
 
     get "/clocks/:user_id", ClockController, :index
     post "/clocks/:user_id", ClockController, :create
+
+    get "/teams", TeamController, :index
+    post "/team", TeamController, :create
+    put "/team/:id", TeamController, :update
+    delete "/team/:id", TeamController, :delete
+
+    post "/team/user/addUser/:user_id/:team_id", TeamMemberController, :create
+    get "/team/users/:team_id", TeamMemberController, :get_users_in_team
+    get "/team/user/isAdmin/:user_id/:team_id", TeamMemberController, :is_user_team_leader
+    put "/team/user/role/:user_id/:team_id", TeamMemberController, :update_user_role
+    delete "/team/user/remove/:user_id/:team_id", TeamMemberController, :remove_user_from_team
+    get "/user/teams/:user_id", TeamMemberController, :get_teams_for_user
+
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

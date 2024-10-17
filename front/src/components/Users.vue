@@ -40,7 +40,7 @@ onBeforeMount(async () => {
 <template>
 <div v-if="response">
   <h3>Users</h3>
-  <RouterLink to="/user?create=true" >Create User</RouterLink>
+  <RouterLink to="/app/user?create=true" >Create User</RouterLink>
   <table>
     <thead>
       <tr>
@@ -57,7 +57,7 @@ onBeforeMount(async () => {
         <td>{{ user.email }}</td>
         <td>
           <nav>
-            <RouterLink :to="`/user/${user.id}`">See</RouterLink>
+            <RouterLink :to="`/app/user/${user.id}`">See</RouterLink>
             <button @click="deleteUser(user.id)">Delete</button>
         </nav>
         </td>
@@ -65,7 +65,9 @@ onBeforeMount(async () => {
     </tbody>
   </table>
 </div>
-<div v-else>No users</div>
+<div v-else>No users
+  <RouterLink to="/app/user?create=true" >Create User</RouterLink>
+</div>
 </template>
 
 <style scoped>

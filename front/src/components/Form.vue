@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { defineProps, defineEmits, computed } from 'vue';
-
-interface User {
-  id?: number ;
-  username: string;
-  email: string;
-}
+import type { User } from '@/types/crudTypes';
 
 interface Props {
     user: User ;
@@ -31,11 +26,11 @@ const handleSubmit = () => {
 </script>
 <template>
     <form @submit.prevent="handleSubmit">
-            <div>
+            <div class="form-field">
                 <label for="username">Username:</label>
                 <input type="text" id="username" v-model="user.username" />
             </div>
-            <div>
+            <div class="form-field">
                 <label for="email">Email:</label>
                 <input type="email" id="email" v-model="user.email" />
             </div>
@@ -47,4 +42,31 @@ const handleSubmit = () => {
 
 <style scoped>
 /* Add your styles here */
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+}
+button {
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    width: fit-content;
+}
 </style>

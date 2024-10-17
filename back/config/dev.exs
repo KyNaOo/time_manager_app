@@ -3,6 +3,7 @@ import System
 
 # Configure your database
 config :time_tracker, TimeTracker.Repo,
+
   username: System.get_env("PGUSER") || "postgres",
   password: System.get_env("PGPASSWORD") || "postgres",
   hostname: System.get_env("PGHOST") || "localhost",
