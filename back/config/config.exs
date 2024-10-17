@@ -48,7 +48,7 @@ config :phoenix, :json_library, Jason
 # Configure Guardian
 config :time_tracker, TimeTracker.Guardian,
   issuer: "time_tracker",
-  secret_key: "your_secret_key"  # Make sure this is a long and secure key
+  secret_key: "McB731AHNZRsVLbxN5bPyg7T/c2GNQuQ01fQ61KIHqRthAcjko459NArATCHjF4T"  # Make sure this is a long and secure key
 
 
 # Import environment specific config. This must remain at the bottom

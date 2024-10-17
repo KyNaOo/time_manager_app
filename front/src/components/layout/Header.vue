@@ -9,13 +9,11 @@ const router = useRouter();
 const route = useRoute();
 const logout = async () => {
   localStorage.clear();
-  router.push("/login");
+  window.location.reload();
 };
 
 
 const isLogged = computed(() => {
-    console.log('Runccomputed:');
-    console.log('isLogged:', store.hasLogin);
     return store.hasLogin;
 });
 
@@ -51,6 +49,8 @@ const isLogged = computed(() => {
     width: 100%;
     position: sticky;
     top: 0;
+    z-index: 2;
+
 }
 .logo{
     cursor: pointer;

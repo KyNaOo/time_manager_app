@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref , shallowRef} from 'vue';
+import { ref , shallowRef, watch} from 'vue';
 import { useValidators } from '@/api/validators';
 import FieldLayout from './FieldLayout.vue';
 
@@ -7,7 +7,14 @@ import FieldLayout from './FieldLayout.vue';
 const props = defineProps<{
     name: string;
     label: string;
+    showRules: boolean;
 }>();
+
+const emit = defineEmits<{
+    (e: 'update:modelValue', value :string): void;
+    (e: 'goodPassword', value: boolean): void;
+}>();
+
 
 const showPassword = shallowRef(false);
 const password = ref('');
@@ -16,8 +23,29 @@ const validators = useValidators();
 
 const validatePassword = () => {
     const validationResult = validators.strongPassword(password.value);
-    error.value = validationResult 
+    const allValid = Object.values(validationResult).every(value => value === true);
+    if (allValid) {
+        error.value = null;
+        console.log('Good password', true);
+        emit('goodPassword', true);
+
+    } else {
+        error.value = validationResult;
+        emit('goodPassword', false);
+
+        
+    }
+    error.value = validationResult;
+    if (!error.value) {
+        error.value = null;
+    }
 };
+
+
+watch(password, (newValue) => {
+    emit('update:modelValue', newValue);
+});
+
 </script>
 
 <template>
@@ -32,7 +60,7 @@ const validatePassword = () => {
         <span class="password-toggle" @click="showPassword = !showPassword">
             {{ showPassword ? "Hide" : "Show" }}
         </span>
-        <ul v-if="error" class="error-list">
+        <ul v-if="error && showRules " class="error-list">
             <li :class="!error.minLength ? 'show' : 'hide'">Password must be at least 12 characters long</li>
             <li :class="!error.hasUpperCase ? 'show' : 'hide'">Password must contain at least one uppercase letter</li>
             <li :class="!error.hasLowerCase ? 'show' : 'hide'">Password must contain at least one lowercase letter</li>

@@ -11,6 +11,8 @@ import {usefulFunctions} from "@/api/useful";
 import moment from 'moment';
 import WorkingTimes from '@/components/WorkingTimes.vue';
 import Users from "@/components/Users.vue";
+import {useAuth} from "@/api/auth";
+
 const route = useRoute();
 const api = useApi();
 const useful = usefulFunctions();
@@ -68,13 +70,8 @@ async function clock() {
 
 onBeforeMount(async () => {
     try {
-        // user.value = store.user;
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            user.value = JSON.parse(storedUser) as User;
-        }
-        console.log("Store user:", user.value);
-
+        user.value = await store.user;
+        console.log("User in Store:", user.value);
         if (user.value) {
             const [workingTimesResponse, clocksResponse] = await Promise.all([
                 api.getWorkingTimes(user.value),

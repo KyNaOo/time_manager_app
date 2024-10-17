@@ -2,6 +2,7 @@
     <div class="modal" v-if="isVisible" @click.self="closeModal">
         <div class="modal-content">
             <span class="close" @click="closeModal">&times;</span>
+            <h2>{{ title }}</h2>
             <p>{{ message }}</p>
         </div>
     </div>
@@ -13,6 +14,7 @@ import { ref, defineProps } from 'vue';
 import { store } from '../../api/store';
 const props = defineProps<{
     message: string;
+    title: string;
 }>();
 
 const isVisible = ref(true);

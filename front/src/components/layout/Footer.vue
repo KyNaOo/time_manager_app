@@ -21,6 +21,7 @@
     width: 100%;
     position: sticky;
     bottom: 0;
+    z-index: 2;
 }
 
 .container {

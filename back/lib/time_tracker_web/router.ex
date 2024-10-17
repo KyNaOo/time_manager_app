@@ -26,10 +26,6 @@ defmodule TimeTrackerWeb.Router do
     get "/clocks/:user_id", ClockController, :index
     post "/clocks/:user_id", ClockController, :create
 
-    # Public routes (no JWT authentication needed)
-    post "/auth/signin", AuthController, :sign_in
-    post "/auth/register", AuthController, :register
-
     get "/teams", TeamController, :index
     post "/team", TeamController, :create
     put "/team/:id", TeamController, :update
@@ -42,6 +38,14 @@ defmodule TimeTrackerWeb.Router do
     delete "/team/user/remove/:user_id/:team_id", TeamMemberController, :remove_user_from_team
     get "/user/teams/:user_id", TeamMemberController, :get_teams_for_user
 
+  end
+
+  scope "/api", TimeTrackerWeb do
+    pipe_through :api # Only the API pipeline, no auth
+
+    # Public routes (no JWT authentication needed)
+    post "/auth/signin", AuthController, :sign_in
+    post "/auth/register", AuthController, :register
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

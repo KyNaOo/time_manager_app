@@ -16,9 +16,13 @@ const props = defineProps<Props>();
 const graphMode = ref('bar');
 const labels :any= ref([])
 const chosenTimelapsed = ref(5);
+
+console.log('Working times:', props.workingTimes)
 const chosenWorkingTimes = ref(props.workingTimes.slice(-chosenTimelapsed.value))
 
+console.log('Chosen working times:', chosenWorkingTimes.value)
 const workingTimesDuration = ref(getWorkingTimesDuration(chosenWorkingTimes.value));
+console.log('Working times duration:', workingTimesDuration.value)
 
 function updateWorkingTimes() {
     console.log('Updating working times')

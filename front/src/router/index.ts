@@ -75,28 +75,19 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   try {
+    console.log('to: ', to);
+    console.log('from: ', from);
     // Check if the user is authenticated
     const authenticated = await is_authenticated();
     if (to.meta.requiresAuth && !authenticated) {
       // User is not authenticated, redirect to login
-      next("/login");
+      return next("/login");
     }
     if ((to.path === "/login" || to.path === "/register" || to.path === "/") && authenticated) {
       // User is authenticated and trying to access login, redirect to dashboard
-      next("/app");
-
+      return next("/app");
     }
-
-    next();
-
-    // // Check if the user is admin
-    // if (to.meta.onlyAdmin && store.user!.role !== 'admin') {
-    //   console.log('User is not admin');
-    //   store.showModal({ message: 'You are not authorized to access this page 🥴' });
-    //   // return { path: from.path };
-    //   next(from.path);
-
-    // }
+    return next();
   } catch (err) {
     alert('server is down');
   }
@@ -104,7 +95,7 @@ router.beforeEach(async (to, from, next) => {
 
 async function is_authenticated() {
   try {
-    return localStorage.getItem("token");
+    return store.hasLogin;
   } catch (err) {
     return false;
   }

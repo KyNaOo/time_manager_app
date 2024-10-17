@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import axios from "axios";
+import instance from "../api/axios";
 import {computed, onBeforeMount, ref} from "vue";
 import SuperTable from "../components/SuperTable.vue";
 import { store } from "../api/store";
@@ -26,7 +26,7 @@ const tableHeaders = computed(() => {
 
 onBeforeMount(async () => {
   try {
-    const apiResp = await axios.get(`http://localhost:4000/api/users`);
+    const apiResp = await instance.get(`/api/users`);
     response.value = apiResp.data.data;
     console.log("users:", response.value)
   } catch (e) {

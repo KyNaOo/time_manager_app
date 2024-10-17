@@ -8,6 +8,7 @@ defmodule TimeTracker.Accounts do
   alias TimeTracker.Accounts.TeamMember
   alias TimeTracker.Accounts.User
   alias TimeTracker.Guardian
+  alias Bcrypt
 
 
   @doc """
@@ -242,15 +243,12 @@ defmodule TimeTracker.Accounts do
   """
   def authenticate_user(email, password) do
     user = Repo.get_by(User, email: email)
-
+    IO.inspect(user, label: "Authenticated User")
     cond do
       user && Bcrypt.check_pass(user, password) ->
         # Issue the JWT token if authentication succeeds
-        {:ok, token, _claims} = Guardian.encode_and_sign(user, %{
-          "user_id" => user.id,
-          "username" => user.username,
-          "email" => user.email
-        })
+        {:ok, token, _claims} = Guardian.encode_and_sign(user)
+        {:ok, token}  # Return the token in the expected format
       true ->
         {:error, :unauthorized}  # Return an error if credentials don't match
     end

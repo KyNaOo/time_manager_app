@@ -1,6 +1,6 @@
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue';
+import { ref, defineProps, watch } from 'vue';
 import { useValidators } from '@/api/validators';
 import FieldLayout from './FieldLayout.vue';
 
@@ -45,6 +45,12 @@ const validateInput = () => {
 };
 
 const inputValue = ref('');
+
+const emit = defineEmits(['update:modelValue']);
+
+watch(inputValue, (newValue) => {
+    emit('update:modelValue', newValue);
+});
 </script>
 
 <template>
