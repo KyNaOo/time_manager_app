@@ -12,17 +12,20 @@ WORKDIR /app
 COPY mix.exs mix.lock ./
 
 # Install Elixir dependencies
-RUN mix deps.get
+RUN mix do deps.get
+
+VOLUME "/app"
 
 # Copy the rest of the application code
 COPY . .
 
-
 # Compile the application
-RUN mix compile
+
+RUN mix do compile
 
 # Expose the port the app runs on
 EXPOSE 4000
 
 # Set the default command to run the Phoenix server
-CMD ["mix", "phx.server"]
+
+CMD ["bash", "-c", "mix ecto.create && mix ecto.migrate && mix phx.server"]

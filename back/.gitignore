@@ -27,4 +27,3 @@ time_tracker-*.tar
 /.idea/
 .elixir_ls
 /config/dev.exs
-dev.exs

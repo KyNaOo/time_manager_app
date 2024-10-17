@@ -18,4 +18,18 @@ defmodule TimeTracker.AccountsFixtures do
 
     user
   end
+
+  @doc """
+  Generate a team.
+  """
+  def team_fixture(attrs \\ %{}) do
+    {:ok, team} =
+      attrs
+      |> Enum.into(%{
+        title: "some title"
+      })
+      |> TimeTracker.Accounts.create_team()
+
+    team
+  end
 end
