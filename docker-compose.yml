@@ -1,68 +1,51 @@
-name: time_manager 
+name: time_manager
 
 volumes:
-  postgres-data:
-  deps_data:
+  database:
 
 networks:
   backend:
+      driver: bridge
   frontend:
+      driver: bridge
 
 services:
 
-  postgres:
-    container_name: time_manager_postgres_dev
-    image: docker.io/postgres
-    shm_size: 128mb
-    ports:
-      - "5432:5432"
+  database:
+    #container_name: time_manager-database
+    image: postgres:latest
     env_file: .env.dev
-    restart: unless-stopped
     volumes: 
-      - postgres-data:/var/lib/postgresql/data
+      - database:/var/lib/postgresql/data
     networks:
       - backend
 
-  phoenix:
-    container_name: time_manager_phoenix_api_dev
-    image: localhost/phoenix_api:dev
+  api:
+    #container_name: time_manager-api
+    #image: phoenix_api
     pull_policy: build 
     build:
-      context: ./api
-      dockerfile: Containerfile.dev
-      network: host
-    env_file: .env.dev
-    depends_on:
-      - postgres
+      context: ./back
+      dockerfile: Dockerfile
     ports:
       - "4000:4000"
+    env_file: .env.dev
+    depends_on:
+      - database
     networks:
       - backend 
       - frontend
-    # Mounting project files as a volume to make a devcontainer
-    volumes:
-      - ./api:/workspace
-      - deps_data:/workspace/deps
-    userns_mode: keep-id 
-    stdin_open: true # Necessary for dev containers
-    tty: true # Necessary for dev containers
 
-  vue:
-    container_name: time_manager_vue_webapp_dev
-    image: localhost/vue_webapp:dev
+  webapp:
+    #container_name: time_manager_webapp
+    #image: vuejs_webapp
     pull_policy: build
     build:
-      context: ./webapp
-      dockerfile: Containerfile.dev
+      context: ./front
+      dockerfile: Dockerfile
     depends_on:
-      - phoenix 
+      - api 
     ports:
       - "5173:5173"
-    # Mounting project files as a volume to make a devcontainer
-    volumes:
-      - ./webapp:/workspace:cached
     networks:
       - frontend
-    userns_mode: keep-id 
-    stdin_open: true # Necessary for dev containers
-    tty: true # Necessary for dev containers

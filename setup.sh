@@ -1,8 +1,7 @@
 #!/bin/bash
 
 delete_all() {
-    docker network rm back
-    docker network rm front
+    docker network rm $(docker network ls -q)
     docker rm -v -f $(docker ps -qa)
     docker rmi -f $(docker images -q)
 }

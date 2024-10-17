@@ -1,13 +1,11 @@
 import Config
 import System
 
-IO.puts(System.get_env("PGDATABASE"))
-
 # Configure your database
 config :time_tracker, TimeTracker.Repo,
   username: System.get_env("PGUSER") || "postgres",
   password: System.get_env("PGPASSWORD") || "postgres",
-  hostname: System.get_env("PGHOST") || "database" || "host.docker.internal" || "localhost",
+  hostname: System.get_env("PGHOST") || "localhost",
   database: System.get_env("PGDATABASE") || "time_tracker_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
