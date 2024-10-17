@@ -5,9 +5,12 @@ defmodule TimeTrackerWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", TimeTrackerWeb do
-    pipe_through :api
+  pipeline :auth do
+    plug TimeTrackerWeb.Plugs.AuthPipeline
+  end
 
+  scope "/api", TimeTrackerWeb do
+    pipe_through [:api, :auth] # By applying auth  here, all routes in this scope (/api) will require JWT-based authentication.
     get "/users", UserController, :index
     get "/users/:user_id", UserController, :show
     post "/users", UserController, :create
@@ -22,6 +25,10 @@ defmodule TimeTrackerWeb.Router do
 
     get "/clocks/:user_id", ClockController, :index
     post "/clocks/:user_id", ClockController, :create
+
+    # Public routes (no JWT authentication needed)
+    post "/auth/signin", AuthController, :sign_in
+    post "/auth/register", AuthController, :register
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development

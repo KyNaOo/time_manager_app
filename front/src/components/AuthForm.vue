@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { shallowRef, computed } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import {useApi} from "../api/index";
 import { store } from "../api/store";
 import type { AuthMode } from "@/types/crudTypes";
 import InputField from "./forms/InputField.vue";
 import PasswordField from "./forms/PasswordField.vue";
+import { useAuth } from "@/api/auth";
+import type { User } from "../types/crudTypes";
 
 
+const auth = useAuth();
 const api = useApi();
-console.log(api);
+
 const props = defineProps({
   authMode: {
     type: String as () => AuthMode,
@@ -17,15 +20,15 @@ const props = defineProps({
   },
 });
 
-const user = shallowRef({
-  username: null,
-  email: null,
-  password: null,
-  confirmPassword: null,
+const user = ref<User>({
+  username: '',
+  email: '',
+  password: '',
+  role: 'user'
 });
 
 const router = useRouter();
-const showPassword = shallowRef(false);
+const showPassword = ref(false);
 
 const hideAllErrors = () => {
     api.turnOffError();
@@ -33,7 +36,9 @@ const hideAllErrors = () => {
 
 const handleAuth = async () => {
   try {
-    await api.authenticate(`/api/users`, user.value, props.authMode);
+    if(props.authMode == 'login') await auth.signIn(user.value.email, user.value.password!);
+    else await auth.register(user.value!);
+    console.log('User Authenticated', user.value);  
     router.push("/app");
   } catch (err) {
     console.log('USer not authenticated', user.value);

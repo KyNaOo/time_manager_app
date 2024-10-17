@@ -7,6 +7,8 @@ defmodule TimeTracker.Accounts do
   alias TimeTracker.Repo
 
   alias TimeTracker.Accounts.User
+  alias TimeTracker.Guardian
+
 
   @doc """
   Returns the list of users.
@@ -104,4 +106,33 @@ defmodule TimeTracker.Accounts do
   def change_user(%User{} = user, attrs \\ %{}) do
     User.changeset(user, attrs)
   end
+
+  @doc """
+  Authenticates a user using Guardian.
+
+  ## Examples
+
+    iex> authenticate_user(email, password)
+    {:ok, token}
+
+    iex> authenticate_user(email, wrong_password)
+    {:error, :unauthorized}
+
+  """
+  def authenticate_user(email, password) do
+    user = Repo.get_by(User, email: email)
+
+    cond do
+      user && Bcrypt.check_pass(user, password) ->
+        # Issue the JWT token if authentication succeeds
+        {:ok, token, _claims} = Guardian.encode_and_sign(user, %{
+          "user_id" => user.id,
+          "username" => user.username,
+          "email" => user.email
+        })
+      true ->
+        {:error, :unauthorized}  # Return an error if credentials don't match
+    end
+  end
+
 end
