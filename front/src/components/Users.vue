@@ -4,20 +4,28 @@ import {computed, onBeforeMount, ref} from "vue";
 import SuperTable from "../components/SuperTable.vue";
 import { store } from "../api/store";
 import { UserGroupIcon } from '@heroicons/vue/24/solid'
+import type { User } from "../types/crudTypes";
 
-interface User {
-  id: number;
-  username: string;
-  email: string;
-}
+
 const response = ref<User[] | null>(null);
 
-const userisAdmin = computed(() => {
-  return store.user?.role === 'admin';
+const user = ref<User | null>(null);
+
+onBeforeMount(async () => {
+  try {
+    user.value = await store.user;
+    console.log("users:", response.value)
+  } catch (e) {
+    console.log("Error fetching users:", e)
+  }
+});
+
+const userisAdmin = computed( () => {
+  return user.value?.role === 'admin';
 });
 
 const tableHeaders = computed(() => {
-  const headers = ['ID', 'Username', 'Email']
+  const headers = user.value ? Object.keys(user.value) : ['ID', 'Username', 'Email', 'Role'];
   if (userisAdmin.value) {
     headers.push('Actions');
   }
@@ -46,30 +54,7 @@ onBeforeMount(async () => {
       <UserGroupIcon class="icon"/>
   </div>
   <RouterLink v-if="userisAdmin" to="/app/user?create=true" >Create User</RouterLink>
-  <!-- <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>Email</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="user in response" :key="user.id">
-        <td>{{ user.id }}</td>
-        <td>{{ user.username }}</td>
-        <td>{{ user.email }}</td>
-        <td>
-          <nav>
-            <RouterLink :to="`/app/user/${user.id}`">See</RouterLink>
-            <button @click="deleteUser(user.id)">Delete</button>
-        </nav>
-        </td>
-      </tr>
-    </tbody>
-  </table> -->
-  <SuperTable v-if="response" :tableData="response" tableType="users" :tableHeaders="tableHeaders" />
+  <SuperTable v-if="response" :tableData="response" tableType="users" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
 </div>
 <div v-else>No users
   <RouterLink to="/app/user?create=true" >Create User</RouterLink>
