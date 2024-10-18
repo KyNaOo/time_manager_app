@@ -19,6 +19,9 @@
     text-align: center;
     border-top: 1px solid #e7e7e7;
     width: 100%;
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
 }
 
 .container {

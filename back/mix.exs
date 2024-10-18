@@ -47,7 +47,9 @@ defmodule TimeTracker.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:dotenv, "~> 3.1.0"},
-      {:dotenvy, "~> 0.8.0"}
+      {:dotenvy, "~> 0.8.0"},
+      {:guardian, "~> 2.0"},
+      {:bcrypt_elixir, "~> 3.0"}
     ]
   end
 

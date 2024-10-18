@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { shallowRef, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import {useApi} from "../api/index";
 import { store } from "../api/store";
 import type { AuthMode } from "@/types/crudTypes";
+import InputField from "./forms/InputField.vue";
+import PasswordField from "./forms/PasswordField.vue";
+import { useAuth } from "@/api/auth";
+import type { User } from "../types/crudTypes";
 
 
-const api = useApi();
-console.log(api);
+const auth = useAuth();
+const api = useApi(); 
+
 const props = defineProps({
   authMode: {
     type: String as () => AuthMode,
@@ -15,14 +20,23 @@ const props = defineProps({
   },
 });
 
-const user = shallowRef({
-  username: null,
-  email: null,
-  password: null,
-});
+const user = ref<Partial<User>>(
+  props.authMode === 'login'
+    ? {
+        email: '',
+        password: '',
+      }
+    : {
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+        role: 'user',
+      }
+);
 
 const router = useRouter();
-const showPassword = shallowRef(false);
+const showPassword = ref(false);
 
 const hideAllErrors = () => {
     api.turnOffError();
@@ -30,11 +44,35 @@ const hideAllErrors = () => {
 
 const handleAuth = async () => {
   try {
-    await api.authenticate(`/api/users`, user.value, props.authMode);
-    router.push("/app");
-  } catch (err) {
+    if (!user.value || !user.value.email || !user.value.password) {
+      console.error('No user data');
+      return;
+    }
+    console.log('Auth Mode:', props.authMode);
+    console.log('User Data:', user.value);
+    if(props.authMode == 'login') {
+      console.log('Attempting to log in...');
+      await auth.signIn(user.value.email, user.value.password!);
+    } else {
+      console.log('Attempting to register...');
+      delete user.value.confirmPassword;
+      console.log('User Data:', user.value);
+      await auth.register({
+        email: user.value.email!,
+        username: user.value.username!,
+        password: user.value.password!,
+        role: user.value.role!
+      });
+    }
+      // User authenticated
+      console.log('User authenticated');
+      // refresh the page
+      window.location.reload();
+      console.log('Redirected to app');
+  } catch (err : any) {
     console.log('USer not authenticated', user.value);
-    console.log(err);
+    console.log(err.response.data.error);
+    store.showModal({message: err.response.data.error, title: 'Error'});
   }
 };
 
@@ -42,6 +80,22 @@ const goTo = () => {
   if(props.authMode == 'login') router.push("/register");
   else router.push("/login")
 };
+
+const isStrongPassword = ref(false);
+
+const goodPassword = (isGoodPassword: boolean) => {
+  console.log('Password is good:', isGoodPassword);
+  isStrongPassword.value = isGoodPassword;
+};
+
+const passwordsMatch = computed(() => {
+  return user.value.password === user.value.confirmPassword;
+});
+
+
+watch(user, (newValue) => {
+  console.log('User updated:', newValue);
+}, { deep: true });
 
 </script>
 <template>
@@ -53,61 +107,24 @@ const goTo = () => {
       <h2 class="title">
         {{ props?.authMode === 'login' ? 'Login' : 'Register' }}
       </h2>
-      <div class="input-group" >
-        <label for="username" class="input-label"
-          >Username
-          <span v-show="api.usernameError.value" :class="{ error: api.usernameError.value }"
-            >required</span
-          ></label
-        >
-        <input
-          type="text"
-          id="username"
-          name="username"
-          v-model="user.username"
-          class="input-field"
-          autocomplete="name"
-          :class="{ inpError: api.usernameError.value }"
-        />
+      <div v-if="props.authMode == 'register'" class="input-group" >
+        <InputField v-model="user.username" :name="'username'" :type="'text'" :label="'Username'" required/>
       </div>
       <div class="input-group">
-        <label for="email" class="input-label"
-          >Email
-          <span v-show="api.emailError.value" :class="{ error: api.emailError.value }"
-            >required</span
-          ></label
-        >
-        <input
-          type="email"
-          id="email"
-          name="email"
-          v-model="user.email"
-          class="input-field"
-          autocomplete="email"
-          :class="{ inpError: api.emailError.value }"
-        />
+        <div class="input-group" >
+        <InputField v-model="user.email" :name="'email'" :type="'text'" :label="'Email'" required/>
+        </div>
       </div>
       <div class="input-group">
-        <label for="password" class="input-label"
-          >Password
-          <span v-show="api.passwordError" :class="{ error: api.passwordError }">{{
-            api.passwordErrorMessge ? api.passwordErrorMessge.value : "required"
-          }}</span></label
-        >
-        <input
-          :type="showPassword ? 'text' : 'password'"
-          id="password"
-          name="password"
-          v-model="user.password"
-          class="input-field"
-          autocomplete="current-password"
-          :class="{ inpError: api.passwordError.value }"
-        />
-        <span class="password-toggle" @click="showPassword = !showPassword">
-            {{ showPassword ? "Hide" : "Show" }}
-        </span>
+        <PasswordField v-model="user.password" :name="'password'" :label="'Password'" required :showRules="authMode === 'register'" @goodPassword="goodPassword($event)"/>
       </div>
-      <button type="submit" class="auth-button">{{props.authMode == 'register' ? 'Register' : 'Login'}}</button>
+      <div v-if="props.authMode == 'register' && isStrongPassword" class="input-group">
+        <PasswordField v-model="user.confirmPassword":name="'confirmPassword'" :label="'Confirm Password'" required :showRules="false"/>
+      </div>
+      <button type="submit" :class="['auth-button', { 'inpError': props.authMode == 'register' && !passwordsMatch }]">
+        {{props.authMode == 'register' ? 'Register' : 'Login'}}
+      </button>
+      <span v-if="!passwordsMatch && authMode === 'register'" class="error">Passwords do not match</span>
       <p class="auth-link">Click <a @click="goTo">here</a> to {{props?.authMode == 'register' ? 'login' : 'register'}}</p>
     </form>
   </div>
@@ -120,7 +137,7 @@ const goTo = () => {
   justify-content: center;
   height: auto;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
+  width: 400px;
 }
 
 .form {
@@ -132,47 +149,20 @@ const goTo = () => {
   border-radius: 8px;
   box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
+  width: 100%;
 }
 
 .title {
   font-size: 24px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .input-group {
   width: 100%;
-  margin-bottom: 15px;
   position: relative;
 }
 
-.password-toggle {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  color: #93c5fd;
-}
 
-.password-toggle:hover {
-  cursor: pointer;
-}
-
-.input-label {
-  font-size: 16px;
-}
-
-.input-field {
-  box-sizing: border-box;
-  width: 100%;
-  height: 40px;
-  border: 1px solid #93c5fd;
-  border-radius: 4px;
-  font-size: 16px;
-  padding: 5px;
-}
-
-.input-field:focus {
-  outline: currentColor;
-}
 
 .auth-button {
   width: 100%;
@@ -205,13 +195,11 @@ const goTo = () => {
 }
 
 .error {
-  position: absolute;
-  color: #f29191;
-  top: 0;
-  top: 0;
-  right: 10px;
+  color: red;
   font-size: 15px;
   margin: 0;
+
+  
 }
 
 .Gerror {
@@ -224,6 +212,8 @@ const goTo = () => {
 }
 
 .inpError {
-  border: 1px solid #ffcccc;
+  background-color: lightgray;
+  color: white;
+  cursor: not-allowed;
 }
 </style>

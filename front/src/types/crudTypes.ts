@@ -2,7 +2,8 @@ export interface User {
     id?: number;
     email: string;
     username: string;
-    password?: string;
+    password: string;
+    confirmPassword?: string;
     role?: Role;
     createdAt?: Date;
     updatedAt?: Date;
@@ -10,8 +11,8 @@ export interface User {
 
 export interface WorkingTime {
     id: number;
-    start: Date;
-    end: Date;
+    start: Date | string;
+    end: Date | string;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -40,6 +41,13 @@ export interface TeamUser {
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+export interface Modal {
+    isVisible: boolean;
+    title: string;
+    message: string;
+}
+
 
 
 export type Role = 'user' | 'manager' | 'admin';

@@ -3,10 +3,9 @@ import System
 
 # Configure your database
 config :time_tracker, TimeTracker.Repo,
-
-  username: System.get_env("PGUSER") || "postgres",
-  password: System.get_env("PGPASSWORD") || "postgres",
-  hostname: System.get_env("PGHOST") || "localhost",
+  username: System.get_env("PGUSER") || "andre_epitech",
+  password: System.get_env("PGPASSWORD") || "mon_mot_de_passe",
+  hostname: System.get_env("PGHOST") || "localhost" || "host.docker.internal" || "localhost",
   database: System.get_env("PGDATABASE") || "time_tracker_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,

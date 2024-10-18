@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 import AppLayout from './components/layout/AppLayout.vue';
-
+import Modal from './components/modals/ModalMessage.vue';
+import { store } from './api/store';
 </script>
 
 <template>
@@ -10,11 +11,11 @@ import AppLayout from './components/layout/AppLayout.vue';
       <AppLayout>
         <transition name="fade" mode="out-in">
           <component :is="Component" />
-
         </transition>
         </AppLayout>
 
     </router-view>
+    <Modal v-if="store.modal !== null" :message="store.modal.message" :title="store.modal.title" />
   </main>
   <!-- <RouterView /> -->
 </template>

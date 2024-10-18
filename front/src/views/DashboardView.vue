@@ -10,6 +10,9 @@ import type { User,WorkingTime, Clock } from "@/types/crudTypes";
 import {usefulFunctions} from "@/api/useful";
 import moment from 'moment';
 import WorkingTimes from '@/components/WorkingTimes.vue';
+import Users from "@/components/Users.vue";
+import {useAuth} from "@/api/auth";
+
 const route = useRoute();
 const api = useApi();
 const useful = usefulFunctions();
@@ -67,13 +70,8 @@ async function clock() {
 
 onBeforeMount(async () => {
     try {
-        // user.value = store.user;
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            user.value = JSON.parse(storedUser) as User;
-        }
-        console.log("Store user:", user.value);
-
+        user.value = await store.user;
+        console.log("User in Store:", user.value);
         if (user.value) {
             const [workingTimesResponse, clocksResponse] = await Promise.all([
                 api.getWorkingTimes(user.value),
@@ -107,33 +105,40 @@ onBeforeMount(async () => {
     <div class="Dashboard">
         <div class="block user">
             <div class="flex-item user">
-                <h2>  Hello {{ user?.username }}</h2>
+                <h2>  Hello {{ user?.username }} !</h2>
               </div>
             <div class="flex-item clockBlock">
                 <div v-if="working && workingTimes" class="workingBlock">
-                    <h3> You are currently working: </h3>
+                    <h3> You are currently working 🤓 </h3>
                     <div class="lastWorkingTime">
                         <div class="timeWrapper">
-                            <h3>Started at:</h3>
+                            <h4 >Started at:</h4>
                             <span class="time startTime">{{ workingTimes[workingTimes.length - 1].start }}</span>
                         </div>
                         <div class="timeWrapper">
-                            <h3>End (not real):</h3>
+                            <h4>End (not real):</h4>
                             <span class="time endTime">{{ workingTimes[workingTimes.length - 1].end }}</span>
                         </div>
                     </div>
                 </div>
                 <div v-else class="notWorkingBlock">
-                    <h3> Clock In to start working </h3>
+                    <h3> Clock In to start working 😮‍💨</h3>
                 </div>
                 <button :class="working ? 'clockOut' : 'clockIn'" @click="clock()">{{ working ? 'Clock Out' : 'Clock In' }}</button>
             </div>
         </div>
         <div class="block chart">
             <ChartManager v-if="workingTimes" :workingTimes="workingTimes" />
+            <span v-else>Loading...</span>
         </div>
         <div class="block currentClockWrapper">
             <WorkingTimes v-if="workingTimes && user" :user="user" />
+            <span v-else>Loading...</span>
+        </div>
+
+        <!-- v-if="user?.role === 'manager'"  -->
+        <div class="block allUsers">
+            <Users/>
         </div>
        
     </div>
@@ -142,8 +147,10 @@ onBeforeMount(async () => {
 <style scoped>
 
 h2 {
-    margin: 10px 0;
     font-size: 30px;
+}
+h4 {
+    font-weight: bold;
 }
 .Dashboard {
     width: 100%;
@@ -173,6 +180,7 @@ h2 {
 .flex-item {
     flex: 1;
     align-content: center;
+    margin: 20px 0;
 }
 
 

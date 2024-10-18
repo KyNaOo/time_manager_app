@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import axios from "axios";
-import {onBeforeMount, ref} from "vue";
+import {computed, onBeforeMount, ref} from "vue";
 import moment from "moment";
 import type { User,WorkingTime, Clock } from "@/types/crudTypes";
 import { useApi } from "@/api";
@@ -23,12 +23,31 @@ const api = useApi();
 
 const useful = usefulFunctions();
 
-const tableHeaders = ['ID','Start', 'End', 'User Id', 'Actions'];
+const tableHeaders = computed(() => {
+  const headers = ['ID', 'Start', 'End', 'User Id'];
+  if (showActions.value) {
+    headers.push('Actions');
+  }
+  return headers;
+});
+
+const showActions = computed(() => {
+  return props.user.role === 'admin';
+});
 
 
 onBeforeMount(async () => {
   try {
-    workingTimes.value =  await api.getWorkingTimes(props.user);
+    workingTimes.value = await api.getWorkingTimes(props.user);
+    if (workingTimes.value) {
+      // Format the date for further treatment in SuperTable
+      workingTimes.value = workingTimes.value.map(workingTime => ({
+        ...workingTime,
+        start: new Date(workingTime.start),
+        end: new Date(workingTime.end)
+        
+      }));
+    }
     console.log("workingtimes:", workingTimes.value);
 
     clocks.value = await api.getClocks(props.user);
@@ -56,7 +75,7 @@ onBeforeMount(async () => {
     <h2>All working Times</h2>
     <ClockIcon class="icon" />
   </div>
-  <SuperTable :tableHeaders="tableHeaders" :tableData="workingTimes" showActions />
+  <SuperTable :tableType="'workingtime'" :tableHeaders="tableHeaders" :tableData="workingTimes" :showActions="showActions" />
 </div>
 <div v-else>No Working Times Yet
 </div>

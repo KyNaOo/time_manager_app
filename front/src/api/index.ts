@@ -1,4 +1,4 @@
-import axios from "./axios";
+import instance from "./axios";
 import { ref , shallowRef} from "vue";
 import { store } from "./store"
 import type { User, WorkingTime, AuthMode } from "@/types/crudTypes";
@@ -8,20 +8,22 @@ const hasErrorOccured = ref<boolean>(false);
 const errorMessage = ref<string | null>(null);
 const emailError = ref<boolean>(false);
 const passwordError = ref<boolean>(false);
+const confirmPasswordError = ref<boolean>(false);
 const passwordErrorMessge = ref<string | null>(null);
+const confirmPasswordErrorMessge = ref<string | null>(null);
 const usernameError = ref<boolean>(false);
 
 const authenticate = async (path: string, userData: any, authMode:AuthMode) => {
   try {
 
     const response = authMode === 'register'
-      ? await axios.post(path, {
+      ? await instance.post(path, {
         user: {
           email: userData.email,
           username: userData.username,
         }
       })
-      : await axios.get(`${path}?email=${userData.email}&username=${userData.username}`);
+      : await instance.get(`${path}?email=${userData.email}&username=${userData.username}`);
 
       console.log(`${authMode === 'register' ? 'Register' : 'Login'} response: `, response.data.data);
 
@@ -65,7 +67,7 @@ const turnOffError = () => {
   async function createUser (user: User) {
     try {
       console.log(`Create user`);
-      const resp = await axios.post(`http://localhost:4000/api/users`, {
+      const resp = await instance.post(`http://localhost:4000/api/users`, {
         user: {
           username: user.username,
           email: user.email
@@ -82,7 +84,7 @@ const turnOffError = () => {
 async function getUser(id: number) {
   try {
       // get user by id
-      const response = await axios.get(`http://localhost:4000/api/users/${id}`)
+      const response = await instance.get(`/api/users/${id}`)
         console.log('User data:', response.data)
         return response.data.data;
   } catch (e) {
@@ -95,7 +97,7 @@ async function modifyUser (user: User) {
   try {
       console.log(`Modify user with ID:`, user.id);
       // Change in the database
-      const resp = await axios.put(`http://localhost:4000/api/users/${user.id}`, {
+      const resp = await instance.put(`http://localhost:4000/api/users/${user.id}`, {
           user: {
               username: user?.username,
               email: user?.email
@@ -115,15 +117,56 @@ async function modifyUser (user: User) {
   }
   };
 
+// Get userTeams
+async function getUserTeams(user: User) {
+  try {
+      // get all teams from user
+      const res = await instance.get(`/api/teams/${user.id}`);
+      return res.data.data;
+  } catch (e) {
+      console.log("Error fetching teams:", e);
+  }
+}
+
 // Delete user
 async function deleteUser(user: User) {
   try {
       console.log(`Delete user with ID:`, user.id);
       // Delete user
-      await axios.delete(`http://localhost:4000/api/users/${user.id}`);
+      await instance.delete(`/api/users/${user.id}`);
       console.log(`Deleted user with ID: ${user.id}`);
   } catch (e) {
       console.log(`Error deleting user with ID: ${user.id}`, e);
+  }
+}
+
+//////////////////// TEAMS ///////////////////////
+
+// Get all teams
+async function getTeams() {
+  try {
+      // get all teams
+      const res = await instance.get(`/api/teams`);
+      return res.data.data;
+  } catch (e) {
+      console.log("Error fetching teams:", e);
+  }
+}
+
+// Create team
+async function createTeam(name: string, managerId: number) {
+  try {
+      console.log(`Create team`);
+      // Create team
+      await instance.post(`/api/teams`, {
+        team: {
+          name: name,
+          managerId: managerId
+      }
+      });
+      console.log(`Created team`);
+  } catch (e) {
+      console.log(`Error creating team`, e);
   }
 }
 
@@ -134,7 +177,7 @@ async function createWorkingTime(user: User, now: string) {
   try {
       console.log(`Create working time`);
       // Create working time
-      await axios.post(`http://localhost:4000/api/workingtime/${user.id}`, {
+      await instance.post(`/api/workingtime/${user.id}`, {
         start: now,
         end: now
     });
@@ -150,7 +193,7 @@ async function createWorkingTime(user: User, now: string) {
 async function getWorkingTimes(user: User): Promise<WorkingTime[]> {
   try {
       // get all working times from user
-      const res = await axios.get(`http://localhost:4000/api/workingtime/${user.id}`);
+      const res = await instance.get(`/api/workingtime/${user.id}`);
       return res.data.data;
   } catch (e) {
       console.log("Error fetching working times:", e);
@@ -163,7 +206,7 @@ async function modifyWorkingTime(now: string, lastWorkingTime: WorkingTime) {
   try {
       console.log(`Modify Woking time`);
       // Modify clock
-      await axios.put(`http://localhost:4000/api/workingtime/${lastWorkingTime.id}`, {
+      await instance.put(`/api/workingtime/${lastWorkingTime.id}`, {
         workingtime: { end: now }
     });
       console.log(`Modified Woking time`);
@@ -177,7 +220,7 @@ async function deleteWorkingTime(id: number): Promise<boolean> {
   try {
       console.log(`Delete working time with ID:`, id);
       // Delete working time
-      await axios.delete(`http://localhost:4000/api/workingtime/${id}`);
+      await instance.delete(`/api/workingtime/${id}`);
       console.log(`Deleted working time with ID: ${id}`);
       return true;
   } catch (e) {
@@ -191,7 +234,7 @@ async function deleteWorkingTime(id: number): Promise<boolean> {
 async function getClocks(user: User) {
   try {
       // get all clocks from user
-      const res =  await axios.get(`http://localhost:4000/api/clocks/${user.id}`);
+      const res =  await instance.get(`/api/clocks/${user.id}`);
       return res.data.data;
   } catch (e) {
       console.log("Error fetching clocks:", e);
@@ -203,7 +246,7 @@ async function createClock(user: User, now: string, status: boolean) {
   try {
       console.log(`Create clock`);
       // Create clock
-      await axios.post(`http://localhost:4000/api/clocks/${user.id}`, {
+      await instance.post(`/api/clocks/${user.id}`, {
             time: now,
             status: status,
         });
@@ -224,7 +267,9 @@ export const useApi = () => {
     errorMessage,
     emailError,
     passwordError,
+    confirmPasswordError,
     passwordErrorMessge,
+    confirmPasswordErrorMessge,
     usernameError,
     turnOffError,
     authenticate,
