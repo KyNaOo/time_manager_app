@@ -1,8 +1,6 @@
 import Config
 import System
 
-IO.puts(System.get_env("PGDATABASE"))
-
 # Configure your database
 config :time_tracker, TimeTracker.Repo,
   username: System.get_env("PGUSER") || "andre_epitech",
