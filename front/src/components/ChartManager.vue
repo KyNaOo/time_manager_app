@@ -6,7 +6,6 @@ import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, Li
 import { CalendarDaysIcon } from '@heroicons/vue/24/solid'
 import moment from 'moment';
 import type { WorkingTime } from '@/types/crudTypes';
-import { cp } from 'fs';
 
 
 interface Props {

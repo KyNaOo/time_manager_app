@@ -4,7 +4,7 @@ export interface User {
     username: string;
     password: string;
     confirmPassword?: string;
-    role?: Role;
+    role: Role;
     createdAt?: Date;
     updatedAt?: Date;
 }

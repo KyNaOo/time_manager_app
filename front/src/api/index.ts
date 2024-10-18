@@ -81,14 +81,15 @@ const turnOffError = () => {
   };
 
 // Get user by id
-async function getUser(id: number) {
+async function getUser(id: number): Promise<User | null> {
   try {
       // get user by id
-      const response = await instance.get(`/api/users/${id}`)
-        console.log('User data:', response.data)
-        return response.data.data;
+      const response = await instance.get(`/api/users/${id}`);
+      console.log('User data:', response.data);
+      return response.data.data as User;
   } catch (e) {
       console.log("Error fetching user:", e);
+      return null;
   }
 }
 

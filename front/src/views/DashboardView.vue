@@ -132,7 +132,7 @@ onBeforeMount(async () => {
             <ChartManager :workingTimes="workingTimes" />
         </div>
         <div class="block currentClockWrapper">
-            <WorkingTimes v-if="user" :user="user" />
+            <WorkingTimes v-if="user && user?.role !== 'admin' " :user="user" />
         </div>
         </template>
         <template v-else>
@@ -142,8 +142,7 @@ onBeforeMount(async () => {
             </div>
         </template>
 
-        <!-- v-if="user?.role === 'manager'"  -->
-        <div class="block allUsers">
+        <div v-if="user?.role === 'admin'" class="block allUsers">
             <Users/>
         </div>
        

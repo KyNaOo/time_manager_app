@@ -23,7 +23,7 @@ async function signIn(email: string, password: string) {
     } catch (error) {
       // Handle error
     }
-  }
+}
 
 // Sign out
 function signOut() {

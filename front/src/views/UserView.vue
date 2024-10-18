@@ -12,7 +12,6 @@ import { store } from '@/api/store';
 
 const user = ref<User | null>(null)
 const route = useRoute()
-const userId = ref(route.params ? route.params.id : store.user ? store.user.id : null);
 const workingTimes = ref<WorkingTime[] | null>(null);
 const mode = computed(() => route.query.create ? 'create' : 'edition');
 const api = useApi();
@@ -36,11 +35,13 @@ onBeforeMount(async () => {
         if (mode.value === 'create') {
             user.value = {
                 username: '',
-                email: ''
+                email: '',
+                password: '',
+                role: 'user',
             }
             return
         }
-        user.value = store.user;
+        user.value = await store.user;
         console.log('Stored User:', user.value)
         if (user.value) {
             workingTimes.value = await api.getWorkingTimes(user.value);
