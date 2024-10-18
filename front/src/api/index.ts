@@ -1,7 +1,7 @@
 import instance from "./axios";
 import { ref , shallowRef} from "vue";
 import { store } from "./store"
-import type { User, WorkingTime, AuthMode } from "@/types/crudTypes";
+import type { User, WorkingTime, AuthMode, Team } from "@/types/crudTypes";
 
 
 const hasErrorOccured = ref<boolean>(false);
@@ -118,14 +118,51 @@ async function modifyUser (user: User) {
   }
   };
 
-// Get userTeams
-async function getUserTeams(user: User) {
+// Get teamMembers
+async function getTeamMembers(team: Team) {
   try {
       // get all teams from user
-      const res = await instance.get(`/api/teams/${user.id}`);
+      const res = await instance.get(`/api/team/user/${team.id}`);
       return res.data.data;
   } catch (e) {
       console.log("Error fetching teams:", e);
+  }
+}
+
+// Modify team member role
+async function modifyTeamMemberRole(user: User, team: Team, isTeamLeader: boolean) {
+  try {
+      console.log(`Modify team member role`);
+      // Modify team member role
+      await instance.put(`/api/team/user/role/${user.id}/${team.id}`, {
+        isTeamLeader: isTeamLeader
+    });
+      console.log(`Modified team member role`);
+  } catch (e) {
+      console.log(`Error modifying team member role`, e);
+  }
+}
+
+// get user team leader
+async function isUserTeamLeader(user: User, team: Team) {
+  try {
+      // get all teams from user
+      const res = await instance.get(`/api/team/user/isAdmin/${user.id}/${team.id}`);
+      return res.data.data;
+  } catch (e) {
+      console.log("Error fetching teams:", e);
+  }
+}
+
+// Get user teams
+async function getUserTeams(user: User) {
+  try {
+      // get all teams from user
+      const res = await instance.get(`/api/user/teams/${user.id}`);
+      console.log('User teams:', res.data);
+      return res.data.teams;
+  } catch (e) {
+      console.log("Error fetching user teams:", e);
   }
 }
 
@@ -159,15 +196,75 @@ async function createTeam(name: string, managerId: number) {
   try {
       console.log(`Create team`);
       // Create team
-      await instance.post(`/api/teams`, {
+      const teamCreated = await instance.post(`/api/team`, {
+        team: {
+          title: name,
+      }
+      });
+
+      if (!teamCreated.data.data) {
+        return null;
+      }
+      console.log(`Created team`, teamCreated.data.data);
+
+
+      const teamMember = await instance.post(`/api/team/user/addUser/${managerId}/${teamCreated.data.data.id}`, {
+       team_member : {
+        userId: managerId,
+        isTeamLeader: true}
+      });
+
+      if (!teamMember) {
+        return null;
+      }
+
+      console.log(`Team leader added to team`, teamCreated.data.data);
+      return teamCreated.data.data;
+      
+  } catch (e) {
+      console.log(`Error creating team`, e);
+      return null;
+  }
+}
+
+// Modify team
+async function modifyTeam(id: number, name: string, managerId: number) {
+  try {
+      console.log(`Modify team with ID:`, id);
+      // Modify team
+      await instance.put(`/api/team/${id}`, {
         team: {
           name: name,
           managerId: managerId
       }
       });
-      console.log(`Created team`);
+      console.log(`Modified team with ID: ${id}`);
   } catch (e) {
-      console.log(`Error creating team`, e);
+      console.log(`Error modifying team with ID: ${id}`, e);
+  }
+}
+
+// Delete member from team
+async function deleteMemberFromTeam(userId: number, teamId: number) {
+  try {
+      console.log(`Delete member from team with ID:`, userId);
+      // Delete member from team
+      await instance.delete(`/api/team/user/remove/${userId}/${teamId}`);
+      console.log(`Deleted member with ID: ${userId} from team with ID: ${teamId}`);
+  } catch (e) {
+      console.log(`Error deleting member from team with ID: ${userId}`, e);
+  }
+}
+
+// Delete team
+async function deleteTeam(id: number) {
+  try {
+      console.log(`Delete team with ID:`, id);
+      // Delete team
+      await instance.delete(`/api/team/${id}`);
+      console.log(`Deleted team with ID: ${id}`);
+  } catch (e) {
+      console.log(`Error deleting team with ID: ${id}`, e);
   }
 }
 
@@ -187,7 +284,18 @@ async function createWorkingTime(user: User, now: string) {
       console.log(`Error creating working time`, e);
   }
 }
+// Get all working times from user
+async function getWorkingTime(userId: number, workingTimeId : number): Promise<WorkingTime> {
+  try {
+      // get all working times from user
 
+      const res = await instance.get(`/api/workingtime/${userId}/${workingTimeId}`);
+      return res.data.data;
+  } catch (e) {
+      console.log("Error fetching working times:", e);
+      throw e; // rethrow the error to handle it outside if needed
+  }
+}
 
 
 // Get all working times from user
@@ -276,6 +384,7 @@ export const useApi = () => {
     authenticate,
     // Working time
     createWorkingTime,
+    getWorkingTime,
     getWorkingTimes,
     modifyWorkingTime,
     deleteWorkingTime,
@@ -287,6 +396,17 @@ export const useApi = () => {
     // Clocks
     getClocks,
     createClock,
-    
+    // Teams
+    createTeam,
+    getTeams,
+    modifyTeam,
+    deleteTeam,
+    // UserTeams
+    getUserTeams,
+    getTeamMembers,
+    modifyTeamMemberRole,
+    isUserTeamLeader,
+    deleteMemberFromTeam
+
   };
 };

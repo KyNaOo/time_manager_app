@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import ChartManager from '@/components/ChartManager.vue';
 import { onBeforeMount } from 'vue';
 import axios from 'axios';
+import Teams from "@/views/TeamsView.vue"
 import { useRoute } from 'vue-router';
 import {useApi} from '@/api/index';
 import { store } from "../api/store";
@@ -40,26 +41,24 @@ async function clock() {
 
     console.log("Last clock:", lastClock)
 
-    if (lastClock && lastClock.status) {
+    if (lastClock && lastClock.status === true) {
         // clock out
+        console.log("Clocking out...");
+        console.log("Last clock:", lastClock);
+        console.log("Working times:", workingTimes.value);
         await useful.clockOut(now, workingTimes.value!, user.value);
         working.value = false;
 
     } else {
         // clock in
+        console.log("Clocking in...")
+        console.log("now:", now);
         await useful.clockIn(now, user.value);
         working.value = true;
     }
 
-    // Reload the data
-    workingTimes.value =  await api.getWorkingTimes(user.value);
-    clocks.value = await api.getClocks(user.value);
-
-    // Reload page
+    // // Reload page
     window.location.reload();
-
-
-    console.log("NEW workingtimes:", workingTimes.value);
 
       } catch (e) {
     console.log("Error clocking:", e)
@@ -132,7 +131,10 @@ onBeforeMount(async () => {
             <ChartManager :workingTimes="workingTimes" />
         </div>
         <div class="block currentClockWrapper">
-            <WorkingTimes v-if="user && user?.role !== 'admin' " :user="user" />
+            <WorkingTimes v-if="user" :user="user" />
+        </div>
+        <div class="block currentClockWrapper">
+            <Teams v-if="user" :user="user" />
         </div>
         </template>
         <template v-else>

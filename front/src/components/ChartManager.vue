@@ -29,24 +29,39 @@ console.log('Chosen working times:', chosenWorkingTimes.value)
 
 const labels = computed(() => {
     const newLabels :any = [];
+    if (chosenWorkingTimes.value.length < chosenTimelapsed.value) {
+        const lastWorkingTime = moment(chosenWorkingTimes.value[chosenWorkingTimes.value.length - 1].start);
+        for (let i = chosenWorkingTimes.value.length; i < chosenTimelapsed.value; i++) {
+            newLabels.unshift(lastWorkingTime.subtract(1, 'days').format('dddd, D'));
+        }
+    }
     chosenWorkingTimes.value
         .map(workingTime => {
             const start = moment(workingTime.start);
             newLabels.push(start.format('dddd, D'));
         });
+    
     return newLabels;
 });
 
 const durations = computed(() => {
-    return chosenWorkingTimes.value.map((workingTime: WorkingTime) => {
+    const shiftedWorkingTimes = chosenWorkingTimes.value.slice(1).concat(chosenWorkingTimes.value.slice(0, 1));
+    const durationValues = shiftedWorkingTimes.map((workingTime: WorkingTime) => {
         const start = moment(workingTime.start);
         const end = moment(workingTime.end);
         return end.diff(start, 'seconds');
     });
+
+    // Fill durations with '0' values if there is a difference in length
+    while (durationValues.length < labels.value.length) {
+        durationValues.unshift(0);
+    }
+
+    return durationValues;
 });
 
 const colors = computed(() => {
-    return chosenWorkingTimes.value.map((workingTime: WorkingTime) => {
+    return labels.value.map(() => {
         return '#'+(Math.random()*0xFFFFFF<<0).toString(16);
     });
 });
@@ -54,6 +69,7 @@ const colors = computed(() => {
 const chartData = computed(() => ({
     labels: labels.value,
     datasets: [{
+        label: 'Seconds',
         data: durations.value,
         backgroundColor: colors.value,
     }],
@@ -73,7 +89,8 @@ const chartOptions = computed(() => {
                 y: {
                     stacked: true
                 }
-            }
+            },
+
         };
     } else if (graphMode.value === 'pie') {
         return {

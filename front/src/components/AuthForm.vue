@@ -36,7 +36,6 @@ const user = ref<Partial<User>>(
 );
 
 const router = useRouter();
-const showPassword = ref(false);
 
 const hideAllErrors = () => {
     api.turnOffError();
@@ -53,6 +52,8 @@ const handleAuth = async () => {
     if(props.authMode == 'login') {
       console.log('Attempting to log in...');
       await auth.signIn(user.value.email, user.value.password!);
+      console.log('Logged in');
+
     } else {
       console.log('Attempting to register...');
       delete user.value.confirmPassword;
@@ -64,11 +65,7 @@ const handleAuth = async () => {
         role: user.value.role!
       });
     }
-      // User authenticated
-      console.log('User authenticated');
-      // refresh the page
-      window.location.reload();
-      console.log('Redirected to app');
+      
   } catch (err : any) {
     console.log('USer not authenticated', user.value);
     console.log(err.response.data.error);

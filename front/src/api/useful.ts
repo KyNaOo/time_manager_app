@@ -1,7 +1,7 @@
 import type { Clock, WorkingTime, User } from '@/types/crudTypes';
 import axios from 'axios';
 import { useApi } from '@/api/index';
-
+import instance from './axios';
 
 const api = useApi();
 
@@ -42,10 +42,7 @@ async function clockOut(now: string, workingTimes: WorkingTime[], user: User) {
         console.log("Last working time:", lastWorkingTime);
 
         if (lastWorkingTime) {
-            // Update the end time of the last working time
-            await axios.put(`http://localhost:4000/api/workingtime/${lastWorkingTime.id}`, {
-                workingtime: { end: now }
-            });
+            await api.modifyWorkingTime(now, lastWorkingTime);
         }
     } catch (e) {
         console.log("Error clocking out:", e);

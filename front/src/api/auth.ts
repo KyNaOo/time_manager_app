@@ -2,6 +2,8 @@
 import {jwtDecode} from "jwt-decode";
 import type { User } from "../types/crudTypes";
 import instance from "./axios";
+import { store } from '@/api/store';
+import router from "../router";
 
 function getUserFromToken(token: string) {
   if (token) {
@@ -14,15 +16,23 @@ function getUserFromToken(token: string) {
 }
 
 async function signIn(email: string, password: string) {
-    try {
-      const response = await instance.post("/api/auth/signin", { email, password });
-      const token = response.data.token;
-      // Save token to localStorage
-      localStorage.setItem("token", token);
-      // Redirect or handle sign-in success
-    } catch (error) {
-      // Handle error
-    }
+  try {
+    console.log("Attempting to sign in with email:", email);
+    const response = await instance.post("/api/auth/signin", { email, password });
+    console.log("Received response:", response);
+    const token = response.data.token;
+    console.log("Extracted token:", token);
+    // Save token to localStorage
+    localStorage.setItem("token", token);
+    store.setToken(token);
+    console.log("Token saved to localStorage and store");
+    router.push('/app');
+    console.log("Redirecting to /app");
+    // Redirect or handle sign-in success
+  } catch (error) {
+    console.error("Error during sign-in:", error);
+    // Handle error
+  }
 }
 
 // Sign out

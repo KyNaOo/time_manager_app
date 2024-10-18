@@ -22,6 +22,7 @@ const isVisible = ref(true);
 function closeModal() {
     isVisible.value = false;
     store.hideModal();
+    window.location.reload();
 }
 </script>
 

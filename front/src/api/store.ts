@@ -12,10 +12,16 @@ export const store = reactive({
   // email: null as string | null,
 
   modal: null as { message: string, title: string} | null,
-  token: computed(() => {
-    const token = localStorage.getItem('token');
-    return token ? token : null;
-  }),
+  // token: computed(() => {
+  //   console.log('token activated in store: ');
+  //   const token = localStorage.getItem('token');
+  //   console.log('token in store: ', token);
+  //   return token ? token : null;
+  // }),
+  token: localStorage.getItem('token') as string | null,
+  setToken(token: string | null) {
+    this.token = token;
+  } ,
   user: computed(async () => {
     const token = store.token;
     if (!token) {
@@ -29,14 +35,16 @@ export const store = reactive({
     }
     return await api.getUser(userId);
   }),
-  hasLogin: computed(() => {
-    return localStorage.getItem('token') !== null;
-    }),
+  // hasLogin: computed(() => {
+  //   console.log('Triggered hasLogin');
+  //   return localStorage.getItem('token') !== null;
+  //   }),
   showModal( value: any) {
     this.modal = value;
   },
   hideModal () {
     this.modal = null;
-  }
+  },
+  
     
 })
