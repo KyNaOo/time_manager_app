@@ -4,6 +4,9 @@ import { useRoute } from 'vue-router'
 import axios from 'axios'
 import type {User, WorkingTime} from '@/types/crudTypes'
 
+import { useApi } from '@/api';
+
+const api = useApi();  
 
 interface Props {
     workingTime: WorkingTime ;
@@ -21,8 +24,7 @@ const workingTime = ref<WorkingTime | null>(null)
 
 onBeforeMount(async () => {
     try {
-        const res = await axios.get(`http://localhost:4000/api/workingtime/${userId.value}/${workingTimeId.value}`);
-        workingTime.value = res.data.data;
+        workingTime.value = await api.getWorkingTime(Number(userId.value), Number(workingTimeId.value));
     } catch (e) {
         console.log("Error fetching working time:", e);
     }

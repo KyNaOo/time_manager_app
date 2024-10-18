@@ -10,6 +10,8 @@ import ProfileView from '@/views/ProfileView.vue'
 
 import axios from '@/api/axios'
 import { store } from '@/api/store';
+import TeamsView from '@/views/TeamsView.vue'
+import TeamView from '@/views/TeamView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,6 +43,30 @@ const router = createRouter({
       component: ProfileView,
       meta: { requiresAuth: true }
     },
+    { 
+      path: '/app/teams',
+      name: 'teams',
+      component: TeamsView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/app/team/:id',
+      name: 'team',
+      component: TeamView,
+      meta: { 
+        requiresAuth: true,
+        onlyAdmin: true
+      }
+    },
+    {
+      path: '/app/team',
+      name: 'teamEdition',
+      component: TeamView,
+      meta: { 
+        requiresAuth: true,
+        onlyAdmin: true
+      }
+    },
     {
       path: '/app/users',
       name: 'users',
@@ -52,16 +78,17 @@ const router = createRouter({
       name: 'user',
       component: UserView,
       meta: { 
-        requiresAuth: true,
-        onlyAdmin: true
-      
+        requiresAuth: true,      
       }
     },
     {
       path: '/app/user',
       name: 'userEdition',
       component: UserView,
-      meta: { requiresAuth: true }
+      meta: { 
+        requiresAuth: true,
+        onlyAdmin: true
+      }
     },
     {
       path: '/app/workingtime/:userId/:id',
@@ -75,18 +102,30 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   try {
-    console.log('to: ', to);
     console.log('from: ', from);
+    console.log('to: ', to);
     // Check if the user is authenticated
     const authenticated = await is_authenticated();
+
+    console.log('authenticated in router: ', authenticated); 
     if (to.meta.requiresAuth && !authenticated) {
+      console.log('Redirecting to login');
       // User is not authenticated, redirect to login
       return next("/login");
     }
     if ((to.path === "/login" || to.path === "/register" || to.path === "/") && authenticated) {
+      console.log('Redirecting to /')
       // User is authenticated and trying to access login, redirect to dashboard
       return next("/app");
     }
+
+    // if (authenticated && to.path === "/app") {
+    //   console.log('Redirecting to ', to.path);
+    //   return next();
+    // }
+
+    console.log('Passed controls: ');
+
     return next();
   } catch (err) {
     alert('server is down');
@@ -95,7 +134,7 @@ router.beforeEach(async (to, from, next) => {
 
 async function is_authenticated() {
   try {
-    return store.hasLogin;
+    return store.token !== null;
   } catch (err) {
     return false;
   }

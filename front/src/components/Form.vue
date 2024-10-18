@@ -1,40 +1,61 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { defineProps, defineEmits, computed } from 'vue';
-import type { User } from '@/types/crudTypes';
+import type { User, Team } from '@/types/crudTypes';
 
 interface Props {
-    user: User ;
+    user?: User ;
+    team?: Team;
+    context: string;
     mode: string;
 }
 
 const emit = defineEmits<{
-    (e: 'submit'): void;
+    (e: 'submit', value : any): void;
 }>();
-
-const action = computed(() => {
-    return props.mode === 'create' ? 'create' : 'edition';
-});
 
 const props = defineProps<Props>();
 
 const user = ref(props.user);
+const team = ref(props.team);
+const formData = computed(() => {
+    if (props.context === 'user' && user.value) {
+        return {
+            username: user.value.username,
+            email: user.value.email,
+        };
+    } else if (props.context === 'team' && team.value) {
+        return {
+            name: team.value.name,
+        };
+    }
+    return {};
+});
 
 const handleSubmit = () => {
-    emit('submit');
+    emit('submit', formData.value);
 };
 </script>
 <template>
     <form @submit.prevent="handleSubmit">
-            <div class="form-field">
-                <label for="username">Username:</label>
-                <input type="text" id="username" v-model="user.username" />
+            <div v-if="props.context === 'user' && user">
+                <div class="form-field">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" v-model="user.username" />
+                </div>
+                <div class="form-field">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" v-model="user.email" />
+                </div>
             </div>
-            <div class="form-field">
-                <label for="email">Email:</label>
-                <input type="email" id="email" v-model="user.email" />
+            <div v-else-if="props.context === 'team' && team">
+                <div class="form-field">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" v-model="team.name" />
+                </div>
             </div>
             <button type="submit">Save</button>
+
         </form>
 </template>
 

@@ -14,10 +14,10 @@ defmodule TimeTrackerWeb.TeamMemberController do
     }
 
     case Accounts.create_team_member(team_member_params) do
-      {:ok, _team_member} ->
+      {:ok, team_member} ->
         conn
         |> put_status(:created)
-        |> json(%{message: "Team member created successfully"})
+        |> render(:show, team_member: team_member)
 
       {:error, %Ecto.Changeset{} = changeset} ->
         conn

@@ -8,13 +8,14 @@ import { computed } from 'vue';
 const router = useRouter();
 const route = useRoute();
 const logout = async () => {
-  localStorage.clear();
-  window.location.reload();
+    localStorage.clear();
+    store.setToken(null);
+    router.push('/');
 };
 
 
 const isLogged = computed(() => {
-    return store.hasLogin;
+    return store.token !== null;
 });
 
 </script>

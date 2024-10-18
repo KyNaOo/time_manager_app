@@ -54,7 +54,7 @@ onBeforeMount(async () => {
       <UserGroupIcon class="icon"/>
   </div>
   <RouterLink v-if="userisAdmin" to="/app/user?create=true" >Create User</RouterLink>
-  <SuperTable v-if="response" :tableData="response" tableType="users" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
+  <SuperTable v-if="response" :tableData="response" tableType="user" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
 </div>
 <div v-else>No users
   <RouterLink to="/app/user?create=true" >Create User</RouterLink>

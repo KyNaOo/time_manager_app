@@ -1,3 +1,4 @@
+
 export interface User {
     id?: number;
     email: string;
@@ -27,17 +28,17 @@ export interface Clock {
 }
 
 export interface Team {
-    id: number;
+    id?: number;
     name: string;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
-export interface TeamUser {
-    id: number;
+export interface TeamMembers {
+    id?: number;
     userId: number;
     teamId: number;
-    manager : boolean;
+    isTeamLeader: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -47,6 +48,7 @@ export interface Modal {
     title: string;
     message: string;
 }
+
 
 
 

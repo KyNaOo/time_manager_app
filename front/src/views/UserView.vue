@@ -60,7 +60,7 @@ onBeforeMount(async () => {
         <div class="flexWrapper">
             <div class="formUser">
             <h2>{{mode === 'create' ? 'Create User' : 'Edit User'}} </h2>
-            <Form :user="user" :mode="mode" @submit="action" />
+            <Form context="user" :user="user" :mode="mode" @submit="action" />
             </div>
             <WorkingTimes v-if="mode === 'edition'" :user="user" />            
         </div>
