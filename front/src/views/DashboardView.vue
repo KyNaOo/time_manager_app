@@ -79,7 +79,7 @@ onBeforeMount(async () => {
             ]);
 
             if (workingTimesResponse) {
-                console.log("Working times:", workingTimesResponse);
+                console.log("Working times from Promise:", workingTimesResponse);
                 workingTimes.value = workingTimesResponse;
             }
 
@@ -127,14 +127,20 @@ onBeforeMount(async () => {
                 <button :class="working ? 'clockOut' : 'clockIn'" @click="clock()">{{ working ? 'Clock Out' : 'Clock In' }}</button>
             </div>
         </div>
+        <template v-if="workingTimes?.length">
         <div class="block chart">
-            <ChartManager v-if="workingTimes" :workingTimes="workingTimes" />
-            <span v-else>Loading...</span>
+            <ChartManager :workingTimes="workingTimes" />
         </div>
         <div class="block currentClockWrapper">
-            <WorkingTimes v-if="workingTimes && user" :user="user" />
-            <span v-else>Loading...</span>
+            <WorkingTimes v-if="user" :user="user" />
         </div>
+        </template>
+        <template v-else>
+            <div class="block chart">
+                <h2>No data to show yet 😓</h2>
+                <p>Start working to see your progress</p>
+            </div>
+        </template>
 
         <!-- v-if="user?.role === 'manager'"  -->
         <div class="block allUsers">
