@@ -28,7 +28,7 @@ async function signIn(email: string, password: string) {
 // Sign out
 function signOut() {
 localStorage.removeItem("token");
-delete axios.defaults.headers.common["Authorization"];
+delete instance.defaults.headers.common["Authorization"];
 // Redirect or handle sign-out success
 }
 
@@ -37,7 +37,7 @@ delete axios.defaults.headers.common["Authorization"];
 
 async function register(user : User) {
     try {
-        const response = await axios.post("/api/auth/register", user);
+        const response = await instance.post("/api/auth/register", user);
         const token = response.data.token;
         // Save token to localStorage
         localStorage.setItem("token", token);

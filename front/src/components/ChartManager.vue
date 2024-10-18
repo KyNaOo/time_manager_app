@@ -6,6 +6,7 @@ import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, Li
 import { CalendarDaysIcon } from '@heroicons/vue/24/solid'
 import moment from 'moment';
 import type { WorkingTime } from '@/types/crudTypes';
+import { cp } from 'fs';
 
 
 interface Props {
@@ -14,48 +15,52 @@ interface Props {
 
 const props = defineProps<Props>();
 const graphMode = ref('bar');
-const labels :any= ref([])
-const chosenTimelapsed = ref(5);
+const chosenTimelapsed = ref(props.workingTimes.length > 5 ? 5 : props.workingTimes.length);
+console.log('Chosen timeElapsed:', chosenTimelapsed.value)
 
-console.log('Working times:', props.workingTimes)
-const chosenWorkingTimes = ref(props.workingTimes.slice(-chosenTimelapsed.value))
+console.log('All Working times:', props.workingTimes)
+const chosenWorkingTimes = computed(() => 
+    props.workingTimes.length < chosenTimelapsed.value 
+        ? props.workingTimes.slice(-chosenTimelapsed.value) 
+        : props.workingTimes
+);
 
 console.log('Chosen working times:', chosenWorkingTimes.value)
-const workingTimesDuration = ref(getWorkingTimesDuration(chosenWorkingTimes.value));
-console.log('Working times duration:', workingTimesDuration.value)
-
-function updateWorkingTimes() {
-    console.log('Updating working times')
-    chosenWorkingTimes.value = props.workingTimes.slice(-chosenTimelapsed.value);
-    console.log('Chosen working times:', chosenWorkingTimes.value)
-    workingTimesDuration.value = getWorkingTimesDuration(chosenWorkingTimes.value);
-    console.log('Working times duration:', workingTimesDuration.value)
-}
 
 
-function getWorkingTimesDuration(workingTimes: WorkingTime[]) {
-    const durations :any = [];
+const labels = computed(() => {
     const newLabels :any = [];
-    workingTimes
+    chosenWorkingTimes.value
         .map(workingTime => {
             const start = moment(workingTime.start);
-            const end = moment(workingTime.end);
-            const duration = end.diff(start, 'seconds');
             newLabels.push(start.format('dddd, D'));
-            durations.push(duration) ;
         });
-    labels.value = newLabels;
+    return newLabels;
+});
 
-    return durations;
-}
+const durations = computed(() => {
+    return chosenWorkingTimes.value.map((workingTime: WorkingTime) => {
+        const start = moment(workingTime.start);
+        const end = moment(workingTime.end);
+        return end.diff(start, 'seconds');
+    });
+});
+
+const colors = computed(() => {
+    return chosenWorkingTimes.value.map((workingTime: WorkingTime) => {
+        return '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+    });
+});
 
 const chartData = computed(() => ({
     labels: labels.value,
     datasets: [{
-        data: workingTimesDuration.value,
-        backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16', '#FFCE56'],
+        data: durations.value,
+        backgroundColor: colors.value,
     }],
 }));
+
+console.log('Chart data:', chartData.value)
 
 const chartOptions = computed(() => {
     if (graphMode.value === 'bar') {
@@ -107,7 +112,7 @@ watchEffect(() => {
             </div>
             <div class="daysSelector">
                 <label for="days">Days:</label>
-                <input type="number" id="days" v-model="chosenTimelapsed" min="1" max="30" @change="updateWorkingTimes"/>
+                <input type="number" id="days" v-model="chosenTimelapsed" min="1" max="30" />
             </div>
             <div class="chartSelector">
                 <select v-model="graphMode">
