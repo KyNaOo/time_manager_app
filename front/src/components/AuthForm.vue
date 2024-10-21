@@ -31,7 +31,7 @@ const user = ref<Partial<User>>(
         email: '',
         password: '',
         confirmPassword: '',
-        role: 'user',
+        role: 'admin',
       }
 );
 
