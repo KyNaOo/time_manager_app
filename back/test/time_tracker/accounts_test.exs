@@ -21,11 +21,13 @@ defmodule TimeTracker.AccountsTest do
     end
 
     test "create_user/1 with valid data creates a user" do
-      valid_attrs = %{email: "some email", username: "some username"}
+      valid_attrs = %{email: "some email", username: "some username", password: "some password",role: "user"}
 
       assert {:ok, %User{} = user} = Accounts.create_user(valid_attrs)
       assert user.email == "some email"
       assert user.username == "some username"
+      assert user.password == "some password"
+      assert user.role == "user"
     end
 
     test "create_user/1 with invalid data returns error changeset" do

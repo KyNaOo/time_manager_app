@@ -12,7 +12,9 @@ defmodule TimeTracker.AccountsFixtures do
       attrs
       |> Enum.into(%{
         email: "some email",
-        username: "some username"
+        username: "some username",
+        password: "some password",
+        role: "user"
       })
       |> TimeTracker.Accounts.create_user()
 
@@ -32,4 +34,5 @@ defmodule TimeTracker.AccountsFixtures do
 
     team
   end
+
 end

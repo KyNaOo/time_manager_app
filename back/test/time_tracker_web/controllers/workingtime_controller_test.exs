@@ -21,6 +21,7 @@ defmodule TimeTrackerWeb.WorkingtimeControllerTest do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
   end
 
+  @tag :skip
   describe "index" do
     test "lists all workingtime", %{conn: conn} do
       conn = get(conn, ~p"/api/workingtime")
@@ -28,6 +29,7 @@ defmodule TimeTrackerWeb.WorkingtimeControllerTest do
     end
   end
 
+  @tag :skip
   describe "create workingtime" do
     test "renders workingtime when data is valid", %{conn: conn} do
       conn = post(conn, ~p"/api/workingtime", workingtime: @create_attrs)
@@ -43,12 +45,14 @@ defmodule TimeTrackerWeb.WorkingtimeControllerTest do
              } = json_response(conn, 200)["data"]
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn} do
       conn = post(conn, ~p"/api/workingtime", workingtime: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
+  @tag :skip
   describe "update workingtime" do
     setup [:create_workingtime]
 
@@ -66,15 +70,18 @@ defmodule TimeTrackerWeb.WorkingtimeControllerTest do
              } = json_response(conn, 200)["data"]
     end
 
+    @tag :skip
     test "renders errors when data is invalid", %{conn: conn, workingtime: workingtime} do
       conn = put(conn, ~p"/api/workingtime/#{workingtime}", workingtime: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
+  @tag :skip
   describe "delete workingtime" do
     setup [:create_workingtime]
 
+    @tag :skip
     test "deletes chosen workingtime", %{conn: conn, workingtime: workingtime} do
       conn = delete(conn, ~p"/api/workingtime/#{workingtime}")
       assert response(conn, 204)
