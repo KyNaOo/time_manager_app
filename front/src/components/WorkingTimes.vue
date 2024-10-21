@@ -70,18 +70,22 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-<div class="WorkingTimes" v-if="workingTimes">
-  <div class="workingTimesTitle">
-    <h2>All working Times</h2>
-    <ClockIcon class="icon" />
+    <div class="WorkingTimes" v-if="workingTimes">
+      <div class="workingTimesTitle">
+        <h2>Toutes tes heures à veiller</h2>
+      </div>
+      <SuperTable :tableType="'workingtime'" :tableHeaders="tableHeaders" :tableData="workingTimes" :showActions="showActions" />
+    </div>
+    <div v-else>Commence à veiller !
   </div>
-  <SuperTable :tableType="'workingtime'" :tableHeaders="tableHeaders" :tableData="workingTimes" :showActions="showActions" />
-</div>
-<div v-else>No Working Times Yet
-</div>
 </template>
 
 <style scoped>
+h2 {
+  text-transform: uppercase;
+  font-size: 28px;
+}
+
 .WorkingTimes {
   margin: 20px 0;
   display: flex;

@@ -71,12 +71,13 @@ watch(password, (newValue) => {
 </template>
 
 <style scoped>
-/* Add your styles here */
 .password-field {
   box-sizing: border-box;
   width: 100%;
   height: 40px;
-  border: 1px solid #93c5fd;
+  border: 1px solid white;
+  background-color: #353535;
+  color: white;
   border-radius: 4px;
   font-size: 16px;
   padding: 5px;
@@ -88,7 +89,7 @@ watch(password, (newValue) => {
   /* position: absolute;
   right: 40px;
   top: 50%; */
-  color: #93c5fd;
+  color: #FFCC26;
 }
 
 .show {

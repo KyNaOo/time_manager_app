@@ -56,22 +56,16 @@ onBeforeMount(async () => {
 
 <template>
     <div class="UserView" v-if="user">
-        <button @click="$router.back()">Go Back</button>
         <div class="flexWrapper">
             <div class="formUser">
-            <h2>{{mode === 'create' ? 'Create User' : 'Edit User'}} </h2>
+            <h2>{{mode === 'create' ? 'Create User' : 'TON PROFIL'}} </h2>
             <Form context="user" :user="user" :mode="mode" @submit="action" />
-            </div>
-            <WorkingTimes v-if="mode === 'edition'" :user="user" />            
+            </div>  
         </div>
-        <div class="graphWrapper">
-
-        <ChartManager v-if="workingTimes" :workingTimes="workingTimes"/>
-        </div>
-
+        <button @click="$router.back()">Go Back</button>
     </div>
     <div v-else>
-        <p>User not found</p>
+        <h2>Tu n'est pas un utilisateur de Gottham.</h2>
         <button @click="$router.back()">Go Back</button>
     </div>
 </template>
@@ -79,19 +73,30 @@ onBeforeMount(async () => {
 
 <style scoped >
 .UserView {
+
+}
+
+h2 {
+    text-transform: uppercase;
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
 }
 
 .flexWrapper {
+    color: white;
+    padding: 30px 50px;
+    margin: auto;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    width: 100%;
-    gap: 20px;
+    width: 50%;
+    padding: ;
     border-color: red 1px solid;
+    background-color: #353535;
 }
 
 .formUser {
-    margin-top: 20px;
     flex: 1;
 }
 

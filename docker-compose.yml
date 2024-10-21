@@ -24,6 +24,7 @@ services:
     #container_name: time_manager-api
     #image: phoenix_api
     pull_policy: build 
+    # restart: unless-stopped
     build:
       context: ./back
       dockerfile: Dockerfile
