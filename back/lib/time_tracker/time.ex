@@ -17,6 +17,10 @@ defmodule TimeTracker.Time do
       [%Clock{}, ...]
 
   """
+  def list_clocks do
+    Repo.all(Clock)
+  end
+
   def list_clocks(params) do
     Clock
     |> where(user_id: ^params["user_id"])

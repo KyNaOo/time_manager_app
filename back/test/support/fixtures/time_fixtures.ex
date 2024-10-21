@@ -1,21 +1,32 @@
 defmodule TimeTracker.TimeFixtures do
-  @moduledoc """
-  This module defines test helpers for creating
-  entities via the `TimeTracker.Time` context.
-  """
+  alias TimeTracker.Accounts
+  alias TimeTracker.Time
 
-  @doc """
-  Generate a clock.
-  """
+  def user_fixture(attrs \\ %{}) do
+    {:ok, user} =
+      attrs
+      |> Enum.into(%{
+        username: "some username",
+        email: "some@email.com",
+        password: "some password",
+        role: "user"
+      })
+      |> Accounts.create_user()
+
+    user
+  end
+
   def clock_fixture(attrs \\ %{}) do
+    user = user_fixture()
+
     {:ok, clock} =
       attrs
       |> Enum.into(%{
+        time: ~N[2023-01-01 12:00:00],
         status: true,
-        time: ~N[2024-10-06 15:05:00],
-        user_id: 42
+        user_id: user.id
       })
-      |> TimeTracker.Time.create_clock()
+      |> Time.create_clock()
 
     clock
   end

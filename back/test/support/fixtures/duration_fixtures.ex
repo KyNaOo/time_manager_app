@@ -1,21 +1,32 @@
 defmodule TimeTracker.DurationFixtures do
-  @moduledoc """
-  This module defines test helpers for creating
-  entities via the `TimeTracker.Duration` context.
-  """
+  alias TimeTracker.Accounts
+  alias TimeTracker.Duration
 
-  @doc """
-  Generate a workingtime.
-  """
+  def user_fixture(attrs \\ %{}) do
+    {:ok, user} =
+      attrs
+      |> Enum.into(%{
+        username: "some username",
+        email: "some@email.com",
+        password: "some password",
+        role: "user"
+      })
+      |> Accounts.create_user()
+
+    user
+  end
+
   def workingtime_fixture(attrs \\ %{}) do
+    user = user_fixture()
+
     {:ok, workingtime} =
       attrs
       |> Enum.into(%{
-        end: ~N[2024-10-06 15:07:00],
-        start: ~N[2024-10-06 15:07:00],
-        user_id: 42
+        start: ~N[2023-01-01 12:00:00],
+        end: ~N[2023-01-01 18:00:00],
+        user_id: user.id
       })
-      |> TimeTracker.Duration.create_workingtime()
+      |> Duration.create_workingtime()
 
     workingtime
   end
