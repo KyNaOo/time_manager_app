@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SuperTable from '@/components/SuperTable.vue';
-
+import { UserGroupIcon } from '@heroicons/vue/24/solid'
 
 import { ref, onBeforeMount, computed } from 'vue';
 
@@ -33,6 +33,14 @@ onBeforeMount(async () => {
     try {
         user.value = await store.user;
         teams.value = await api.getUserTeams(user.value!);
+        if (!teams.value) {
+            teams.value = [];
+        }
+        teams.value.forEach((team) => {
+            if (team.is_team_leader !== undefined) {
+                delete team?.is_team_leader;
+            }
+        });
         console.log("teams:", teams.value)
     } catch (e) {
         console.log("Error fetching teams:", e)
@@ -50,17 +58,13 @@ onBeforeMount(async () => {
             <UserGroupIcon class="icon"/>
         </div>        
         <RouterLink v-if="userisAdmin" to="/app/team/?create=true" >Create Team</RouterLink>
-        <SuperTable v-if="teams" :tableData="teams" tableType="teams" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
+        <SuperTable v-if="teams" :tableData="teams" tableType="team" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
     </div>
 </template>
 
 
 
 <style scoped>
-.teams {
-    padding: 20px;
-}
-
 .teams h1 {
     font-size: 24px;
     margin-bottom: 10px;

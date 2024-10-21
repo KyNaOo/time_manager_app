@@ -167,14 +167,14 @@ async function getUserTeams(user: User) {
 }
 
 // Delete user
-async function deleteUser(user: User) {
+async function deleteUser(userId: number) {
   try {
-      console.log(`Delete user with ID:`, user.id);
+      console.log(`Delete user with ID:`, userId);
       // Delete user
-      await instance.delete(`/api/users/${user.id}`);
-      console.log(`Deleted user with ID: ${user.id}`);
+      await instance.delete(`/api/users/${userId}`);
+      console.log(`Deleted user with ID: ${userId}`);
   } catch (e) {
-      console.log(`Error deleting user with ID: ${user.id}`, e);
+      console.log(`Error deleting user with ID: ${userId}`, e);
   }
 }
 
@@ -188,6 +188,18 @@ async function getTeams() {
       return res.data.data;
   } catch (e) {
       console.log("Error fetching teams:", e);
+  }
+}
+
+// Get team by id
+async function getTeam(id: number): Promise<Team | null> {
+  try {
+      // get team by id
+      const response = await instance.get(`/api/team/${id}`);
+      return response.data.data as Team;
+  } catch (e) {
+      console.log("Error fetching team:", e);
+      return null;
   }
 }
 
@@ -399,6 +411,7 @@ export const useApi = () => {
     // Teams
     createTeam,
     getTeams,
+    getTeam,
     modifyTeam,
     deleteTeam,
     // UserTeams

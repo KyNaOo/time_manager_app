@@ -8,10 +8,10 @@ import InputField from "./forms/InputField.vue";
 import PasswordField from "./forms/PasswordField.vue";
 import { useAuth } from "@/api/auth";
 import type { User } from "../types/crudTypes";
-
-
 const auth = useAuth();
 const api = useApi(); 
+
+const error = ref<string | null>(null);
 
 const props = defineProps({
   authMode: {
@@ -57,6 +57,8 @@ const handleAuth = async () => {
     } else {
       console.log('Attempting to register...');
       delete user.value.confirmPassword;
+      // const hashedPassword = await bcrypt.hash(user.value.password!, 10);
+      // user.value.password = hashedPassword;
       console.log('User Data:', user.value);
       await auth.register({
         email: user.value.email!,
@@ -65,11 +67,17 @@ const handleAuth = async () => {
         role: user.value.role!
       });
     }
-      
+    router.push('/app');   
   } catch (err : any) {
     console.log('USer not authenticated', user.value);
     console.log(err.response.data.error);
-    store.showModal({message: err.response.data.error, title: 'Error'});
+    const message = err.response.data.error;
+    if (message === 'unauthorized') {
+      error.value = 'Invalid email or password';
+    } else {
+      error.value = 'An error occurred';
+    }
+    // store.showModal({message: err.response.data.error, title: 'Error'});
   }
 };
 
@@ -122,6 +130,7 @@ watch(user, (newValue) => {
         {{props.authMode == 'register' ? 'Register' : 'Login'}}
       </button>
       <span v-if="!passwordsMatch && authMode === 'register'" class="error">Passwords do not match</span>
+      <span v-if="error" class="error">{{error}}</span>
       <p class="auth-link">Click <a @click="goTo">here</a> to {{props?.authMode == 'register' ? 'login' : 'register'}}</p>
     </form>
   </div>

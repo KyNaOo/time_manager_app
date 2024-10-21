@@ -7,19 +7,9 @@ import type {User, WorkingTime} from '@/types/crudTypes'
 import { useApi } from '@/api';
 
 const api = useApi();  
-
-interface Props {
-    workingTime: WorkingTime ;
-}
-
-const props = defineProps<Props>();
-
 const route = useRoute()
-const workingTimeId = ref(route.params.id);
+const workingTimeId = ref(route.params.id ? String(route.params.id) : null);
 const userId = ref(route.params.userId);
-
-
-const user = ref<User | null>(null)
 const workingTime = ref<WorkingTime | null>(null)
 
 onBeforeMount(async () => {

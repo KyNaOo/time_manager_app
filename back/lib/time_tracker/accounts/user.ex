@@ -5,7 +5,8 @@ defmodule TimeTracker.Accounts.User do
   schema "users" do
     field :email, :string
     field :username, :string
-    field :password, :string
+    field :password, :string, virtual: true
+    field :password_hash, :string
     field :role, :string
     has_many :team_members, TimeTracker.Accounts.TeamMember
     timestamps(type: :utc_datetime)
@@ -15,9 +16,18 @@ defmodule TimeTracker.Accounts.User do
   def changeset(user, attrs) do
     user
     |> cast(attrs, [:username, :email, :password, :role])
-    |> validate_required([:username, :email , :password, :role])
+    |> validate_required([:username, :email, :password, :role])
+    |> unique_constraint(:email)
+    |> unique_constraint(:username)
+    |> put_password_hash()
   end
 
 
+  defp put_password_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
+    # Hash the password and update the changeset
+    change(changeset, Bcrypt.add_hash(password))
+  end
+
+  defp put_password_hash(changeset), do: changeset
 
 end
