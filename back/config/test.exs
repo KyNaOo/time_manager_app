@@ -6,8 +6,8 @@ import Config
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :time_tracker, TimeTracker.Repo,
-  username: "postgres",
-  password: "23012003",
+  username: "ethanol",
+  password: "Rooot55!",
   hostname: "localhost",
   database: "time_tracker_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
