@@ -36,11 +36,11 @@ onBeforeMount(async () => {
         if (!teams.value) {
             teams.value = [];
         }
-        teams.value.forEach((team) => {
-            if (team.is_team_leader !== undefined) {
-                delete team?.is_team_leader;
-            }
-        });
+        // teams.value.forEach((team) => {
+        //     if (team.is_team_leader !== undefined) {
+        //         delete team?.is_team_leader;
+        //     }
+        // });
         console.log("teams:", teams.value)
     } catch (e) {
         console.log("Error fetching teams:", e)
