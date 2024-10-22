@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: epitechmscpropromo2026-arc-runners
+    runs-on: self-hosted  # Using self-hosted runner
     defaults:
       run:
         working-directory: ./back
@@ -15,11 +15,16 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential make gcc libssl-dev automake autoconf
+    
     - name: Set up Elixir
       uses: erlef/setup-beam@v1
       with:
         elixir-version: '1.15.7'    
-        otp-version: '26'        
+        otp-version: '26'         
     
     - name: Restore dependencies cache
       uses: actions/cache@v2
@@ -29,14 +34,17 @@ jobs:
         restore-keys: ${{ runner.os }}-mix-
     
     - name: Install dependencies
-      run: mix deps.get
+      run: |
+        mix local.hex --force
+        mix local.rebar --force
+        mix deps.get
     
     - name: Run tests
       run: mix test
 
   build:
     needs: test
-    runs-on: epitechmscpropromo2026-arc-runners
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v2
     
