@@ -119,11 +119,6 @@ router.beforeEach(async (to, from, next) => {
       return next("/app");
     }
 
-    // if (authenticated && to.path === "/app") {
-    //   console.log('Redirecting to ', to.path);
-    //   return next();
-    // }
-
     console.log('Passed controls: ');
 
     return next();
