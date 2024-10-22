@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: epitechmscpropromo2026-arc-runners
+    runs-on: epitechmscpropromo2026-arc-runners-dkpd7-runner-292mr
 
     steps:
       - name: Check Docker Status
