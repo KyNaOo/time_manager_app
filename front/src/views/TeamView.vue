@@ -9,7 +9,8 @@ import { store } from '@/api/store';
 
 const route = useRoute();
 const team = ref<Team | null>(null)
-const teamId = route.query.id ? String(route.query.id) : undefined;
+const teamId = route.params.id ? String(route.params.id) : undefined;
+console.log('Team ID:', teamId)
 const mode = computed(() => route.query.create ? 'create' : 'edition');
 const api = useApi();
 const currentUser = ref<User | null>(null);
@@ -22,16 +23,16 @@ const action = async() => {
     }
     if (mode.value === 'create') {
         if (currentUser.value && currentUser.value.id !== undefined) {
-            const newTeam = await api.createTeam(team.value.name, currentUser.value.id)
+            const newTeam = await api.createTeam(team.value.title, currentUser.value.id)
             console.log('Team created', newTeam)
         } else {
             console.error('Current user or user ID is null or undefined')
         }
         // redirect to teams view
-        // router.push('/app/teams')
+        store.showModal({message: 'Team created successfully', title: 'Success'});
     } else {
         if (teamId !== undefined && currentUser.value && currentUser.value.id !== undefined) {
-            await api.modifyTeam(Number(teamId), team.value.name, currentUser.value!.id);
+            await api.modifyTeam(Number(teamId), team.value.title, currentUser.value!.id);
         } else {
             console.error('Team ID is undefined');
         }
@@ -45,12 +46,15 @@ onBeforeMount(async () => {
         console.log('Full Route :', route)
         if (mode.value === 'create') {
             team.value = {
-                name: '',
+                title: '',
+                is_team_leader: true
             }
             return
         }
+        team.value = await api.getTeam(Number(teamId));
+
+        console.log('Team:', team.value)
         
-        console.log('Stored User:', currentUser.value)
       
     } catch (error) {
         console.error('Error fetching user data:', error)

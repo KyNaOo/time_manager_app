@@ -6,8 +6,8 @@ import Config
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :time_tracker, TimeTracker.Repo,
-  username: "postgres",
-  password: "postgres",
+  username: "ethanol",
+  password: "Rooot55!",
   hostname: "localhost",
   database: "time_tracker_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
@@ -18,7 +18,7 @@ config :time_tracker, TimeTracker.Repo,
 config :time_tracker, TimeTrackerWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
   secret_key_base: "eVjlmkiCrx4B4f2XKOghjTLhFf6cZmFSVf3v0b7CWLyKVT5okwGyrrN8ghXPtzl+",
-  server: false
+  server: true
 
 # In test we don't send emails
 config :time_tracker, TimeTracker.Mailer, adapter: Swoosh.Adapters.Test

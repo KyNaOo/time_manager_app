@@ -13,7 +13,7 @@ defmodule TimeTracker.User do
   def changeset(user, attrs) do
     user
     |> cast(attrs, [:username, :email])
-    |> validate_required([:username, :email])
-
+    |> validate_required([:username, :email, :password])
+    |> unique_constraint(:email)
   end
 end

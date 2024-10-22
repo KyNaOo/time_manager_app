@@ -29,7 +29,8 @@ export interface Clock {
 
 export interface Team {
     id?: number;
-    name: string;
+    title: string;
+    is_team_leader: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }

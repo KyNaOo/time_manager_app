@@ -36,7 +36,13 @@ const modal = ref<Modal>({
 
 async function reallyDelete(id: number) {
         try {
-            await api.deleteWorkingTime(id);
+            if (props.tableType === 'team') {
+                await api.deleteTeam(id);
+            } else if (props.tableType === 'user') {
+                await api.deleteUser(id);
+            } else if (props.tableType === 'workingtime') {
+                await api.deleteWorkingTime(id);
+            }
             store.showModal({message: 'Item deleted successfully', title: 'Success'});
         } catch (error) {
             console.error('Failed to delete item:', error);
@@ -44,17 +50,15 @@ async function reallyDelete(id: number) {
     };
 
 const handleDelete = async () => {
-    console.log(`Delete row`);``
+    console.log(`Delete row`);
     modal.value = {
         isVisible: true,
-        title: 'User deletion?',
-        message: 'Are you sure you want to delete this item?'
+        title: `${props.tableType.charAt(0).toUpperCase() + props.tableType.slice(1)} deletion?`,
+        message: `Are you sure you want to delete this ${props.tableType}?`
     };
 };
 
 const { tableHeaders, tableData } = toRefs(props);
-
-console.log(tableHeaders.value, tableData.value[0]);   
 
 function formatDate(date: Date) {
     return moment(date).format('MMMM Do YYYY, h:mm:ss a')
@@ -78,10 +82,11 @@ function formatDate(date: Date) {
                     <td v-if="showActions" class="actionCell">
                         <RouterLink v-if="tableType === 'workingtime'" :to="`/app/${tableType}/${tableData[0].user_id}/${tableData[rowIndex].id}`">See</RouterLink>
                         <RouterLink v-else-if="tableType === 'user'" :to="`/app/${tableType}/${tableData[rowIndex].id}`">See</RouterLink>
+                        <RouterLink v-else-if="tableType === 'team'" :to="`/app/${tableType}/${tableData[rowIndex].team_id}`">See</RouterLink>
                         <!-- Add your action buttons or elements here -->
                         <button class="deleteBtn" @click="handleDelete()">Delete</button>
                         <ModalAction v-if="modal.isVisible" :title=modal.title :message="modal.message" 
-                        @confirm="reallyDelete(tableData[rowIndex].id)" @close="modal.isVisible = false" />
+                        @confirm="reallyDelete(tableType === 'team' ? tableData[rowIndex].team_id :tableData[rowIndex].id)" @close="modal.isVisible = false" />
                     </td>
                 </tr>
 

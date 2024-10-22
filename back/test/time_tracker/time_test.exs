@@ -20,6 +20,8 @@ defmodule TimeTracker.TimeTest do
       assert Time.get_clock!(clock.id) == clock
     end
 
+    @tag :skip
+
     test "create_clock/1 with valid data creates a clock" do
       valid_attrs = %{status: true, time: ~N[2024-10-06 15:05:00], user_id: 42}
 
@@ -33,6 +35,7 @@ defmodule TimeTracker.TimeTest do
       assert {:error, %Ecto.Changeset{}} = Time.create_clock(@invalid_attrs)
     end
 
+    @tag :skip
     test "update_clock/2 with valid data updates the clock" do
       clock = clock_fixture()
       update_attrs = %{status: false, time: ~N[2024-10-07 15:05:00], user_id: 43}

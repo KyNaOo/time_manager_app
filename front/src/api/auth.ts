@@ -31,6 +31,7 @@ async function signIn(email: string, password: string) {
     // Redirect or handle sign-in success
   } catch (error) {
     console.error("Error during sign-in:", error);
+    throw error;
     // Handle error
   }
 }
@@ -51,6 +52,9 @@ async function register(user : User) {
         const token = response.data.token;
         // Save token to localStorage
         localStorage.setItem("token", token);
+        store.setToken(token);
+        console.log("Token saved to localStorage and store");
+    router.push('/app');
     } catch (error) {
         // Handle error
         throw error;

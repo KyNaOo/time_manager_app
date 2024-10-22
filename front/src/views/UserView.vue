@@ -63,6 +63,7 @@ onBeforeMount(async () => {
             </div>  
         </div>
         <button @click="$router.back()">Go Back</button>
+
     </div>
     <div v-else>
         <h2>Tu n'est pas un utilisateur de Gottham.</h2>
@@ -91,7 +92,7 @@ h2 {
     flex-direction: row;
     justify-content: space-between;
     width: 50%;
-    padding: ;
+    padding: 23px 64px;
     border-color: red 1px solid;
     background-color: #353535;
 }
