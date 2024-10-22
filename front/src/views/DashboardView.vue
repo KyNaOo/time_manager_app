@@ -183,6 +183,7 @@ h4 {
     padding: 60px 80px;
     border-radius: 8px;
     background-color: #353535;
+    color: white;
 }
 
 .clockBlock{

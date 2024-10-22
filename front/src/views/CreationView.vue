@@ -22,7 +22,7 @@ onBeforeMount(async () => {
 
 <template>
     <div class="UserView">
-        <UserBox v-if="user" :user="user" />
+        <UserBox :user="user" />
     </div>
 </template>
 
@@ -31,7 +31,6 @@ onBeforeMount(async () => {
 .UserView {
     width: 100%;
 }
-
 .ProfileView {
     padding: 20px;
     max-width: 600px;

@@ -23,6 +23,8 @@ const formData = computed(() => {
         return {
             username: user.value.username,
             email: user.value.email,
+            password: user.value.password,
+            role: user.value.role
         };
     } else if (props.context === 'team' && team.value) {
         return {
@@ -50,6 +52,10 @@ const handleSubmit = () => {
                 <div class="form-field">
                     <label for="password">Password:</label>
                     <input type="password" id="password" v-model="user.password" />
+                </div>
+                <div class="form-field">
+                    <label for="role">Rôle:</label>
+                    <input type="text" id="role" v-model="user.role" />
                 </div>
             </div>
             <div v-else-if="props.context === 'team' && team">

@@ -70,7 +70,9 @@ const turnOffError = () => {
       const resp = await instance.post(`http://localhost:4000/api/users`, {
         user: {
           username: user.username,
-          email: user.email
+          email: user.email,
+          password: user.password,
+          role: user.role
         }
       });
       console.log(`Created user: ${resp.data.data}`);
