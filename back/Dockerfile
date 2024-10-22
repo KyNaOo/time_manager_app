@@ -14,8 +14,6 @@ COPY mix.exs mix.lock ./
 # Install Elixir dependencies
 RUN mix do deps.get
 
-VOLUME "/app"
-
 # Copy the rest of the application code
 COPY . .
 

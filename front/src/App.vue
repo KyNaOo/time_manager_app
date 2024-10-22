@@ -13,7 +13,6 @@ import { store } from './api/store';
           <component :is="Component" />
         </transition>
         </AppLayout>
-
     </router-view>
     <Modal v-if="store.modal !== null" :message="store.modal.message" :title="store.modal.title" />
   </main>

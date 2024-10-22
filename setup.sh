@@ -7,8 +7,8 @@ delete_all() {
 }
 
 create_network() {
-    docker network create --driver bridge back
-    docker network create --driver bridge front
+    docker network create --driver bridge backend
+    docker network create --driver bridge frontend
 }
 
 do_database() {
@@ -75,4 +75,7 @@ do_all() {
     do_frontend
 }
 
-do_all
+#do_all
+delete_all
+#create_network
+#do_database

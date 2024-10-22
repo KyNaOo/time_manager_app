@@ -6,13 +6,8 @@ import HelloWorld from '@/components/HelloWorld.vue'
 
 <template>
   <div class="Home">
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
     <div class="wrapper">
       <HelloWorld msg="Time Manager" />
-      <nav>
-        <RouterLink to="/login">Login</RouterLink>
-        <RouterLink to="/register">Register</RouterLink>
-      </nav>
     </div>
   </div>
   </template>

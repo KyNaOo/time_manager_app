@@ -101,27 +101,28 @@ onBeforeMount(async () => {
 </script>
 
 <template>
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
     <div class="Dashboard">
         <div class="block user">
             <div class="flex-item user">
-                <h2>  Hello {{ user?.username }} !</h2>
+                <h2>  Heyyy {{ user?.username }} !</h2>
               </div>
             <div class="flex-item clockBlock">
                 <div v-if="working && workingTimes" class="workingBlock">
-                    <h3> You are currently working 🤓 </h3>
+                    <h3> J'ai l'impression que tu es déjà entrain de veiller sur Gottham City ! </h3>
                     <div class="lastWorkingTime">
-                        <div class="timeWrapper">
-                            <h4 >Started at:</h4>
+                        <div class="timeWrapper start">
+                            <h4 >Tu as commencé à :</h4>
                             <span class="time startTime">{{ workingTimes[workingTimes.length - 1].start }}</span>
                         </div>
-                        <div class="timeWrapper">
+                        <div class="timeWrapper end">
                             <h4>End (not real):</h4>
                             <span class="time endTime">{{ workingTimes[workingTimes.length - 1].end }}</span>
                         </div>
                     </div>
                 </div>
                 <div v-else class="notWorkingBlock">
-                    <h3> Clock In to start working 😮‍💨</h3>
+                    <h3> D'un simple "clock in" à un rapide "clock out", prenez le contrôle <br> de votre journée en un clin d'œil – pas besoin de Bat-Signal ! 😮‍💨</h3>
                 </div>
                 <button :class="working ? 'clockOut' : 'clockIn'" @click="clock()">{{ working ? 'Clock Out' : 'Clock In' }}</button>
             </div>
@@ -139,8 +140,8 @@ onBeforeMount(async () => {
         </template>
         <template v-else>
             <div class="block chart">
-                <h2>No data to show yet 😓</h2>
-                <p>Start working to see your progress</p>
+                <h2>Tu n'as enregistré aucune heure</h2>
+                <p>Commence a veiller pour voir tes clocks</p>
             </div>
         </template>
 
@@ -154,25 +155,31 @@ onBeforeMount(async () => {
 <style scoped>
 
 h2 {
-    font-size: 30px;
+    font-size: 38px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+h3 {
+    margin-bottom: 10px;
+    font-weight: lighter;
 }
 h4 {
     font-weight: bold;
 }
 .Dashboard {
-    width: 100%;
+    width: 70%;
     height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: start;
-    gap: 20px;
+    gap: 25px;
+    font-family: 'Poppins';
 }
 
-.block{
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+.chart{
+    padding: 60px 80px;
     border-radius: 8px;
-
+    background-color: #353535;
 }
 
 .clockBlock{
@@ -214,21 +221,32 @@ h4 {
     gap: 20px;
 }
 
-.timeWrapper {
+.start {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin-bottom: 10px;
+}
+
+.start span {
+    text-align: center;
+    padding: 8px 4px;
+    font-size: 12px;
+}
+
+.end {
+    display: none;
 }
 
 .time {
     font-size: 14px;
     font-weight: bold;
-    border-radius: 10px;
+    border-radius: 5px;
     padding: 10px 5px;
 }
 
 .startTime {
-    background-color: #4CAF50;
+    background-color: #3b913d;
     color: white;
 }
 
@@ -238,24 +256,41 @@ h4 {
 }
 
 .clockIn {
-    padding: 10px;
+    padding: 12px 20px;
     background-color: #4CAF50;
     color: white;
     border: none;
     cursor: pointer;
     border-radius: 5px;
     width: fit-content;
-    font-size: medium;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.clockIn:hover {
+    cursor: pointer;
+    transition: 0.4s;
+    background-color: #1e481f;
 }
 
 .clockOut {
-    padding: 10px;
-    background-color: #ff4d4d;
+    padding: 12px 20px;
+    background-color: #cd1d1d;
     color: white;
     border: none;
     cursor: pointer;
     border-radius: 5px;
     width: fit-content;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.clockOut:hover {
+    cursor: pointer;
+    transition: 0.4s;
+    background-color: #671e1e;
 }
 
 </style>

@@ -54,8 +54,7 @@ onBeforeMount(async () => {
 <template>
     <div class="teams">
         <div class="usersTitle">
-            <h2>Teams</h2>
-            <UserGroupIcon class="icon"/>
+            <h2>Ton équipe</h2>
         </div>        
         <RouterLink v-if="userisAdmin" to="/app/team/?create=true" >Create Team</RouterLink>
         <SuperTable v-if="teams" :tableData="teams" tableType="team" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
@@ -65,17 +64,21 @@ onBeforeMount(async () => {
 
 
 <style scoped>
+.teams {
+    background-color: #353535;
+    padding: 30px 60px;
+    border-radius: 10px;
+}
+
 .teams h1 {
     font-size: 24px;
     margin-bottom: 10px;
 }
 
-.teams ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-.teams li {
-    margin: 5px 0;
+.teams h2 {
+    text-transform: uppercase;
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
 }
 </style>

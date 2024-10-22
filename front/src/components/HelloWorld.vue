@@ -1,41 +1,46 @@
 <script setup lang="ts">
-defineProps<{
-  msg: string
-}>()
 </script>
 
 <template>
-  <div class="greetings">
-    <h1 class="green">{{ msg }}</h1>
-    <h3>
-      This is a Time Manager app built with
-      <a href="https://vitejs.dev/" target="_blank" rel="noopener">Vite</a> +
-      <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>.
-    </h3>
+  <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+  <div class="accueil">
+    <h1>Bienvenue sur TimeTrack</h1>
+    <h3>GEREZ VOTRE TEMPS COMME CLOCK TIME</h3>
+    <nav>
+        <RouterLink class="login" to="/login">Login</RouterLink>
+        <RouterLink class="register" to="/register">Register</RouterLink>
+    </nav>
   </div>
 </template>
 
 <style scoped>
-h1 {
-  font-weight: 500;
-  font-size: 2.6rem;
-  position: relative;
-  top: -10px;
+.accueil {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Poppins';
+  background-color: #353535;
+  padding: 80px 60px;
+  border-radius: 25px;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-h3 {
-  font-size: 1.2rem;
+.accueil h1 {
+  margin: auto;
+  font-size: 42px;
+  font-weight: bold;
 }
 
-.greetings h1,
-.greetings h3 {
-  text-align: center;
+.acceuil h3 {
+  font-size: 32px;
+  font-weight: lighter;
+  margin: auto;
 }
 
-@media (min-width: 1024px) {
-  .greetings h1,
-  .greetings h3 {
-    text-align: left;
-  }
+nav {
+  width: 220px;
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
 }
 </style>

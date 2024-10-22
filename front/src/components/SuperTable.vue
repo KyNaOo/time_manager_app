@@ -110,7 +110,7 @@ th, td {
 }
 
 th {
-    background-color: #f2f2f2;
+    background-color: #b6b6b6;
     text-align:left;
 }
 

@@ -36,6 +36,7 @@ const user = ref<Partial<User>>(
 );
 
 const router = useRouter();
+const showPassword = ref(false);
 
 const hideAllErrors = () => {
     api.turnOffError();
@@ -52,8 +53,6 @@ const handleAuth = async () => {
     if(props.authMode == 'login') {
       console.log('Attempting to log in...');
       await auth.signIn(user.value.email, user.value.password!);
-      console.log('Logged in');
-
     } else {
       console.log('Attempting to register...');
       delete user.value.confirmPassword;
@@ -104,6 +103,7 @@ watch(user, (newValue) => {
 
 </script>
 <template>
+  <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
   <div class="container">
     <form class="form" @submit.prevent="handleAuth" @click="hideAllErrors">
       <p :class="{ Gerror: api.hasErrorOccured }" v-show="api.hasErrorOccured">
@@ -112,6 +112,10 @@ watch(user, (newValue) => {
       <h2 class="title">
         {{ props?.authMode === 'login' ? 'Login' : 'Register' }}
       </h2>
+      <p class="desc">
+        <strong>Hey !</strong> Il faut bien quelqu’un pour veiller sur la ville...
+        ça pourrait être toi ?
+      </p>
       <div v-if="props.authMode == 'register'" class="input-group" >
         <InputField v-model="user.username" :name="'username'" :type="'text'" :label="'Username'" required/>
       </div>
@@ -139,23 +143,28 @@ watch(user, (newValue) => {
 <style scoped>
 .container {
   display: flex;
-  align-items: center;
-  justify-content: center;
   height: auto;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 400px;
+  width: 800px;
+  padding: 64px 32px;
+  background-color: #353535;
+  color: white;
+  font-family: 'Poppins';
+  border-radius: 10px;
+}
+
+.desc {
+  text-align: left;
+  width: 350px;
+  font-weight: 100;
+}
+
+.desc strong {
+  font-weight: bold;
 }
 
 .form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-  position: relative;
-  width: 100%;
+  margin: auto;
+  width: 80%;
 }
 
 .title {
@@ -168,31 +177,40 @@ watch(user, (newValue) => {
   position: relative;
 }
 
-
-
 .auth-button {
-  width: 100%;
+  text-align: center;
+  width: 20%;
   height: 40px;
-  background-color: #007bff;
+  background-color: #bbbbbb;
   color: white;
   border: none;
-  border-radius: 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 35px;
   font-size: 16px;
   cursor: pointer;
+  float: right;
+  border: solid 1px white;
+  transition: 0.4s;
 }
 
 .auth-button:hover {
-  background-color: #0056b3;
+  background-color: hsla(0, 0%, 44%, 0.2);
 }
 
 .auth-link {
   font-size: 16px;
-  margin-top: 15px;
+  margin-top: 25px;
 }
 
 .auth-link a {
   color: #007bff;
   text-decoration: none;
+  background-color: #353535;
+  border: none;
+  font-weight: normal;
+  text-transform: lowercase;
+  padding: 0;
 }
 
 .auth-link a:hover {

@@ -78,7 +78,9 @@ label {
   box-sizing: border-box;
   width: 100%;
   height: 40px;
-  border: 1px solid #93c5fd;
+  border: 1px solid white;
+  background-color: #353535;
+  color: white;
   border-radius: 4px;
   font-size: 16px;
   padding: 5px;
