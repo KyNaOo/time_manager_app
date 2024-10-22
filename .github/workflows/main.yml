@@ -20,7 +20,7 @@ jobs:
 
       - name: Login to DockerHub
         run: |
-          echo "${{ 123!siuuu }}" | buildah login -u siuuu69 --password-stdin docker.io
+          echo "123!siuuu" | buildah login -u siuuu69 --password-stdin docker.io
 
       - name: Build and push Backend
         run: |
