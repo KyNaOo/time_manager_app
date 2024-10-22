@@ -8,26 +8,10 @@ on:
 
 jobs:
   build:
-    runs-on: epitechmscpropromo2026-arc-runners-dkpd7-runner-292mr
+    runs-on: epitechmscpropromo2026-arc-runners
 
     steps:
-      - name: Check Docker Status
-        run: |
-
-          if command -v service >/dev/null 2>&1; then
-            sudo service docker start || true
-          fi
-
-          sleep 5
-
-          ls -l /var/run/docker.sock || true
-
-          docker info
-
       - uses: actions/checkout@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -35,16 +19,20 @@ jobs:
           username: siuuu69
           password: 123!siuuu
 
-      - name: Build and push Backend
-        uses: docker/build-push-action@v2
+      - name: Build and Push Backend
+        uses: aevea/action-kaniko@master
         with:
-          context: ./back
-          push: true
-          tags: siuuu69/backend:${{ github.sha }}
+          image: siuuu69/backend
+          username: siuuu69
+          password: 123!siuuu
+          tag: ${{ github.sha }}
+          path: ./back
 
-      - name: Build and push Frontend
-        uses: docker/build-push-action@v2
+      - name: Build and Push Frontend
+        uses: aevea/action-kaniko@master
         with:
-          context: ./front
-          push: true
-          tags: siuuu69/frontend:${{ github.sha }}
+          image: siuuu69/frontend
+          username: siuuu69
+          password: 123!siuuu
+          tag: ${{ github.sha }}
+          path: ./front
