@@ -1,7 +1,6 @@
 defmodule TimeTrackerWeb.Endpoint do
 
   use Phoenix.Endpoint, otp_app: :time_tracker
-  plug CORSPlug  # Allow requests from Vite dev server
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
   # Set :encryption_salt if you would also like to encrypt it.
@@ -47,6 +46,7 @@ defmodule TimeTrackerWeb.Endpoint do
 
   plug Plug.MethodOverride
   plug Plug.Head
+  plug CORSPlug, origin: "*"  # Allow requests from Vite dev server
   plug Plug.Session, @session_options
   plug TimeTrackerWeb.Router
 end

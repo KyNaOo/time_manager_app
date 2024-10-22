@@ -48,15 +48,15 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-<div v-if="response">
+<div class="user-page" v-if="response">
   <div class="usersTitle">
-      <h2>Users</h2>
-      <UserGroupIcon class="icon"/>
+      <h2>Utilisateur</h2>
+      <RouterLink class="button-add-user" v-if="userisAdmin" to="/app/user?create=true" >Créer un utilisateur</RouterLink>
   </div>
-  <RouterLink v-if="userisAdmin" to="/app/user?create=true" >Create User</RouterLink>
+  
   <SuperTable v-if="response" :tableData="response" tableType="user" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
 </div>
-<div v-else>No users
+<div v-else>Il n'y a pas d'utilisateur
   <RouterLink to="/app/user?create=true" >Create User</RouterLink>
 </div>
 </template>
@@ -67,5 +67,27 @@ onBeforeMount(async () => {
     align-items: center;
     gap: 10px;
     margin: 20px 0;
+    text-transform: uppercase;
+    font-weight: bold;
+    justify-content: space-between;
 }
+
+h2 {
+  font-size: 28px;
+}
+
+.button-add-user {
+  width: 200px;
+  background-color: #FFCC26;
+}
+
+.button-add-user:hover {
+  background-color: #947920;
+}
+
+.user-page {
+  display: flex;
+  flex-direction: column;
+}
+
 </style>

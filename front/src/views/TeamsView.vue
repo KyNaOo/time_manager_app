@@ -55,8 +55,9 @@ onBeforeMount(async () => {
     <div class="teams">
         <div class="usersTitle">
             <h2>Ton équipe</h2>
+            <RouterLink class="button-add-member-team" v-if="userisAdmin" to="/app/team/?create=true" >Ajouter un membre</RouterLink>
         </div>        
-        <RouterLink v-if="userisAdmin" to="/app/team/?create=true" >Create Team</RouterLink>
+        
         <SuperTable v-if="teams" :tableData="teams" tableType="team" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
     </div>
 </template>
@@ -80,5 +81,9 @@ onBeforeMount(async () => {
     font-size: 28px;
     font-weight: bold;
     color: white;
+}
+
+.button-add-member-team {
+    width: 200px;
 }
 </style>

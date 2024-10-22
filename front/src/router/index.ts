@@ -12,6 +12,7 @@ import axios from '@/api/axios'
 import { store } from '@/api/store';
 import TeamsView from '@/views/TeamsView.vue'
 import TeamView from '@/views/TeamView.vue'
+import CreationView from '@/views/CreationView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -83,8 +84,8 @@ const router = createRouter({
     },
     {
       path: '/app/user',
-      name: 'userEdition',
-      component: UserView,
+      name: 'userCreation',
+      component: CreationView,
       meta: { 
         requiresAuth: true,
         onlyAdmin: true

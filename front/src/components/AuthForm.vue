@@ -69,7 +69,7 @@ const handleAuth = async () => {
     router.push('/app');   
   } catch (err : any) {
     console.log('USer not authenticated', user.value);
-    console.log(err.response.data.error);
+    console.log(err);
     const message = err.response.data.error;
     if (message === 'unauthorized') {
       error.value = 'Invalid email or password';
