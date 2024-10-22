@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    runs-on: self-hosted  # Using self-hosted runner
+    runs-on: epitechmscpropromo2026-arc-runners
     defaults:
       run:
         working-directory: ./back
@@ -44,7 +44,7 @@ jobs:
 
   build:
     needs: test
-    runs-on: self-hosted
+    runs-on: epitechmscpropromo2026-arc-runners
     steps:
     - uses: actions/checkout@v2
     
