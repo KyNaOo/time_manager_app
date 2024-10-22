@@ -103,6 +103,16 @@ table {
     border-collapse: collapse;
 }
 
+a {
+    background-color: #000000;
+    width: 60px;
+    font-size: 12px;
+}
+
+a:hover {
+    opacity: 0.6;
+}
+
 th, td {
     border: 1px solid #ddd;
     padding: 8px;
@@ -113,24 +123,39 @@ th {
     text-align:left;
 }
 
+tr {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
 button {
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
+    text-decoration: none;
+    transition: 0.4s;
+    color: white;
+    background-color: #cd1d1d;
+    padding: 4px 8px;
+    border: solid white 1px;
+    border-radius: 25px;
+    width: 80px;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
     cursor: pointer;
+    font-size: 12px;
+}
+
+button:hover {
+    background-color: #731a23;
 }
 
 .actionCell {
     display: flex;
+    justify-content: flex-end;
     gap: 5px;
 }
 
 .seeBtn {
     background-color: #007bff;
-    color: white;
-}
-.deleteBtn {
-    background-color: #dc3545;
     color: white;
 }
 </style>
