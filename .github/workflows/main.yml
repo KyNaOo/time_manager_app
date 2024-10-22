@@ -13,26 +13,23 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Install Buildah
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y buildah
+
       - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: siuuu69
-          password: 123!siuuu
+        run: |
+          echo "${{ 123!siuuu }}" | buildah login -u siuuu69 --password-stdin docker.io
 
-      - name: Build and Push Backend
-        uses: aevea/action-kaniko@master
-        with:
-          image: siuuu69/backend
-          username: siuuu69
-          password: 123!siuuu
-          tag: ${{ github.sha }}
-          path: ./back
+      - name: Build and push Backend
+        run: |
+          cd back
+          buildah bud -t docker.io/siuuu69/backend:${{ github.sha }} .
+          buildah push docker.io/siuuu69/backend:${{ github.sha }}
 
-      - name: Build and Push Frontend
-        uses: aevea/action-kaniko@master
-        with:
-          image: siuuu69/frontend
-          username: siuuu69
-          password: 123!siuuu
-          tag: ${{ github.sha }}
-          path: ./front
+      - name: Build and push Frontend
+        run: |
+          cd front
+          buildah bud -t docker.io/siuuu69/frontend:${{ github.sha }} .
+          buildah push docker.io/siuuu69/frontend:${{ github.sha }}
