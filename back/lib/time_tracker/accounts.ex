@@ -243,9 +243,10 @@ defmodule TimeTracker.Accounts do
   """
   def authenticate_user(email, password) do
     user = Repo.get_by(User, email: email)
-    IO.inspect(user, label: "Authenticated User")
+    IO.inspect(user, label: "Authenticating user")
     cond do
-      user && Bcrypt.check_pass(user, password) ->
+      user && Bcrypt.verify_pass(password, user.password_hash) ->
+        IO.puts("User #{user.email} authenticated successfully.")
         # Issue the JWT token if authentication succeeds
         {:ok, token, _claims} = Guardian.encode_and_sign(user)
         {:ok, token}  # Return the token in the expected format

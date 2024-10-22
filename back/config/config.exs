@@ -54,3 +54,6 @@ config :time_tracker, TimeTracker.Guardian,
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
+
+# Note: Do not use this value in production
+# config :bcrypt_elixir, log_rounds: 12

@@ -26,7 +26,7 @@ const formData = computed(() => {
         };
     } else if (props.context === 'team' && team.value) {
         return {
-            name: team.value.name,
+            name: team.value.title,
         };
     }
     return {};
@@ -51,7 +51,7 @@ const handleSubmit = () => {
             <div v-else-if="props.context === 'team' && team">
                 <div class="form-field">
                     <label for="name">Name:</label>
-                    <input type="text" id="name" v-model="team.name" />
+                    <input type="text" id="name" v-model="team.title" />
                 </div>
             </div>
             <button type="submit">Save</button>

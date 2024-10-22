@@ -27,6 +27,7 @@ defmodule TimeTrackerWeb.Router do
     post "/clocks/:user_id", ClockController, :create
 
     get "/teams", TeamController, :index
+    get "/team/:id", TeamController, :show
     post "/team", TeamController, :create
     put "/team/:id", TeamController, :update
     delete "/team/:id", TeamController, :delete

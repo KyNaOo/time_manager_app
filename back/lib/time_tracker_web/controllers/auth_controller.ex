@@ -1,6 +1,7 @@
 defmodule TimeTrackerWeb.AuthController do
   use TimeTrackerWeb, :controller
   alias TimeTracker.{Accounts, Guardian}
+  alias Bcrypt
 
 
 
