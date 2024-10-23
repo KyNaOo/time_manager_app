@@ -1,32 +1,41 @@
 import React, { useState } from 'react';
-import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Button} from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Button } from 'react-native';
 import axios from 'axios';
-import {router} from "expo-router";
+import { router } from "expo-router";
 
-export default function AuthScreen() {
+export default function RegisterScreen() {
 
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const handleLogin = async () => {
-        if (!email || !password) {
-            Alert.alert('Error', 'Please fill in both email and password');
+    const handleRegister = async () => {
+        if (!username || !email || !password || !confirmPassword) {
+            Alert.alert('Error', 'Please fill in all fields');
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            Alert.alert('Error', 'Passwords do not match');
             return;
         }
 
         setLoading(true);
 
         try {
-            const response = await axios.post('https://relative-cowbird-fleet.ngrok-free.app/api/auth/signin', {
+            const response = await axios.post('https://relative-cowbird-fleet.ngrok-free.app/api/auth/register', {
+                "username": username,
                 "email": email,
-                "password": password
+                "password": password,
+                "role": "user",
             });
-            console.log("response")
-            console.warn(response)
+
             if (response.status === 200) {
-                Alert.alert('Success', 'Logged in successfully!');
+                Alert.alert('Success', 'Registered successfully!');
                 console.log('Token:', response.data.token);
+                router.navigate('/login');
             } else {
                 Alert.alert('Error', 'An unexpected error occurred. Please try again.');
             }
@@ -35,7 +44,7 @@ export default function AuthScreen() {
             // @ts-ignore
             if (error.response) {
                 // @ts-ignore
-                Alert.alert('Error', error.response.data.message || 'Invalid credentials');
+                Alert.alert('Error', error.response.data.message || 'Invalid registration details');
             } else {
                 Alert.alert('Error', 'Could not connect to the server');
             }
@@ -47,9 +56,16 @@ export default function AuthScreen() {
     return (
         <View style={styles.container}>
             <Button
-                title={"retour"}
+                title={"Retour"}
                 onPress={() => router.navigate('/')} />
-            <Text style={styles.title}>Connexion</Text>
+            <Text style={styles.title}>Inscription</Text>
+
+            <TextInput
+                style={styles.input}
+                placeholder="Username"
+                value={username}
+                onChangeText={setUsername}
+            />
 
             <TextInput
                 style={styles.input}
@@ -67,17 +83,25 @@ export default function AuthScreen() {
                 secureTextEntry={true}
             />
 
+            <TextInput
+                style={styles.input}
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={true}
+            />
+
             <TouchableOpacity
                 style={styles.button}
-                onPress={handleLogin}
+                onPress={handleRegister}
                 disabled={loading}
             >
-                <Text style={styles.buttonText}>{loading ? 'Logging in...' : 'Login'}</Text>
+                <Text style={styles.buttonText}>{loading ? 'Registering...' : 'Register'}</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => router.navigate('/register')}>
+            <TouchableOpacity onPress={() => router.navigate('/login')}>
                 <Text style={styles.authLink}>
-                    Pas encore du compte ? Inscrivez-vous !
+                    Already have an account? Login here
                 </Text>
             </TouchableOpacity>
         </View>
