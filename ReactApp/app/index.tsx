@@ -11,7 +11,7 @@ export default function AuthScreen() {
                     onPress={() => router.navigate('/login')} />
                 <Button
                     title={"S'inscrire"}
-                    onPress={() => router.navigate('/login')} />
+                    onPress={() => router.navigate('/register')} />
             </View>
         </SafeAreaView>
     );

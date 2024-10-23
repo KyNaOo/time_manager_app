@@ -60,7 +60,6 @@ export default function AuthScreen() {
     <View style={styles.container}>
       <Button title={"retour"} onPress={() => router.navigate("/")} />
       <Text style={styles.title}>Connexion</Text>
-
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -87,8 +86,10 @@ export default function AuthScreen() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity>
-        <Text style={styles.authLink}>Click here to register</Text>
+      <TouchableOpacity onPress={() => router.navigate("/register")}>
+        <Text style={styles.authLink}>
+          Pas encore du compte ? Inscrivez-vous !
+        </Text>
       </TouchableOpacity>
     </View>
   );
