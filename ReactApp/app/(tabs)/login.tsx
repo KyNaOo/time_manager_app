@@ -15,8 +15,10 @@ export default function AuthScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const ngrokUrl = process.env.EXPO_PUBLIC_API_URL
 
   const handleLogin = async () => {
+      console.log(ngrokUrl);
     if (!email || !password) {
       Alert.alert("Error", "Please fill in both email and password");
       return;
@@ -25,8 +27,9 @@ export default function AuthScreen() {
     setLoading(true);
 
     try {
+
       const response = await axios.post(
-        `${process.env.ngrok}/api/auth/signin`,
+        `${ngrokUrl}/api/auth/signin`,
         {
           email: email,
           password: password,
@@ -37,16 +40,16 @@ export default function AuthScreen() {
       if (response.status === 200) {
         Alert.alert("Success", "Logged in successfully!");
         console.log("Token:", response.data.token);
+        router.navigate('/home');
       } else {
         Alert.alert("Error", "An unexpected error occurred. Please try again.");
       }
     } catch (error) {
       // @ts-ignore
       if (error.response) {
-        // @ts-ignore
-        Alert.alert(
+          Alert.alert(
           "Error",
-          error.response.data.message || "Invalid credentials"
+          "Invalid credentials"
         );
       } else {
         Alert.alert("Error", "Could not connect to the server");

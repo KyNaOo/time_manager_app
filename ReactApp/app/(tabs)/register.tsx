@@ -10,6 +10,7 @@ export default function RegisterScreen() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const ngrokUrl = process.env.EXPO_PUBLIC_API_URL
 
     const handleRegister = async () => {
         if (!username || !email || !password || !confirmPassword) {
@@ -25,7 +26,7 @@ export default function RegisterScreen() {
         setLoading(true);
 
         try {
-            const response = await axios.post('https://relative-cowbird-fleet.ngrok-free.app/api/auth/register', {
+            const response = await axios.post(`${ngrokUrl}/api/auth/register`, {
                 "username": username,
                 "email": email,
                 "password": password,
