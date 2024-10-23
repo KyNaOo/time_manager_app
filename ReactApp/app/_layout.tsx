@@ -2,6 +2,9 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import {useEffect, useState} from 'react';
 import 'react-native-reanimated';
+import { Slot } from 'expo-router';
+import { SessionProvider } from '@/utils/ctx';
+
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -23,10 +26,8 @@ export default function RootLayout() {
   }
 
   return (
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+      <SessionProvider>
+          <Slot />
+      </SessionProvider>
   );
 }
