@@ -10,12 +10,15 @@ import {
 } from "react-native";
 import axios from "axios";
 import { router } from "expo-router";
+import { useSession } from '@/utils/ctx';
+import {setStorageItemAsync} from "@/utils/useStorageState";
 
 export default function AuthScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const ngrokUrl = process.env.EXPO_PUBLIC_API_URL
+  const { signIn } = useSession();
 
   const handleLogin = async () => {
       console.log(ngrokUrl);
@@ -38,7 +41,8 @@ export default function AuthScreen() {
       console.log("response");
       console.warn(response);
       if (response.status === 200) {
-        Alert.alert("Success", "Logged in successfully!");
+        signIn();
+        await setStorageItemAsync("token", response.data.token);
         console.log("Token:", response.data.token);
         router.navigate('/home');
       } else {

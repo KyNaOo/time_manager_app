@@ -1,25 +1,36 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { router } from 'expo-router';  // Pour la navigation
+import { router } from 'expo-router';
+import axios from "axios";
+import moment from "moment";
+import {useStorageState} from "@/utils/useStorageState";
+import {jwtDecode} from "jwt-decode";
 
 export default function HomePage() {
-    const navigation = useNavigation();
     const [lastAction, setLastAction] = useState<'clockIn' | 'clockOut' | null>(null);
+    const ngrokUrl = process.env.EXPO_PUBLIC_API_URL
+    const [token, setToken] = useStorageState("token")
 
     const handleLogout = () => {
-        // Implémentation de la déconnexion (par exemple, suppression du token et retour à la page de login)
         Alert.alert('Déconnexion', 'Vous êtes déconnecté');
         router.navigate('/login');
     };
 
     const handleProfile = () => {
-        // Redirection vers la page de profil
         router.navigate('/profile');
     };
 
     const handleClockIn = async () => {
         try {
+            console.warn(token[1]);
+            // const myToken = jwtDecode(token[1]);
+            // console.warn(myToken)
+            const now = moment().format('YYY-MM-DD HH:mm:ss');
+            const response = await axios.post(`${ngrokUrl}/api/clocks/userid`, {
+                "time": now,
+                "status": true,
+            })
             // Implémentation de l'API pour clock in
             Alert.alert('Clock In', 'Vous avez clock in avec succès');
             setLastAction('clockIn');
@@ -30,6 +41,11 @@ export default function HomePage() {
 
     const handleClockOut = async () => {
         try {
+            const now = moment().format('YYY-MM-DD HH:mm:ss');
+            const response = await axios.post(`${ngrokUrl}/api/clocks/userid`, {
+                "time": now,
+                "status": false,
+            })
             // Implémentation de l'API pour clock out
             Alert.alert('Clock Out', 'Vous avez clock out avec succès');
             setLastAction('clockOut');
@@ -47,7 +63,7 @@ export default function HomePage() {
     };
 
     return (
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             {/* Topbar / Header */}
             <View style={styles.header}>
                 <View style={styles.logoContainer}>
@@ -62,8 +78,6 @@ export default function HomePage() {
                     </TouchableOpacity>
                 </View>
             </View>
-
-            {/* Corps de la page */}
             <View style={styles.body}>
                 <Text style={styles.slogan}>
                     D'un simple "clock in" à un rapide "clock out", prenez le contrôle
@@ -76,22 +90,23 @@ export default function HomePage() {
                     </Text>
                 </TouchableOpacity>
             </View>
-        </View>
+        </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         backgroundColor: '#f5f5f5',
     },
     header: {
-        backgroundColor: '#333',  // Gris foncé
-        height: 60,
+        backgroundColor: '#333',
+        height: 100,
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-end',
         justifyContent: 'space-between',
         paddingHorizontal: 20,
+        paddingBottom: 10,
     },
     logoContainer: {
         flex: 1,
@@ -113,9 +128,9 @@ const styles = StyleSheet.create({
     },
     body: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
+        paddingTop: 30,
     },
     slogan: {
         fontSize: 18,
@@ -127,6 +142,7 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
         paddingHorizontal: 40,
         borderRadius: 10,
+        marginTop: 20,
     },
     clockButtonText: {
         color: 'white',
