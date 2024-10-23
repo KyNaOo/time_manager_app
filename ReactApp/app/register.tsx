@@ -24,7 +24,6 @@ export default function RegisterScreen() {
         }
 
         setLoading(true);
-
         try {
             const response = await axios.post(`${ngrokUrl}/api/auth/register`, {
                 "username": username,
