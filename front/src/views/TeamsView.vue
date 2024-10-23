@@ -1,15 +1,10 @@
 <script setup lang="ts">
 import SuperTable from '@/components/SuperTable.vue';
 import { UserGroupIcon } from '@heroicons/vue/24/solid'
-
 import { ref, onBeforeMount, computed } from 'vue';
-
 import { store } from '@/api/store';
-
 import type { Team,  User } from '@/types/crudTypes';
-
 import instance from '@/api/axios';
-
 import { useApi } from '@/api';
 
 const api = useApi();
@@ -55,7 +50,10 @@ onBeforeMount(async () => {
     <div class="teams">
         <div class="usersTitle">
             <h2>Ton équipe</h2>
-            <RouterLink class="button-add-member-team" v-if="userisAdmin" to="/app/team/?create=true" >Ajouter un membre</RouterLink>
+            <div class="buts">
+                <RouterLink class="button-create-team" v-if="userisAdmin" to="/app/team/?create=true" >Créer</RouterLink>
+                <RouterLink class="button-add-member-team" v-if="userisAdmin" to="/app/team/addUser" >Ajouter</RouterLink>
+            </div>
         </div>        
         
         <SuperTable v-if="teams" :tableData="teams" tableType="team" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
@@ -83,7 +81,19 @@ onBeforeMount(async () => {
     color: white;
 }
 
+.button-create-team {
+    width: 90px;
+    font-size: 12px;
+}
+
 .button-add-member-team {
-    width: 200px;
+    width: 90px;
+    font-size: 12px;
+}
+
+.buts {
+    display: flex;
+    width: 190px;
+    justify-content: space-between;
 }
 </style>

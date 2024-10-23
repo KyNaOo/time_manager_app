@@ -62,6 +62,17 @@ const turnOffError = () => {
 
 
 ///////////////////// USERS ///////////////////////
+// Get all users
+async function getAllUsers(): Promise<User[]> {
+  try {
+    // get all users
+    const response = await instance.get('/api/users');
+    return response.data.data as User[];
+  } catch (e) {
+    console.log("Error fetching users:", e);
+    return [];
+  }
+}
 
   // Create user
   async function createUser (user: User) {
@@ -282,6 +293,21 @@ async function deleteTeam(id: number) {
   }
 }
 
+// Add user to team
+async function addUserToTeam(userId: number, teamId: number, isTeamLeader: boolean) {
+  try {
+    // Add user to team
+    await instance.post(`/api/team/user/addUser/${userId}/${teamId}`, {
+      team_member: {
+        team_id : teamId,
+        user_id: userId,
+        is_team_leader: isTeamLeader
+      }
+    });
+  } catch (e) {
+  }
+}
+
 ///////////////////// WORKING TIMES ///////////////////////
 
 // Create working time
@@ -403,6 +429,7 @@ export const useApi = () => {
     modifyWorkingTime,
     deleteWorkingTime,
     // Users
+    getAllUsers,
     getUser,
     modifyUser,
     createUser,
@@ -421,7 +448,7 @@ export const useApi = () => {
     getTeamMembers,
     modifyTeamMemberRole,
     isUserTeamLeader,
-    deleteMemberFromTeam
-
+    deleteMemberFromTeam,
+    addUserToTeam
   };
 };

@@ -64,32 +64,35 @@ onBeforeMount(async () => {
 
 <template>
     <div class="TeamView" v-if="currentUser">
-        <button @click="$router.back()">Go Back</button>
         <div class="flexWrapper">
             <div class="formUser">
-            <h2>{{mode === 'create' ? 'Create Team' : 'Edit Team'}} </h2>
+            <h2>{{mode === 'create' ? 'Créer une équipe' : 'Modifier ton équipe'}} </h2>
             <Form v-if="team" :context="'team'" :team="team" :mode="mode" @submit="action" />
             </div>
+            <!-- <SuperTable :tableData="teams" tableType="team" :tableHeaders="tableHeaders" :showActions="userisAdmin"/> -->
         </div>
     </div>
     <div v-else>
         <p>Team not found</p>
-        <button @click="$router.back()">Go Back</button>
     </div>
 </template>
 
 
 <style scoped >
 .TeamView {
+    width: 40%;
 }
 
 .flexWrapper {
+    width: 50%;
+    color: white;
     display: flex;
     flex-direction: row;
+    background-color: #353535;
+    border-radius: 15px;
+    padding: 40px 80px;
     justify-content: space-between;
     width: 100%;
-    gap: 20px;
-    border-color: red 1px solid;
 }
 
 .formUser {
@@ -97,14 +100,7 @@ onBeforeMount(async () => {
     flex: 1;
 }
 
-button {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    width: fit-content;
+h2 {
+    text-transform: uppercase;
 }
 </style>

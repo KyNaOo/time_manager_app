@@ -104,13 +104,18 @@ table {
 }
 
 a {
-    background-color: #000000;
-    width: 60px;
-    font-size: 12px;
+    background-color: transparent;
+    border: none;
+    font-size: 14px;
+    color: rgb(148, 148, 148);
+    width: 40px;
+    text-decoration: underline;
 }
 
 a:hover {
-    opacity: 0.6;
+    transition: 0.8s;
+    cursor: pointer;
+    text-decoration: none;
 }
 
 th, td {
@@ -123,30 +128,31 @@ th {
     text-align:left;
 }
 
-tr {
+thead tr {
     text-transform: uppercase;
     font-weight: bold;
 }
 
 button {
     text-decoration: none;
-    transition: 0.4s;
-    color: white;
-    background-color: #cd1d1d;
-    padding: 4px 8px;
-    border: solid white 1px;
+    transition: 0.8s;
+    color: rgb(148, 148, 148);
+    background-color: transparent;
     border-radius: 25px;
-    width: 80px;
+    border: none;
     text-align: center;
     text-transform: uppercase;
     font-weight: bold;
-    cursor: pointer;
-    font-size: 12px;
+    font-size: 14px;    
+    text-decoration: underline;
 }
 
 button:hover {
-    background-color: #731a23;
+    transition: 0.8s;
+    cursor: pointer;
+    text-decoration: none;
 }
+
 
 .actionCell {
     display: flex;
