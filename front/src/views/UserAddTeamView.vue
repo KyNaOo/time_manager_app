@@ -9,12 +9,14 @@ import { useApi } from '@/api';
 
 const api = useApi();
 const users = ref<User[] | null>(null);
+const user = ref<User | null>(null);
 const teams = ref<Team[] | null>(null);
 
 onBeforeMount(async () => {
     try {
         users.value = await api.getAllUsers();
         teams.value = await api.getTeams();
+        // allUserInTeam.value = await api.getUserInTeam(Number(formData2.value.teamId))
         if (!teams.value) {
             teams.value = [];
         }
@@ -28,19 +30,18 @@ onBeforeMount(async () => {
 const formData = ref({
     userId: '',
     teamId: '',
-    isTeamLeader : false,
+    isTeamLeader : '',
 });
 
 const addUserInTeams = async() => {
     try {
-        await api.addUserToTeam(Number(formData.value.userId), Number(formData.value.teamId), formData.value.isTeamLeader);
+        await api.addUserToTeam(Number(formData.value.userId), Number(formData.value.teamId), Boolean(formData.value.isTeamLeader));
         store.showModal({message: "User add successfully", title: 'Success'});
     }
     catch(e:any) {
         store.showModal({message: e.response.data.error, title: 'Error'});
     }
 }
-
 </script>
 
 
@@ -52,13 +53,7 @@ const addUserInTeams = async() => {
         
         <form @submit.prevent="addUserInTeams()">
             <div class="form-group">
-                <label for="teamSelect">Choisir une équipe:</label>
-                <select id="teamSelect" v-model="formData.teamId">
-                    <option v-for="team in teams" :key="team.id" :value="team.id">{{ team.title }}</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="userSelect">Choisir un utilisateur:</label>
+                <label for="userSelect">Choisir un utilisateur :</label>
                 <select id="userSelect" v-model="formData.userId">
                     <option v-for="user in users" :key="user.id" :value="user.id">{{ user.username }}</option>
                 </select>
@@ -66,13 +61,14 @@ const addUserInTeams = async() => {
             <div class="form-group">
                 <label for="managerSelect">Est-il manager :</label>
                 <select id="managerSelect" v-model="formData.isTeamLeader">
-                    <option :value="true">Oui</option>
-                    <option :value="false">Non</option>
+                    <option value="true">Oui</option>
+                    <option value="false">Non</option>
                 </select>
             </div>
             <button type="submit" class="add-button">Ajouter</button>
         </form>
     </div>
+
 </template>
 
 

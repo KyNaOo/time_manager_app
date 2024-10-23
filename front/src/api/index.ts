@@ -179,6 +179,18 @@ async function getUserTeams(user: User) {
   }
 }
 
+// Get user teams
+async function getUserInTeam(team: Team) {
+  try {
+      // get all teams from user
+      const res = await instance.get(`/api/team/users/${team.id}`);
+      console.log('Team users:', res.data);
+      return res.data.users;
+  } catch (e) {
+      console.log("Error fetching user teams:", e);
+  }
+}
+
 // Delete user
 async function deleteUser(userId: number) {
   try {
@@ -449,6 +461,7 @@ export const useApi = () => {
     modifyTeamMemberRole,
     isUserTeamLeader,
     deleteMemberFromTeam,
-    addUserToTeam
+    addUserToTeam,
+    getUserInTeam
   };
 };

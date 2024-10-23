@@ -82,7 +82,7 @@ function formatDate(date: Date) {
                     <td v-if="showActions" class="actionCell">
                         <RouterLink v-if="tableType === 'workingtime'" :to="`/app/${tableType}/${tableData[0].user_id}/${tableData[rowIndex].id}`">See</RouterLink>
                         <RouterLink v-else-if="tableType === 'user'" :to="`/app/${tableType}/${tableData[rowIndex].id}`">See</RouterLink>
-                        <RouterLink v-else-if="tableType === 'team'" :to="`/app/${tableType}/${tableData[rowIndex].team_id}`">See</RouterLink>
+                        <RouterLink v-else-if="tableType === 'team'" :to="`/app/${tableType}/${tableData[rowIndex].id}`">See</RouterLink>
                         <!-- Add your action buttons or elements here -->
                         <button class="deleteBtn" @click="handleDelete()">Delete</button>
                         <ModalAction v-if="modal.isVisible" :title=modal.title :message="modal.message" 
