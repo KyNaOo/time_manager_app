@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../../global.css";
 
 const ProfilePage = () => {
   const [username, setUsername] = useState("johndoe");
