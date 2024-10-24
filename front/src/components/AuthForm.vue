@@ -20,6 +20,30 @@ const props = defineProps({
   },
 });
 
+const isUserNameValid = ref<boolean>(false);
+const isEmailValid = ref<boolean>(false);
+const isStrongPassword = ref(false);
+
+
+
+// Computed property to validate the entire form
+const isFormValid = computed(() => {
+  console.log("Is form valid ? ", isUserNameValid.value && isEmailValid.value && isStrongPassword.value)
+    return isUserNameValid.value && isEmailValid.value
+     && isStrongPassword.value;
+});
+
+const updateFormValidity = (field:any) => {
+  console.log("EMIT TRIGGGEEEEEREDDDDD:" )
+  console.log("Context:", field )
+    if ( field.name === 'email'){
+      isEmailValid.value = field.isValid;
+    }
+    if ( field.name === 'username'){
+      isUserNameValid.value = field.isValid;
+    }
+};
+
 const user = ref<Partial<User>>(
   props.authMode === 'login'
     ? {
@@ -68,7 +92,7 @@ const handleAuth = async () => {
     }
     router.push('/');   
   } catch (err : any) {
-    console.log('USer not authenticated', user.value);
+    console.log('Usser not authenticated', user.value);
     console.log(err);
     const message = err.response.data.error;
     if (message === 'unauthorized') {
@@ -85,7 +109,6 @@ const goTo = () => {
   else router.push("/login")
 };
 
-const isStrongPassword = ref(false);
 
 const goodPassword = (isGoodPassword: boolean) => {
   console.log('Password is good:', isGoodPassword);
@@ -117,11 +140,11 @@ watch(user, (newValue) => {
         ça pourrait être toi ?
       </p>
       <div v-if="props.authMode == 'register'" class="input-group" >
-        <InputField v-model="user.username" :name="'username'" :type="'text'" :label="'Username'" required/>
+        <InputField v-model="user.username" :name="'username'" :type="'text'" :label="'Username'" required @form-validity="updateFormValidity($event)"/>
       </div>
       <div class="input-group">
         <div class="input-group" >
-        <InputField v-model="user.email" :name="'email'" :type="'text'" :label="'Email'" required/>
+        <InputField v-model="user.email" :name="'email'" :type="'text'" :label="'Email'" required @form-validity="updateFormValidity($event)"/>
         </div>
       </div>
       <div class="input-group">
@@ -130,7 +153,7 @@ watch(user, (newValue) => {
       <div v-if="props.authMode == 'register' && isStrongPassword" class="input-group">
         <PasswordField v-model="user.confirmPassword":name="'confirmPassword'" :label="'Confirm Password'" required :showRules="false"/>
       </div>
-      <button type="submit" :class="['auth-button', { 'inpError': props.authMode == 'register' && !passwordsMatch }]">
+      <button :disabled="!isFormValid" type="submit" :class="['auth-button', { 'inpError': props.authMode == 'register' && !passwordsMatch }]">
         {{props.authMode == 'register' ? 'Register' : 'Login'}}
       </button>
       <span v-if="!passwordsMatch && authMode === 'register'" class="error">Passwords do not match</span>
