@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, SafeAreaView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
 import axios from "axios";
@@ -10,8 +10,10 @@ import {jwtDecode} from "jwt-decode";
 export default function HomePage() {
     const [lastAction, setLastAction] = useState<'clockIn' | 'clockOut' | null>(null);
     const ngrokUrl = process.env.EXPO_PUBLIC_API_URL;
+    const [workingTimes, setWorkingTimes] = useState([]);
     const [token, setToken] = useStorageState("token");
     const [refreshLastClock, setRefreshLastClock] = useState(false)
+    const [lastWT, setLastWT] = useState(null)
 
     const handleLogout = () => {
         Alert.alert('Déconnexion', 'Vous êtes déconnecté');
@@ -27,6 +29,8 @@ export default function HomePage() {
             const myToken = jwtDecode(token[1]);
             const idUser = myToken["sub"];
             const now = moment();
+
+            // Création du working time lors du clock in
             const response = await axios.post(`${ngrokUrl}/api/clocks/${idUser}`, {
                 "time": now,
                 "status": true,
@@ -35,9 +39,19 @@ export default function HomePage() {
                     Authorization: `Bearer ${token[1]}`,
                 }
             });
+
+            const workingTimeResponse = await axios.post(`${ngrokUrl}/api/workingtime/${idUser}`, {
+                "start": now,
+                "end": now,
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token[1]}`,
+                }
+            });
+
             setRefreshLastClock(!refreshLastClock);
-            Alert.alert('Vous avez clock in avec succès');
-            setLastAction('clockIn');
+            Alert.alert('Clock In', 'Vous avez clock in avec succès');
+            fetchWorkingTimes();  // Rafraîchir la liste des working times
         } catch (error) {
             Alert.alert('Erreur', 'Erreur lors du clock in');
         }
@@ -48,6 +62,7 @@ export default function HomePage() {
             const myToken = jwtDecode(token[1]);
             const idUser = myToken["sub"];
             const now = moment();
+            let idWT = lastWT.id
             const response = await axios.post(`${ngrokUrl}/api/clocks/${idUser}`, {
                 "time": now,
                 "status": false,
@@ -57,11 +72,50 @@ export default function HomePage() {
                 }
             });
 
+            const responseUpdate = await axios.put(`${ngrokUrl}/api/workingtime/${idWT}`, {
+                "workingtime": {
+                    "end": now
+                }
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token[1]}`,
+                }
+            });
             Alert.alert('Clock Out', 'Vous avez clock out avec succès');
-            setLastAction('clockOut');
             setRefreshLastClock(!refreshLastClock);
         } catch (error) {
             Alert.alert('Erreur', 'Erreur lors du clock out');
+        }
+    };
+
+    const fetchWorkingTimes = async () => {
+        try {
+            const myToken = jwtDecode(token[1]);
+            const idUser = myToken["sub"];
+
+            // Récupérer la liste des working times
+            const response = await axios.get(`${ngrokUrl}/api/workingtime/${idUser}`, {
+                headers: {
+                    Authorization: `Bearer ${token[1]}`,
+                }
+            });
+            setWorkingTimes(response.data.data);
+        } catch (error) {
+            Alert.alert('Erreur', 'Erreur lors de la récupération des working times');
+        }
+    };
+
+    const handleDelete = async (id: any) => {
+        try {
+            await axios.delete(`${ngrokUrl}/api/workingtime/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token[1]}`,
+                }
+            });
+            Alert.alert('Success', 'Working time supprimé');
+            fetchWorkingTimes();
+        } catch (error) {
+            Alert.alert('Erreur', 'Erreur lors de la suppression du working time');
         }
     };
 
@@ -73,6 +127,25 @@ export default function HomePage() {
         }
     };
 
+    const getLastWT = async () => {
+        const myToken = jwtDecode(token[1]);
+        const idUser = myToken["sub"];
+        const response = await axios.get(`${ngrokUrl}/api/workingtime/${idUser}`, {
+            headers: {
+                Authorization: `Bearer ${token[1]}`,
+            }
+        });
+        let compare = 0;
+        let theLastWT = null;
+        for (let workingtime of response.data.data) {
+            if (workingtime.id > compare) {
+                compare = workingtime.id;
+                theLastWT = workingtime;
+            }
+        }
+        setLastWT(theLastWT);
+    }
+
     const getLastClock = async () => {
         const myToken = jwtDecode(token[1]);
         const idUser = myToken["sub"];
@@ -81,11 +154,9 @@ export default function HomePage() {
                 Authorization: `Bearer ${token[1]}`,
             }
         });
-        console.warn(response.data)
         let compare = 0;
         let theLastClock = null
         for (let clock of response.data.data){
-            console.warn(clock)
             if (clock.id > compare){
                 compare = clock.id;
                 theLastClock = clock;
@@ -101,25 +172,27 @@ export default function HomePage() {
     useEffect(() => {
         if (!token[0]){
             getLastClock();
+            getLastWT();
+            fetchWorkingTimes();
         }
     }, [refreshLastClock, token]);
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            {/* Topbar / Header */}
-            <View style={styles.header}>
-                <View style={styles.logoContainer}>
-                    <Text style={styles.logo}>MonLogo</Text>
-                </View>
-                <View style={styles.buttonsContainer}>
-                    <TouchableOpacity onPress={handleProfile} style={styles.headerButton}>
-                        <Text style={styles.buttonText}>Profil</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
-                        <Text style={styles.buttonText}>Déconnexion</Text>
-                    </TouchableOpacity>
-                </View>
+        <View>
+        <View style={styles.header}>
+            <View style={styles.logoContainer}>
+                <Text style={styles.logo}>MonLogo</Text>
             </View>
+            <View style={styles.buttonsContainer}>
+                <TouchableOpacity onPress={handleProfile} style={styles.headerButton}>
+                    <Text style={styles.buttonText}>Profil</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
+                    <Text style={styles.buttonText}>Déconnexion</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+        <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.body}>
                 <Text style={styles.slogan}>
                     D'un simple "clock in" à un rapide "clock out", prenez le contrôle
@@ -131,8 +204,30 @@ export default function HomePage() {
                         {lastAction === 'clockIn' ? 'Clock Out' : 'Clock In'}
                     </Text>
                 </TouchableOpacity>
+
+                <View style={styles.workingTimesTable}>
+                    <Text style={styles.tableTitle}>Working Times</Text>
+
+                    <View style={styles.tableHeader}>
+                        <Text style={styles.headerText}>Début</Text>
+                        <Text style={styles.headerText}>Fin</Text>
+                        <Text style={styles.headerText}>Action</Text>
+                    </View>
+
+                    {workingTimes.map((wt, index) => (
+                        <View key={index} style={styles.workingTimeRow}>
+                            <Text style={styles.workingTimeText}>{moment(wt.start).format('DD/MM/YYYY HH:mm')}</Text>
+                            <Text style={styles.workingTimeText}>{moment(wt.end).format('DD/MM/YYYY HH:mm')}</Text>
+                            <TouchableOpacity onPress={() => handleDelete(wt.id)} style={styles.deleteButton}>
+                                <Text style={styles.deleteButtonText}>Supprimer</Text>
+                            </TouchableOpacity>
+                        </View>
+                    ))}
+                </View>
+
             </View>
         </ScrollView>
+        </View>
     );
 }
 
@@ -140,6 +235,7 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         backgroundColor: '#f5f5f5',
+        paddingBottom: 10,
     },
     header: {
         backgroundColor: '#333',
@@ -189,5 +285,48 @@ const styles = StyleSheet.create({
     clockButtonText: {
         color: 'white',
         fontSize: 18,
+    },
+    workingTimesTable: {
+        marginTop: 40,
+        width: '100%',
+    },
+    tableTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 15,
+        textAlign: 'center',
+    },
+    tableHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        borderBottomWidth: 2,
+        borderBottomColor: '#ccc',
+        paddingVertical: 8,
+    },
+    headerText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    workingTimeRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+        alignItems: 'center',
+    },
+    workingTimeText: {
+        fontSize: 14,
+    },
+    deleteButton: {
+        backgroundColor: 'red',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 5,
+        marginLeft: 10,
+    },
+    deleteButtonText: {
+        color: 'white',
+        fontSize: 12,
     },
 });

@@ -20,5 +20,7 @@ export default function TabLayout() {
   }
 
   // This layout can be deferred because it's not the root layout.
-  return <Stack />;
+  return <Stack screenOptions={{
+    headerShown: false,
+  }}/>;
 }
