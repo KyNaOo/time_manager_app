@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createMemoryHistory, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import UserView from '../views/UserView.vue'
 import UsersView from '../views/UsersView.vue'
@@ -16,7 +16,8 @@ import CreationView from '@/views/CreationView.vue'
 import UserAddTeamView from '@/views/UserAddTeamView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  // history: createMemoryHistory(),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
@@ -121,16 +122,12 @@ router.beforeEach(async (to, from, next) => {
       // User is not authenticated, redirect to login
       return next("/login");
     }
+    
     if ((to.path === "/login" || to.path === "/register" || to.path === "/") && authenticated) {
       console.log('Redirecting to /')
       // User is authenticated and trying to access login, redirect to dashboard
       return next("/app");
     }
-
-    // if (authenticated && to.path === "/app") {
-    //   console.log('Redirecting to ', to.path);
-    //   return next();
-    // }
 
     console.log('Passed controls: ');
 

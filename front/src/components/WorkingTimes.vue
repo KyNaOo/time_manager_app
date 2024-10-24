@@ -10,6 +10,7 @@ import { ClockIcon } from '@heroicons/vue/24/solid'
 
 interface Props {
     user: User ;
+    workingTimes: WorkingTime[];
 }
 const props = defineProps<Props>();
 
@@ -38,7 +39,8 @@ const showActions = computed(() => {
 
 onBeforeMount(async () => {
   try {
-    workingTimes.value = await api.getWorkingTimes(props.user);
+    workingTimes.value = props.workingTimes;
+    
     if (workingTimes.value) {
       // Format the date for further treatment in SuperTable
       workingTimes.value = workingTimes.value.map(workingTime => ({
