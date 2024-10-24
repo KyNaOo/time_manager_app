@@ -154,18 +154,21 @@ export default function HomePage() {
                 Authorization: `Bearer ${token[1]}`,
             }
         });
-        let compare = 0;
-        let theLastClock = null
-        for (let clock of response.data.data){
-            if (clock.id > compare){
-                compare = clock.id;
-                theLastClock = clock;
+        if(response.data.data.length != 0){
+            let compare = 0;
+            let theLastClock = null
+            for (let clock of response.data.data){
+                if (clock.id > compare){
+                    compare = clock.id;
+                    theLastClock = clock;
+                }
             }
-        }
-        if (theLastClock.status == true){
-            setLastAction('clockIn');
-        } else {
-            setLastAction('clockOut')
+            if (theLastClock.status == true){
+                setLastAction('clockIn');
+            } else {
+                setLastAction('clockOut')
+
+            }
         }
     }
 
