@@ -13,6 +13,7 @@ import { store } from '@/api/store';
 import TeamsView from '@/views/TeamsView.vue'
 import TeamView from '@/views/TeamView.vue'
 import CreationView from '@/views/CreationView.vue'
+import UserAddTeamView from '@/views/UserAddTeamView.vue'
 
 const router = createRouter({
   // history: createMemoryHistory(),
@@ -96,6 +97,12 @@ const router = createRouter({
       path: '/app/workingtime/:userId/:id',
       name: 'workingtime',
       component: WorkingTime,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/app/team/addUser',
+      name: 'useraddteamview',
+      component: UserAddTeamView,
       meta: { requiresAuth: true }
     },
 

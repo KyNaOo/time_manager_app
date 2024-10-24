@@ -22,16 +22,16 @@ const isLogged = computed(() => {
 
 <template>
     <header class="header">
-        <h1 class="logo" @click="router.push('/')">Timetracker</h1>
+        <img class="logoimg" src="../../assets/logoImg.svg" @click="router.push('/')" alt="logo">
         <nav>
             <ul class="navList loggedOut" v-if="!isLogged">
-                <li><router-link to="/"><HomeIcon class="icon"/> <span class="navText">Home</span></router-link></li>
-                <li><router-link to="/login"><UserIcon class="icon"/> <span class="navText">Login</span></router-link></li>
-                <li><router-link to="/register"><BeakerIcon class="icon"/> <span class="navText">Register</span></router-link></li>
+                <li><router-link to="/"><span>Home</span></router-link></li>
+                <li><router-link to="/login"><span>Login</span></router-link></li>
+                <li><router-link to="/register"><span>Register</span></router-link></li>
             </ul>
             <ul class="navList loggedIn" v-else>
-                <li><router-link to="/app/profile"><UserIcon class="icon"/> <span class="navText">Profile</span></router-link></li>
-                <li class="logout" @click="logout"> <span class="navText">Logout</span><ArrowLongRightIcon class="icon"/></li>
+                <li><router-link to="/app/profile"><span>Profil</span></router-link></li>
+                <li class="logout" @click="logout"> <span>Logout</span></li>
             </ul>
         </nav>
     </header>
@@ -43,7 +43,7 @@ const isLogged = computed(() => {
 .header {
     background-color: #333;
     color: white;
-    padding: 1rem;
+    padding: 0px 50px 0px 0px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -51,11 +51,12 @@ const isLogged = computed(() => {
     position: sticky;
     top: 0;
     z-index: 2;
-
 }
-.logo{
+
+.logoimg{
     cursor: pointer;
     margin: 0;
+    width: 250px;
 }
 .header h1 {
     margin: 0;
@@ -65,6 +66,12 @@ const isLogged = computed(() => {
     width: 20px;
 }
 
+li {
+    text-transform: uppercase;
+    font-weight: bold;
+    text-align: center;
+    font-size: 20px;
+}
 
 .navList {
     list-style: none;
@@ -75,40 +82,39 @@ const isLogged = computed(() => {
     align-items: center;
 }
 
-.navList li{
-    color: white;
-    text-decoration: none;
-    cursor: pointer;
+a {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.header nav ul li a {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border: none;
+    background-color: rgb(0, 0, 0);
+    order: none;
     border-radius: 5px;
     transition: background-color 0.3s ease;
+    padding: 0.5rem 1rem;
+    width: 130px;
+    border: none;
 }
 
-.navText {
-    color: white;
+a:hover {
+    cursor: pointer;
+    background-color: #8a8a8a;
 }
 
 .logout {
     color: white;
-    background-color: #ff4d4d;
+    display: flex;
+    background-color: #cd1d1d;
     border: none;
     border-radius: 5px;
     transition: background-color 0.3s ease;
     padding: 0.5rem 1rem;
-
+    width: 130px;
 }
 
-    .logout:hover {
-        background-color: #ff1a1a;
+.logout:hover {
+    cursor: pointer;
+    background-color: #7d1919;
+}
+
+span {
+    margin: auto;
 }
 </style>

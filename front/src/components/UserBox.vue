@@ -47,7 +47,6 @@ onBeforeMount(async () => {
             return
         }else {
             user.value = props.user ? props.user : null;
-            console.log("ehehe:", props.user)
         }
  
         if (user.value) {

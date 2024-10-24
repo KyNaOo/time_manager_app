@@ -10,6 +10,8 @@ interface Props {
     mode: string;
 }
 
+
+
 const emit = defineEmits<{
     (e: 'submit', value : any): void;
 }>();
@@ -66,7 +68,7 @@ const handleSubmit = () => {
             </div>
             <div class="buts">
                 <button class="save" type="submit">Save</button>
-                <button class="delete" type="submit">Delete</button>
+                <button v-if="props.mode !== 'create' " class="delete" type="submit">Delete</button>
             </div>
 
         </form>
