@@ -47,6 +47,6 @@ services:
     depends_on:
       - api 
     ports:
-      - "5173:5173"
+      - "5173:80"
     networks:
       - frontend
