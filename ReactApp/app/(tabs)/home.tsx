@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
@@ -9,8 +9,9 @@ import {jwtDecode} from "jwt-decode";
 
 export default function HomePage() {
     const [lastAction, setLastAction] = useState<'clockIn' | 'clockOut' | null>(null);
-    const ngrokUrl = process.env.EXPO_PUBLIC_API_URL
-    const [token, setToken] = useStorageState("token")
+    const ngrokUrl = process.env.EXPO_PUBLIC_API_URL;
+    const [token, setToken] = useStorageState("token");
+    const [refreshLastClock, setRefreshLastClock] = useState(false)
 
     const handleLogout = () => {
         Alert.alert('Déconnexion', 'Vous êtes déconnecté');
@@ -23,16 +24,19 @@ export default function HomePage() {
 
     const handleClockIn = async () => {
         try {
-            console.warn(token[1]);
-            // const myToken = jwtDecode(token[1]);
-            // console.warn(myToken)
-            const now = moment().format('YYY-MM-DD HH:mm:ss');
-            const response = await axios.post(`${ngrokUrl}/api/clocks/userid`, {
+            const myToken = jwtDecode(token[1]);
+            const idUser = myToken["sub"];
+            const now = moment();
+            const response = await axios.post(`${ngrokUrl}/api/clocks/${idUser}`, {
                 "time": now,
                 "status": true,
-            })
-            // Implémentation de l'API pour clock in
-            Alert.alert('Clock In', 'Vous avez clock in avec succès');
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token[1]}`,
+                }
+            });
+            setRefreshLastClock(!refreshLastClock);
+            Alert.alert('Vous avez clock in avec succès');
             setLastAction('clockIn');
         } catch (error) {
             Alert.alert('Erreur', 'Erreur lors du clock in');
@@ -41,14 +45,21 @@ export default function HomePage() {
 
     const handleClockOut = async () => {
         try {
-            const now = moment().format('YYY-MM-DD HH:mm:ss');
-            const response = await axios.post(`${ngrokUrl}/api/clocks/userid`, {
+            const myToken = jwtDecode(token[1]);
+            const idUser = myToken["sub"];
+            const now = moment();
+            const response = await axios.post(`${ngrokUrl}/api/clocks/${idUser}`, {
                 "time": now,
                 "status": false,
-            })
-            // Implémentation de l'API pour clock out
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token[1]}`,
+                }
+            });
+
             Alert.alert('Clock Out', 'Vous avez clock out avec succès');
             setLastAction('clockOut');
+            setRefreshLastClock(!refreshLastClock);
         } catch (error) {
             Alert.alert('Erreur', 'Erreur lors du clock out');
         }
@@ -61,6 +72,37 @@ export default function HomePage() {
             handleClockIn();
         }
     };
+
+    const getLastClock = async () => {
+        const myToken = jwtDecode(token[1]);
+        const idUser = myToken["sub"];
+        const response = await axios.get(`${ngrokUrl}/api/clocks/${idUser}`, {
+            headers: {
+                Authorization: `Bearer ${token[1]}`,
+            }
+        });
+        console.warn(response.data)
+        let compare = 0;
+        let theLastClock = null
+        for (let clock of response.data.data){
+            console.warn(clock)
+            if (clock.id > compare){
+                compare = clock.id;
+                theLastClock = clock;
+            }
+        }
+        if (theLastClock.status == true){
+            setLastAction('clockIn');
+        } else {
+            setLastAction('clockOut')
+        }
+    }
+
+    useEffect(() => {
+        if (!token[0]){
+            getLastClock();
+        }
+    }, [refreshLastClock, token]);
 
     return (
         <ScrollView contentContainerStyle={styles.container}>

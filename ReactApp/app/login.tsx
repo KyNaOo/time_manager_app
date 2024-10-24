@@ -21,7 +21,6 @@ export default function AuthScreen() {
   const { signIn } = useSession();
 
   const handleLogin = async () => {
-      console.log(ngrokUrl);
     if (!email || !password) {
       Alert.alert("Error", "Please fill in both email and password");
       return;
@@ -38,12 +37,9 @@ export default function AuthScreen() {
           password: password,
         }
       );
-      console.log("response");
-      console.warn(response);
       if (response.status === 200) {
         signIn();
         await setStorageItemAsync("token", response.data.token);
-        console.log("Token:", response.data.token);
         router.navigate('/home');
       } else {
         Alert.alert("Error", "An unexpected error occurred. Please try again.");
