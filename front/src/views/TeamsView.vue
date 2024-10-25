@@ -80,8 +80,8 @@ onBeforeMount(async () => {
 }
 
 .button-create-team {
-    width: 90px;
-    font-size: 12px;
+    width: 110px;
+    font-size: 16px;
 }
 
 .button-add-member-team {

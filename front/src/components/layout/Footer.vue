@@ -6,7 +6,7 @@
 <template>
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2023 LesBogoz. All rights reserved.</p>
+            <p>&copy; TimeTrack. All rights reserved.</p>
         </div>
     </footer>
 </template>
