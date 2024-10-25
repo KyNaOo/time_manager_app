@@ -9,6 +9,8 @@ import { store } from '@/api/store';
 
 const api = useApi();
 
+const idToDelete = ref(0)
+
 const props = defineProps({
     tableType: {
         type: String,
@@ -35,23 +37,27 @@ const modal = ref<Modal>({
 });
 
 async function reallyDelete(id: number) {
-        try {
-            if (props.tableType === 'team') {
-                await api.deleteTeam(id);
-            } else if (props.tableType === 'user') {
-                await api.deleteUser(id);
-            } else if (props.tableType === 'workingtime') {
-                await api.deleteWorkingTime(id);
-            }
-            store.showModal({message: `${props.tableType} with Id: ${id}, has been successfully deleted `, title: 'Success'});
+    console.log(id)
+    try {
+        if (props.tableType === 'team') {
+            console.log("massi", id)
+            await api.deleteTeam(id);            
+        } else if (props.tableType === 'user') {
+            await api.deleteUser(id);
+        } else if (props.tableType === 'workingtime') {
+            await api.deleteWorkingTime(id);
+        }
+        store.showModal({message: `${props.tableType} with Id: ${id}, has been successfully deleted `, title: 'Success'});
 
         } catch (error) {
             console.error('Failed to delete item:', error);
-        }
-    };
+    }
+};
 
-    async function handleDelete (id : number)  {
+async function handleDelete (id : number)  {
     console.log(`Delete row`);
+    console.log(id)
+    idToDelete.value = id;
     modal.value = {
         isVisible: true,
         title: `${props.tableType.charAt(0).toUpperCase() + props.tableType.slice(1)} deletion?`,
@@ -88,7 +94,7 @@ function formatDate(date: Date) {
                         <!-- Add your action buttons or elements here -->
                         <button class="deleteBtn" @click="handleDelete(tableData[rowIndex].id)">Delete</button>
                         <ModalAction v-if="modal.isVisible" :title=modal.title :message="modal.message" 
-                        @confirm="reallyDelete(tableType === 'team' ? tableData[rowIndex].team_id :tableData[rowIndex].id)" @close="modal.isVisible = false" />
+                        @confirm="reallyDelete(idToDelete)" @close="modal.isVisible = false" />
                     </td>
                 </tr>
 

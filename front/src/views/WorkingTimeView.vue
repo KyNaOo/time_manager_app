@@ -24,10 +24,9 @@ onBeforeMount(async () => {
 
 <template>
     <div class="workingtime-view" v-if="workingTime" >
-        <button @click="$router.back()">Go Back</button>
         <h1>Working Time {{workingTime.id}}</h1>
-        <p>Start: {{workingTime.start}}</p>
-        <p>End: {{workingTime.end}}</p>
+        <p><u>Tu as commencé à:</u> {{ workingTime.start}}</p>
+        <p><u>Et finis à:</u> {{ workingTime.end}}</p>
     </div>
     <div v-else>
         <p>WorkingTime not found</p>
@@ -39,5 +38,27 @@ onBeforeMount(async () => {
 <style scoped>
 .user-view {
     padding: 20px;
+}
+
+.workingtime-view {
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+    background-color: #353535;
+    color: white;
+    border-radius: 15px;
+    padding: 40px 60px;
+}
+
+h1 {
+    font-weight: bold;
+    font-size: 28px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+p {
+    font-weight: 300;
+    font-size: 20px;
 }
 </style>
