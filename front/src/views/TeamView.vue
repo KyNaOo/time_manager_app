@@ -44,6 +44,7 @@ const action = async(teamToChange : Team) => {
     } else {
         if (teamId && currentUser.value && currentUser.value.id) {
             await api.modifyTeam(Number(teamId), teamToChange.title, currentUser.value!.id);
+            store.showModal({message: 'Name modified with success', title: 'Success'});
         } else {
             console.error('Team ID is undefined');
         }
@@ -158,13 +159,13 @@ function deleteTeam() {
                     <option v-for="user in users" :key="user.id" :value="user.id">{{ user.username }}</option>
                 </select>
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label for="managerSelect">Est-il manager :</label>
                 <select id="managerSelect" v-model="formData.isTeamLeader">
                     <option value="true">Oui</option>
                     <option value="false">Non</option>
                 </select>
-            </div>
+            </div> -->
             <button type="submit" class="add-button">Ajouter</button>
         </form>
     </div>

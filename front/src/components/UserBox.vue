@@ -9,6 +9,8 @@ import ChartManager from '@/components/ChartManager.vue';
 import type { User, WorkingTime } from '@/types/crudTypes'
 import { useApi } from '@/api';
 import { store } from '@/api/store';
+import router from "../router";
+
 
 const user = ref<User | null>(null)
 const route = useRoute()
@@ -26,13 +28,25 @@ const action = async() => {
         console.error('User is null')
         return
     }
-    if (mode.value === 'create') {
-        await api.createUser(user.value)
+    if (user.value.id) {
+            await api.modifyUser(user.value);
+            store.showModal({message: 'User edit with success', title: 'Success'});
+            router.push('/');
+        } else {
+            console.error('Team ID is undefined');
+        }
+};
+
+const deleteUser = async() => {
+    if (user.value === null) {
+        console.error('User is null')
+        return
     }
-    else {
-        await api.deleteUser(Number(user.value.id))
-        store.token=null;
-    }
+    await api.deleteUser(Number(user.value.id))
+    localStorage.clear();
+    store.token = null;
+    store.showModal({message: 'User delete with success', title: 'Success'});
+    router.push('/');
 };
 
 
@@ -67,7 +81,7 @@ onBeforeMount(async () => {
         <div class="flexWrapper">
             <div class="formUser">
             <h2>{{mode === 'create' ? 'CREER UN UTILISATEUR' : 'PROFIL DE ' +  user.username  }} </h2>
-            <Form context="user" :user="user" :mode="mode" @submit="action" />
+            <Form context="user" :user="user" :mode="mode" @delete="deleteUser" @submit="action" />
             </div>  
         </div>
 
