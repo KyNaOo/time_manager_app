@@ -211,9 +211,6 @@ export default function HomePage() {
     return (
         <View>
         <View style={styles.header}>
-            <View style={styles.logoContainer}>
-                <Text style={styles.logo}>MonLogo</Text>
-            </View>
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity onPress={handleProfile} style={styles.headerButton}>
                     <Text style={styles.buttonText}>Profil</Text>
