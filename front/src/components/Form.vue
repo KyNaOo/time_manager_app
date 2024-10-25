@@ -12,12 +12,14 @@ interface Props {
 
 const emit = defineEmits<{
     (e: 'submit', value : any): void;
+    (e: 'delete'): void;
 }>();
 
 const props = defineProps<Props>();
 
 const user = ref(props.user);
 const team = ref(props.team);
+console.log('TEAM in TEAMVIEW:', team.value)
 const formData = computed(() => {
     if (props.context === 'user' && user.value) {
         return {
@@ -27,16 +29,20 @@ const formData = computed(() => {
             role: user.value.role
         };
     } else if (props.context === 'team' && team.value) {
-        return {
-            name: team.value.title,
-        };
+        return team.value;
     }
     return {};
 });
 
 const handleSubmit = () => {
+    console.log('Form data:', formData.value);
     emit('submit', formData.value);
 };
+
+function deleteContent() {
+    console.log('Delete:');
+    emit('delete');
+}
 </script>
 <template>
     <form @submit.prevent="handleSubmit">
@@ -49,16 +55,16 @@ const handleSubmit = () => {
                     <label for="email">Email:</label>
                     <input type="email" id="email" v-model="user.email" />
                 </div>
-                <div class="form-field">
+                <!-- <div class="form-field">
                     <label for="password">Password:</label>
                     <input type="password" id="password" v-model="user.password" />
-                </div>
+                </div> -->
                 <div class="form-field">
                     <label for="role">Rôle:</label>
                     <input type="text" id="role" v-model="user.role" />
                 </div>
             </div>
-            <div v-else-if="props.context === 'team' && team">
+            <div v-else-if="team">
                 <div class="form-field">
                     <label for="name">Name:</label>
                     <input type="text" id="name" v-model="team.title" />
@@ -66,7 +72,7 @@ const handleSubmit = () => {
             </div>
             <div class="buts">
                 <button class="save" type="submit">Save</button>
-                <button class="delete" type="submit">Delete</button>
+                <button v-if="props.mode !== 'create' " class="delete" @click.prevent="deleteContent">Delete</button>
             </div>
 
         </form>
@@ -146,5 +152,11 @@ label {
     cursor: pointer;
     transition: 0.4s;
     background-color: #9a790e;
+}
+
+.formu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 </style>

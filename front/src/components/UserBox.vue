@@ -28,7 +28,8 @@ const action = async() => {
     }
     if (mode.value === 'create') {
         await api.createUser(user.value)
-    } else {
+    }
+    else {
         await api.modifyUser(user.value)
     }
 };
@@ -47,7 +48,6 @@ onBeforeMount(async () => {
             return
         }else {
             user.value = props.user ? props.user : null;
-            console.log("ehehe:", props.user)
         }
  
         if (user.value) {

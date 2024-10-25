@@ -62,12 +62,23 @@ const turnOffError = () => {
 
 
 ///////////////////// USERS ///////////////////////
+// Get all users
+async function getAllUsers(): Promise<User[]> {
+  try {
+    // get all users
+    const response = await instance.get('/api/users');
+    return response.data.data as User[];
+  } catch (e) {
+    console.log("Error fetching users:", e);
+    return [];
+  }
+}
 
   // Create user
   async function createUser (user: User) {
     try {
       console.log(`Create user`);
-      const resp = await instance.post(`http://localhost:4000/api/users`, {
+      const resp = await instance.post(`/api/users`, {
         user: {
           username: user.username,
           email: user.email,
@@ -100,7 +111,7 @@ async function modifyUser (user: User) {
   try {
       console.log(`Modify user with ID:`, user.id);
       // Change in the database
-      const resp = await instance.put(`http://localhost:4000/api/users/${user.id}`, {
+      const resp = await instance.put(`/api/users/${user.id}`, {
           user: {
               username: user?.username,
               email: user?.email
@@ -163,6 +174,18 @@ async function getUserTeams(user: User) {
       const res = await instance.get(`/api/user/teams/${user.id}`);
       console.log('User teams:', res.data);
       return res.data.teams;
+  } catch (e) {
+      console.log("Error fetching user teams:", e);
+  }
+}
+
+// Get user teams
+async function getUserInTeam(team: Team) {
+  try {
+      // get all teams from user
+      const res = await instance.get(`/api/team/users/${team.id}`);
+      console.log('Team users:', res.data);
+      return res.data.users;
   } catch (e) {
       console.log("Error fetching user teams:", e);
   }
@@ -242,15 +265,14 @@ async function createTeam(name: string, managerId: number) {
 }
 
 // Modify team
-async function modifyTeam(id: number, name: string, managerId: number) {
+async function modifyTeam(id: number, title: string, managerId: number) {
   try {
       console.log(`Modify team with ID:`, id);
       // Modify team
       await instance.put(`/api/team/${id}`, {
         team: {
-          name: name,
-          managerId: managerId
-      }
+          title: title,
+        }
       });
       console.log(`Modified team with ID: ${id}`);
   } catch (e) {
@@ -279,6 +301,21 @@ async function deleteTeam(id: number) {
       console.log(`Deleted team with ID: ${id}`);
   } catch (e) {
       console.log(`Error deleting team with ID: ${id}`, e);
+  }
+}
+
+// Add user to team
+async function addUserToTeam(userId: number, teamId: number, isTeamLeader: boolean) {
+  try {
+    // Add user to team
+    await instance.post(`/api/team/user/addUser/${userId}/${teamId}`, {
+      team_member: {
+        team_id : teamId,
+        user_id: userId,
+        is_team_leader: isTeamLeader
+      }
+    });
+  } catch (e) {
   }
 }
 
@@ -403,6 +440,7 @@ export const useApi = () => {
     modifyWorkingTime,
     deleteWorkingTime,
     // Users
+    getAllUsers,
     getUser,
     modifyUser,
     createUser,
@@ -421,7 +459,8 @@ export const useApi = () => {
     getTeamMembers,
     modifyTeamMemberRole,
     isUserTeamLeader,
-    deleteMemberFromTeam
-
+    deleteMemberFromTeam,
+    addUserToTeam,
+    getUserInTeam
   };
 };

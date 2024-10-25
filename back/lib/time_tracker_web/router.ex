@@ -35,7 +35,7 @@ defmodule TimeTrackerWeb.Router do
     post "/team/user/addUser/:user_id/:team_id", TeamMemberController, :create
     get "/team/users/:team_id", TeamMemberController, :get_users_in_team
     get "/team/user/isAdmin/:user_id/:team_id", TeamMemberController, :is_user_team_leader
-    put "/team/user/role/:user_id/:team_id", TeamMemberController, :update_user_role
+    put "/team/user/role/:user_id/:team_id", TeamMemberController, :update_team_member
     delete "/team/user/remove/:user_id/:team_id", TeamMemberController, :remove_user_from_team
     get "/user/teams/:user_id", TeamMemberController, :get_teams_for_user
 
