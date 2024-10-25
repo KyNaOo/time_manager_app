@@ -12,8 +12,9 @@ export default function HomePage() {
     const ngrokUrl = process.env.EXPO_PUBLIC_API_URL;
     const [workingTimes, setWorkingTimes] = useState([]);
     const [token, setToken] = useStorageState("token");
-    const [refreshLastClock, setRefreshLastClock] = useState(false)
-    const [lastWT, setLastWT] = useState(null)
+    const [refreshLastClock, setRefreshLastClock] = useState(false);
+    const [lastWT, setLastWT] = useState(null);
+    const [teams, setTeams] = useState([]);
 
     const handleLogout = () => {
         Alert.alert('Déconnexion', 'Vous êtes déconnecté');
@@ -62,6 +63,7 @@ export default function HomePage() {
             const myToken = jwtDecode(token[1]);
             const idUser = myToken["sub"];
             const now = moment();
+            // @ts-ignore
             let idWT = lastWT.id
             const response = await axios.post(`${ngrokUrl}/api/clocks/${idUser}`, {
                 "time": now,
@@ -88,12 +90,29 @@ export default function HomePage() {
         }
     };
 
+    const fetchTeams = async () => {
+        try {
+            const myToken = jwtDecode(token[1]);
+            const idUser = myToken["sub"];
+
+            const response = await axios.get(`${ngrokUrl}/api/user/teams/${idUser}`, {
+                headers: {
+                    Authorization: `Bearer ${token[1]}`,
+                }
+            });
+
+            setTeams(response.data.teams);
+        } catch (error) {
+            Alert.alert('Erreur', 'Erreur lors de la récupération des teams');
+        }
+
+    };
+
     const fetchWorkingTimes = async () => {
         try {
             const myToken = jwtDecode(token[1]);
             const idUser = myToken["sub"];
 
-            // Récupérer la liste des working times
             const response = await axios.get(`${ngrokUrl}/api/workingtime/${idUser}`, {
                 headers: {
                     Authorization: `Bearer ${token[1]}`,
@@ -103,6 +122,7 @@ export default function HomePage() {
         } catch (error) {
             Alert.alert('Erreur', 'Erreur lors de la récupération des working times');
         }
+        console.warn(token[1]);
     };
 
     const handleDelete = async (id: any) => {
@@ -177,6 +197,7 @@ export default function HomePage() {
             getLastClock();
             getLastWT();
             fetchWorkingTimes();
+            fetchTeams();
         }
     }, [refreshLastClock, token]);
 
@@ -227,7 +248,21 @@ export default function HomePage() {
                         </View>
                     ))}
                 </View>
-
+                <View style={styles.teamsTable}>
+                    <Text style={styles.tableTitle}>Teams</Text>
+                    <View style={styles.tableHeader}>
+                        <Text style={styles.headerText}>Nom de l'équipe</Text>
+                    </View>
+                    {teams.length > 0 ? (
+                        teams.map((team, index) => (
+                            <View key={index} style={styles.teamRow}>
+                                <Text style={styles.teamText}>{team.team_name}</Text>
+                            </View>
+                        ))
+                    ) : (
+                        <Text style={styles.noTeamsText}>Aucun team trouvé.</Text>
+                    )}
+                </View>
             </View>
         </ScrollView>
         </View>
@@ -331,5 +366,26 @@ const styles = StyleSheet.create({
     deleteButtonText: {
         color: 'white',
         fontSize: 12,
+    },
+    teamsTable: {
+        marginTop: 40,
+        width: '100%',
+    },
+    teamRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingVertical: 8,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+        alignItems: 'center',
+    },
+    teamText: {
+        fontSize: 14,
+    },
+    noTeamsText: {
+        fontSize: 16,
+        color: '#666',
+        textAlign: 'center',
+        marginTop: 10,
     },
 });
