@@ -266,15 +266,14 @@ async function createTeam(name: string, managerId: number) {
 }
 
 // Modify team
-async function modifyTeam(id: number, name: string, managerId: number) {
+async function modifyTeam(id: number, title: string, managerId: number) {
   try {
       console.log(`Modify team with ID:`, id);
       // Modify team
       await instance.put(`/api/team/${id}`, {
         team: {
-          name: name,
-          managerId: managerId
-      }
+          title: title,
+        }
       });
       console.log(`Modified team with ID: ${id}`);
   } catch (e) {

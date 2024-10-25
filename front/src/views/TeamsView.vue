@@ -13,6 +13,7 @@ const teams = ref<Team[] | null>(null);
 const userisAdmin = computed( () => {
   return user.value?.role === 'admin';
 });
+console.log('USER IN TEAMMMMMs:', user.value)
 
 
 const tableHeaders = computed(() => {
@@ -42,15 +43,20 @@ onBeforeMount(async () => {
 
 
 <template>
-    <div class="teams">
+    <div class="teams" v-if="teams && teams.length > 0">
         <div class="usersTitle">
-            <h2>Ton équipe</h2>
+            <h2>Équipes</h2>
             <div class="buts">
                 <RouterLink class="button-create-team" v-if="userisAdmin" to="/app/team/?create=true" >Créer</RouterLink>
             </div>
         </div>        
         
-        <SuperTable class="arrayAllTeams" v-if="teams" :tableData="teams" tableType="team" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
+        <SuperTable class="arrayAllTeams" :tableData="teams" tableType="team" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
+    </div>
+    <div v-else>
+        <p>Il n'y a pas encore d'équipe</p>
+        <RouterLink class="button-create-team" v-if="userisAdmin" to="/app/team/?create=true" >Créer une équipe</RouterLink>
+
     </div>
 </template>
 

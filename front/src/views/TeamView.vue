@@ -7,7 +7,11 @@ import type { User,Team, WorkingTime } from '@/types/crudTypes'
 import { useApi } from '@/api';
 import { store } from '@/api/store';
 import SuperTable from '@/components/SuperTable.vue';
-
+export interface TeamMember {
+    userId: number;
+    teamId: number;
+    isTeamLeader: boolean; 
+}
 const route = useRoute();
 const user = ref<User | null>(null);
 const teams = ref<Team[] | null>(null);
@@ -22,7 +26,7 @@ const users = ref<User[] | null>(null);
 const teamMembers = ref<TeamMember[]>([]); 
 const allUsersInTeam = ref<User[] | null>(null)
 
-const action = async() => {
+const action = async(teamToChange : Team) => {
     if (team.value === null) {
         console.error('Team is null')
         return
@@ -31,14 +35,15 @@ const action = async() => {
         if (currentUser.value && currentUser.value.id !== undefined) {
             const newTeam = await api.createTeam(team.value.title, currentUser.value.id)
             const leader = await api.modifyTeamMemberRole(currentUser.value, newTeam, true)
+            router.push(`/app/team/${newTeam.id}`)
         } else {
             console.error('Current user or user ID is null or undefined')
         }
         // redirect to teams view
         store.showModal({message: 'Team created successfully', title: 'Success'});
     } else {
-        if (teamId !== undefined && currentUser.value && currentUser.value.id !== undefined) {
-            await api.modifyTeam(Number(teamId), team.value.title, currentUser.value!.id);
+        if (teamId && currentUser.value && currentUser.value.id) {
+            await api.modifyTeam(Number(teamId), teamToChange.title, currentUser.value!.id);
         } else {
             console.error('Team ID is undefined');
         }
@@ -110,11 +115,17 @@ const tableHeaders = computed(() => {
   return headers;
 });
 
-export interface TeamMember {
-    userId: number;
-    teamId: number;
-    isTeamLeader: boolean; 
+function deleteTeam() {
+    if (team.value && teamId) {
+        console.log('Delete team:', team.value)
+        api.deleteTeam(Number(teamId));
+        router.push('/app');
+    } else {
+        console.error('Team ID is undefined');
+    }
 }
+
+
 
 </script>
 
@@ -122,8 +133,8 @@ export interface TeamMember {
     <div class="TeamView" v-if="currentUser">
         <div class="flexWrapper">
             <div class="formUser">
-            <h2>{{mode === 'create' ? 'Créer une équipe' : 'Modifier ton équipe'}} </h2>
-            <Form v-if="team" :context="'team'" :team="team" :mode="mode" @submit="action" />
+            <h2>{{mode === 'create' ? 'Créer une équipe' : 'Modifies ton équipe'}} </h2>
+            <Form v-if="team" :context="'team'" :team="team" :mode="mode" @submit="action($event)" @delete="deleteTeam" />
             </div>
         </div>
     </div>
@@ -132,7 +143,6 @@ export interface TeamMember {
     </div>
 
     <div v-if="mode !== 'create'" class="teamArray">
-        <h2 class="titleArray">ton équipe</h2>
         <SuperTable class="arrayTeam" v-if="allUsersInTeam" :tableData="allUsersInTeam" tableType="user" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
     </div>
 

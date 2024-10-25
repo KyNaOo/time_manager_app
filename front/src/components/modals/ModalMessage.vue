@@ -10,8 +10,10 @@
 
 <script setup lang="ts">
 import { ref, defineProps } from 'vue';
-
 import { store } from '../../api/store';
+import { useRouter } from "vue-router";
+const router = useRouter();
+
 const props = defineProps<{
     message: string;
     title: string;
@@ -22,6 +24,7 @@ const isVisible = ref(true);
 function closeModal() {
     isVisible.value = false;
     store.hideModal();
+    router.go(0)
 }
 </script>
 
