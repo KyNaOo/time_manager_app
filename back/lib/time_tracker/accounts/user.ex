@@ -22,6 +22,14 @@ defmodule TimeTracker.Accounts.User do
     |> put_password_hash()
   end
 
+  def update_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:username, :email, :role])
+    |> validate_required([:username, :email, :role])  # Password is excluded here
+    |> unique_constraint(:email)
+    |> unique_constraint(:username)
+  end
+
 
   defp put_password_hash(%Ecto.Changeset{valid?: true, changes: %{password: password}} = changeset) do
     # Hash the password and update the changeset
