@@ -28,7 +28,8 @@ const action = async() => {
     }
     if (mode.value === 'create') {
         await api.createUser(user.value)
-    } else {
+    }
+    else {
         await api.modifyUser(user.value)
     }
 };

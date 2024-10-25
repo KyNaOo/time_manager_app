@@ -51,7 +51,6 @@ onBeforeMount(async () => {
 <div class="user-page" v-if="response">
   <div class="usersTitle">
       <h2>Utilisateur</h2>
-      <RouterLink class="button-add-user" v-if="userisAdmin" to="/app/user?create=true" >Créer un utilisateur</RouterLink>
   </div>
   
   <SuperTable v-if="response" :tableData="response" tableType="user" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
