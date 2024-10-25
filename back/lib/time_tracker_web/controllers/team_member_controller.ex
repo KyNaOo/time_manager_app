@@ -6,23 +6,12 @@ defmodule TimeTrackerWeb.TeamMemberController do
 
   action_fallback TimeTrackerWeb.FallbackController
 
-  def create(conn, %{"team_id" => team_id, "user_id" => user_id}) do
-    team_member_params = %{
-      "team_id" => team_id,
-      "user_id" => user_id,
-      "is_team_leader" => false
-    }
-
-    case Accounts.create_team_member(team_member_params) do
-      {:ok, team_member} ->
-        conn
-        |> put_status(:created)
-        |> render(:show, team_member: team_member)
-
-      {:error, %Ecto.Changeset{} = changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{errors: translate_errors(changeset)})
+  def create(conn, %{"team_member" => team_member_params}) do
+    with {:ok, %TeamMember{} = team_member} <- Accounts.create_team_member(team_member_params) do
+      conn
+      |> put_status(:created)
+      |> put_resp_header("location", ~p"/api/team_members/#{team_member}")
+      |> render(:show, team_member: team_member)
     end
   end
 
