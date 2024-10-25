@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ScrollView, SafeAreaView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
 import axios from "axios";
 import moment from "moment";
 import {useStorageState} from "@/utils/useStorageState";
 import {jwtDecode} from "jwt-decode";
+import TeamDetailsModal from "@/components/teamDetailsModal";
 
 export default function HomePage() {
     const [lastAction, setLastAction] = useState<'clockIn' | 'clockOut' | null>(null);
@@ -15,6 +15,8 @@ export default function HomePage() {
     const [refreshLastClock, setRefreshLastClock] = useState(false);
     const [lastWT, setLastWT] = useState(null);
     const [teams, setTeams] = useState([]);
+    const [selectedTeamId, setSelectedTeamId] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     const handleLogout = () => {
         Alert.alert('Déconnexion', 'Vous êtes déconnecté');
@@ -31,7 +33,6 @@ export default function HomePage() {
             const idUser = myToken["sub"];
             const now = moment();
 
-            // Création du working time lors du clock in
             const response = await axios.post(`${ngrokUrl}/api/clocks/${idUser}`, {
                 "time": now,
                 "status": true,
@@ -52,7 +53,7 @@ export default function HomePage() {
 
             setRefreshLastClock(!refreshLastClock);
             Alert.alert('Clock In', 'Vous avez clock in avec succès');
-            fetchWorkingTimes();  // Rafraîchir la liste des working times
+            fetchWorkingTimes();
         } catch (error) {
             Alert.alert('Erreur', 'Erreur lors du clock in');
         }
@@ -102,6 +103,7 @@ export default function HomePage() {
             });
 
             setTeams(response.data.teams);
+            console.warn(response.data.teams);
         } catch (error) {
             Alert.alert('Erreur', 'Erreur lors de la récupération des teams');
         }
@@ -192,6 +194,11 @@ export default function HomePage() {
         }
     }
 
+    const openTeamDetails = (teamId: any) => {
+        setSelectedTeamId(teamId);
+        setIsModalVisible(true);
+    };
+
     useEffect(() => {
         if (!token[0]){
             getLastClock();
@@ -250,19 +257,25 @@ export default function HomePage() {
                 </View>
                 <View style={styles.teamsTable}>
                     <Text style={styles.tableTitle}>Teams</Text>
-                    <View style={styles.tableHeader}>
-                        <Text style={styles.headerText}>Nom de l'équipe</Text>
-                    </View>
                     {teams.length > 0 ? (
                         teams.map((team, index) => (
-                            <View key={index} style={styles.teamRow}>
+                            <TouchableOpacity
+                                key={index}
+                                style={styles.teamRow}
+                                onPress={() => openTeamDetails(team.team_id)}
+                            >
                                 <Text style={styles.teamText}>{team.team_name}</Text>
-                            </View>
+                            </TouchableOpacity>
                         ))
                     ) : (
                         <Text style={styles.noTeamsText}>Aucun team trouvé.</Text>
                     )}
                 </View>
+                <TeamDetailsModal
+                    teamId={selectedTeamId}
+                    visible={isModalVisible}
+                    onClose={() => setIsModalVisible(false)}
+                />
             </View>
         </ScrollView>
         </View>
