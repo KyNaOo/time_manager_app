@@ -10,8 +10,6 @@ interface Props {
     mode: string;
 }
 
-
-
 const emit = defineEmits<{
     (e: 'submit', value : any): void;
 }>();
@@ -51,10 +49,10 @@ const handleSubmit = () => {
                     <label for="email">Email:</label>
                     <input type="email" id="email" v-model="user.email" />
                 </div>
-                <div class="form-field">
+                <!-- <div class="form-field">
                     <label for="password">Password:</label>
                     <input type="password" id="password" v-model="user.password" />
-                </div>
+                </div> -->
                 <div class="form-field">
                     <label for="role">Rôle:</label>
                     <input type="text" id="role" v-model="user.role" />
@@ -148,5 +146,11 @@ label {
     cursor: pointer;
     transition: 0.4s;
     background-color: #9a790e;
+}
+
+.formu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 </style>
