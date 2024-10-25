@@ -211,16 +211,17 @@ defmodule TimeTracker.Accounts do
     TeamMember.is_user_team_leader(team_id, user_id)
   end
 
-  def update_user_role(team_id, user_id, is_team_leader) do
-    TeamMember.update_user_role(team_id, user_id, is_team_leader)
-  end
-
   def remove_user_from_team(team_id, user_id) do
     TeamMember.remove_user_from_team(team_id, user_id)
   end
 
+
   def get_teams_for_user(user_id) do
     TeamMember.get_teams_for_user(user_id)
+  end
+
+  def get_team_member!(user_id) do
+    Repo.get_by!(TeamMember, user_id: user_id)
   end
 
   def create_team_member(attrs \\ %{}) do
@@ -228,6 +229,16 @@ defmodule TimeTracker.Accounts do
     |> TeamMember.changeset(attrs)
     |> Repo.insert()
   end
+
+  def update_team_member(%TeamMember{} = team_member, attrs) do
+    team_member
+    |> TeamMember.changeset(attrs)
+    |> Repo.update()
+  end
+
+  # def change_team(%Team{} = team, attrs \\ %{}) do
+  #   Team.changeset(team, attrs)
+  # end
 
   @doc """
   Authenticates a user using Guardian.

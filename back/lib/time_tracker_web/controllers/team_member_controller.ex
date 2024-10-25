@@ -47,10 +47,11 @@ defmodule TimeTrackerWeb.TeamMemberController do
     end
   end
 
-  def update_user_role(conn, %{"team_id" => team_id, "user_id" => user_id, "is_team_leader" => is_team_leader}) do
-    case Accounts.update_user_role(team_id, user_id, is_team_leader) do
-      {:ok, team_member} ->
-        render(conn, "team_member.json", team_member: team_member)
+  def update_team_member(conn, %{"team_id" => team_id, "user_id" => user_id, "team_member" => team_member_params}) do
+    with team_member <- Accounts.get_team_member!(user_id),
+         {:ok, team_member} <- Accounts.update_team_member(team_member, team_member_params) do
+      render(conn, "team_member.json", team_member: team_member)
+    else
       {:error, changeset} ->
         conn
         |> put_status(:unprocessable_entity)
