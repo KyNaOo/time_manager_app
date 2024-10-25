@@ -27,7 +27,7 @@ async function signIn(email: string, password: string) {
     localStorage.setItem("token", token);
     store.setToken(token);
     console.log("Token saved to localStorage and store");
-    router.push('/app');
+    router.push('/');
     console.log("Redirecting to /app");
     // Redirect or handle sign-in success
   } catch (error) {
@@ -57,7 +57,7 @@ async function register(user : User) {
         localStorage.setItem("token", token);
         store.setToken(token);
         console.log("Token saved to localStorage and store");
-    router.push('/app');
+    router.push('/');
     } catch (error) {
         // Handle error
         throw error;

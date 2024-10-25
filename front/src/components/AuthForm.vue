@@ -66,7 +66,7 @@ const handleAuth = async () => {
         role: user.value.role!
       });
     }
-    router.push('/app');   
+    router.push('/');   
   } catch (err : any) {
     console.log('USer not authenticated', user.value);
     console.log("PASSSSSSSSSSSSSS2");
