@@ -3,7 +3,6 @@ import { ref , shallowRef} from "vue";
 import { store } from "./store"
 import type { User, WorkingTime, AuthMode, Team } from "@/types/crudTypes";
 
-
 const hasErrorOccured = ref<boolean>(false);
 const errorMessage = ref<string | null>(null);
 const emailError = ref<boolean>(false);
@@ -78,7 +77,7 @@ async function getAllUsers(): Promise<User[]> {
   async function createUser (user: User) {
     try {
       console.log(`Create user`);
-      const resp = await instance.post(`http://localhost:4000/api/users`, {
+      const resp = await instance.post(`/api/users`, {
         user: {
           username: user.username,
           email: user.email,
@@ -111,7 +110,7 @@ async function modifyUser (user: User) {
   try {
       console.log(`Modify user with ID:`, user.id);
       // Change in the database
-      const resp = await instance.put(`http://localhost:4000/api/users/${user.id}`, {
+      const resp = await instance.put(`/api/users/${user.id}`, {
           user: {
               username: user?.username,
               email: user?.email

@@ -18,6 +18,7 @@ function getUserFromToken(token: string) {
 async function signIn(email: string, password: string) {
   try {
     console.log("Attempting to sign in with email:", email);
+    console.log("PASSSSSSSSSSSSSSSSSSSSSS0");
     const response = await instance.post("/api/auth/signin", { email, password });
     console.log("Received response:", response);
     const token = response.data.token;
@@ -31,6 +32,8 @@ async function signIn(email: string, password: string) {
     // Redirect or handle sign-in success
   } catch (error) {
     console.error("Error during sign-in:", error);
+    console.error("Error during sign-in:", JSON.stringify(error, null, 2));
+    console.log("PASSSSSSSSSSSSSSSSSSSSSS1");
     throw error;
     // Handle error
   }
