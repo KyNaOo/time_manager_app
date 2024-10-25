@@ -111,33 +111,35 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   try {
+
+    console.log('Before each route');
+    // Check if the user is authenticated
+    const authenticated = is_authenticated();
+    console.log('User is autenticated ? ', authenticated); 
     console.log('from: ', from);
     console.log('to: ', to);
-    // Check if the user is authenticated
-    const authenticated = await is_authenticated();
 
-    console.log('authenticated in router: ', authenticated); 
-    if (to.meta.requiresAuth && !authenticated) {
-      console.log('Redirecting to login');
-      // User is not authenticated, redirect to login
-      return next("/login");
-    }
-    
     if ((to.path === "/login" || to.path === "/register" || to.path === "/") && authenticated) {
-      console.log('Redirecting to /')
+      console.log('Redirecting to app, user is already authenticated');
       // User is authenticated and trying to access login, redirect to dashboard
       return next("/app");
     }
 
-    console.log('Passed controls: ');
+    if (to.meta.requiresAuth && !authenticated) {
+      console.log('Redirecting to login, user is not authenticated');
+      // User is not authenticated, redirect to login
+      return next("/login");
+    }
+
+    console.log('Passed controls, going to: ', to.path);
 
     return next();
-  } catch (err) {
-    alert('server is down');
+  } catch (err : any) {
+    store.showModal({message: `Ann error in the router`, title: 'Error in router'});
   }
 });
 
-async function is_authenticated() {
+function is_authenticated() {
   try {
     return store.token !== null;
   } catch (err) {

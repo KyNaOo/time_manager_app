@@ -137,8 +137,12 @@ onBeforeMount(async () => {
         <div class="block currentClockWrapper">
             <WorkingTimes v-if="user" :user="user" :workingTimes="workingTimes" />
         </div>
-        <div class="block currentClockWrapper">
-            <Teams v-if="user" :user="user" />
+        <div class="block TeamsBlock">
+            <Teams v-if="user && user.role === 'admin'" :user="user" />
+            <!-- <div v-else >
+                <h2 class="titleArray">ton équipe</h2>
+                <SuperTable class="arrayTeam" v-if="allUsersInTeam" :tableData="allUsersInTeam" tableType="user" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
+            </div> -->
         </div>
         </template>
         <template v-else>

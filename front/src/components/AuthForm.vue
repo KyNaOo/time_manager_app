@@ -36,7 +36,6 @@ const user = ref<Partial<User>>(
 );
 
 const router = useRouter();
-const showPassword = ref(false);
 
 const hideAllErrors = () => {
     api.turnOffError();
@@ -66,7 +65,7 @@ const handleAuth = async () => {
         role: user.value.role!
       });
     }
-    router.push('/');   
+    router.push('/app');   
   } catch (err : any) {
     console.log('USer not authenticated', user.value);
     console.log(err);
@@ -76,7 +75,6 @@ const handleAuth = async () => {
     } else {
       error.value = 'An error occurred';
     }
-    // store.showModal({message: err.response.data.error, title: 'Error'});
   }
 };
 

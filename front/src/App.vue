@@ -7,16 +7,15 @@ import { store } from './api/store';
 
 <template>
   <main>
-    <router-view v-slot="{ Component }">
       <AppLayout>
-        <transition name="fade" mode="out-in">
-          <component :is="Component" />
-        </transition>
-        </AppLayout>
-    </router-view>
-    <Modal v-if="store.modal !== null" :message="store.modal.message" :title="store.modal.title" />
+        <router-view v-slot="{ Component }" :key="$route.fullPath">
+          <!-- <transition name="fade" mode="out-in"> -->
+            <component :is="Component" />
+          <!-- </transition> -->
+          </router-view>
+      </AppLayout>
+      <Modal v-if="store.modal !== null" :message="store.modal.message" :title="store.modal.title" />
   </main>
-  <!-- <RouterView /> -->
 </template>
 
 <style scoped>

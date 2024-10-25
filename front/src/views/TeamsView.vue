@@ -44,7 +44,7 @@ onBeforeMount(async () => {
 <template>
     <div class="teams">
         <div class="usersTitle">
-            <h2>Ton équipe</h2>
+            <h2>Équipes</h2>
             <div class="buts">
                 <RouterLink class="button-create-team" v-if="userisAdmin" to="/app/team/?create=true" >Créer</RouterLink>
             </div>
