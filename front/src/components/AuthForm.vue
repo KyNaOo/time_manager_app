@@ -156,8 +156,8 @@ watch(user, (newValue) => {
       <button v-if="props.authMode == 'register' && isStrongPassword" :disabled="!isFormValid" type="submit" :class="['auth-button', { 'inpError': props.authMode == 'register' && !passwordsMatch }]">
         {{props.authMode == 'register' ? 'Register' : 'Login'}}
       </button>
-      <button type="submit" :class="['auth-button', { 'inpError': props.authMode == 'register' && !passwordsMatch }]">
-        {{props.authMode == 'register' ? 'Register' : 'Login'}}
+      <button v-if="props.authMode != 'register' && isStrongPassword" type="submit" :class="['auth-button', { 'inpError': !passwordsMatch }]">
+        {{'Login'}}
       </button>
       <span v-if="!passwordsMatch && authMode === 'register'" class="error">Passwords do not match</span>
       <span v-if="error" class="error">{{error}}</span>

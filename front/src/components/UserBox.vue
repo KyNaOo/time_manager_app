@@ -30,7 +30,8 @@ const action = async() => {
         await api.createUser(user.value)
     }
     else {
-        await api.modifyUser(user.value)
+        await api.deleteUser(Number(user.value.id))
+        store.token=null;
     }
 };
 

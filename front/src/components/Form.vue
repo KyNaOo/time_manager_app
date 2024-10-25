@@ -68,7 +68,6 @@ const handleSubmit = () => {
                 <button class="save" type="submit">Save</button>
                 <button v-if="props.mode !== 'create' " class="delete" type="submit">Delete</button>
             </div>
-
         </form>
 </template>
 
