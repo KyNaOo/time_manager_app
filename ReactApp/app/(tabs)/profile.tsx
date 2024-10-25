@@ -7,11 +7,13 @@ import {
   ScrollView,
   ActivityIndicator,
   SafeAreaView,
+  Button,
 } from "react-native";
 import axios from "axios";
 import { useStorageState } from "@/utils/useStorageState";
 import { jwtDecode } from "jwt-decode";
 import "../../global.css";
+import { router } from "expo-router";
 
 const ProfilePage = () => {
   const [username, setUsername] = useState("");
@@ -175,6 +177,10 @@ const ProfilePage = () => {
                 </Text>
                 <Text className="text-xl text-gray-900">{userData.role}</Text>
               </View>
+              <Button
+                title={"retour"}
+                onPress={() => router.navigate("/home")}
+              />
             </View>
           </>
         )}
