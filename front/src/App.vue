@@ -14,7 +14,6 @@ import { store } from './api/store';
         </AppLayout>
     <Modal v-if="store.modal !== null" :message="store.modal.message" :title="store.modal.title" />
   </main>
-  <!-- <RouterView /> -->
 </template>
 
 <style scoped>

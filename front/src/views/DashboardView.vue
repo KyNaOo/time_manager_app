@@ -105,7 +105,7 @@ onBeforeMount(async () => {
 
 <template>
     <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
-    <div class="Dashboard">
+    <div v-if="user" class="Dashboard" >
         <div class="block user">
             <div class="flex-item user">
                 <h2>Heyyy {{ user?.username }} !</h2>
@@ -135,10 +135,7 @@ onBeforeMount(async () => {
             <ChartManager :workingTimes="workingTimes" />
         </div>
         <div class="block currentClockWrapper">
-            <WorkingTimes v-if="user" :user="user" :workingTimes="workingTimes" />
-        </div>
-        <div class="block currentClockWrapper">
-            <Teams v-if="user" :user="user" />
+            <WorkingTimes :user="user" :workingTimes="workingTimes" />
         </div>
         </template>
         <template v-else>
@@ -147,7 +144,9 @@ onBeforeMount(async () => {
                 <p>Commence a veiller pour voir tes clocks</p>
             </div>
         </template>
-
+        <div class="block TeamsBlock">
+            <Teams :user="user" />
+        </div>
         <div v-if="user?.role === 'admin'" class="block allUsers">
             <Users/>
         </div>

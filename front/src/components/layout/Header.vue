@@ -6,7 +6,7 @@ import { BeakerIcon, UserIcon , ArrowLongRightIcon, HomeIcon } from '@heroicons/
 import { computed } from 'vue';
 
 const router = useRouter();
-const route = useRoute();
+
 const logout = async () => {
     localStorage.clear();
     store.setToken(null);
@@ -30,7 +30,7 @@ const isLogged = computed(() => {
                 <li><router-link to="/register"><span>Register</span></router-link></li>
             </ul>
             <ul class="navList loggedIn" v-else>
-                <li><router-link to="/app/profile"><span>Profil</span></router-link></li>
+                <li><router-link to="/app/profile"><span>Profile</span></router-link></li>
                 <li class="logout" @click="logout"> <span>Logout</span></li>
             </ul>
         </nav>

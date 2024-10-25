@@ -50,7 +50,7 @@ onBeforeMount(async () => {
 <template>
 <div class="user-page" v-if="response">
   <div class="usersTitle">
-      <h2>Utilisateur</h2>
+      <h2>Utilisateurs</h2>
   </div>
   
   <SuperTable v-if="response" :tableData="response" tableType="user" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
