@@ -30,7 +30,7 @@ const action = async() => {
     if (mode.value === 'create') {
         if (currentUser.value && currentUser.value.id !== undefined) {
             const newTeam = await api.createTeam(team.value.title, currentUser.value.id)
-            console.log('Team created', newTeam)
+            const leader = await api.modifyTeamMemberRole(currentUser.value, newTeam, true)
         } else {
             console.error('Current user or user ID is null or undefined')
         }
@@ -72,6 +72,7 @@ onBeforeMount(async () => {
         users.value = await api.getAllUsers();
         teams.value = await api.getTeams();
         allUsersInTeam.value = await api.getUserInTeam(team.value as Team);
+        console.log("eheeh", allUsersInTeam)
         if (!teams.value) {
             teams.value = [];
         }
@@ -84,15 +85,13 @@ onBeforeMount(async () => {
 const formData = ref({
     userId: '',
     teamId: '',
-    isTeamLeader : false,
+    isTeamLeader : '',
 });
 
 const addUserInTeams = async() => {
     try {
-        await api.addUserToTeam(Number(formData.value.userId), Number(team.value?.id), formData.value.isTeamLeader);
+        await api.addUserToTeam(Number(formData.value.userId), Number(team.value?.id), Boolean(formData.value.isTeamLeader));
         store.showModal({message: "User add successfully", title: 'Success'});
-        //allUsersInTeam.value = await api.getUserInTeam(team.value as Team);
-
     }
     catch(e:any) {
         store.showModal({message: e.response.data.error, title: 'Error'});
@@ -117,7 +116,6 @@ export interface TeamMember {
     isTeamLeader: boolean; 
 }
 
-console.log("eheeh", formData)
 </script>
 
 <template>
@@ -153,8 +151,8 @@ console.log("eheeh", formData)
             <div class="form-group">
                 <label for="managerSelect">Est-il manager :</label>
                 <select id="managerSelect" v-model="formData.isTeamLeader">
-                    <option :value="true">Oui</option>
-                    <option :value="false">Non</option>
+                    <option value="true">Oui</option>
+                    <option value="false">Non</option>
                 </select>
             </div>
             <button type="submit" class="add-button">Ajouter</button>
