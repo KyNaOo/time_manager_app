@@ -31,7 +31,6 @@ const action = async() => {
     if (user.value.id) {
             await api.modifyUser(user.value);
             store.showModal({message: 'User edit with success', title: 'Success'});
-            router.push('/');
         } else {
             console.error('Team ID is undefined');
         }

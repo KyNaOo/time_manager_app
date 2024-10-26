@@ -185,7 +185,7 @@ async function getUserInTeam(team: Team) {
   try {
       // get all teams from user
       const res = await instance.get(`/api/team/users/${team.id}`);
-      console.log('Team users:', res.data);
+      console.log('eheh Team users:', res.data);
       return res.data.users;
   } catch (e) {
       console.log("Error fetching user teams:", e);
@@ -266,14 +266,15 @@ async function createTeam(name: string, managerId: number) {
 }
 
 // Modify team
-async function modifyTeam(id: number, title: string, managerId: number) {
+async function modifyTeam(id: number, name: string, managerId: number) {
   try {
       console.log(`Modify team with ID:`, id);
       // Modify team
       await instance.put(`/api/team/${id}`, {
         team: {
-          title: title,
-        }
+          name: name,
+          managerId: managerId
+      }
       });
       console.log(`Modified team with ID: ${id}`);
   } catch (e) {
