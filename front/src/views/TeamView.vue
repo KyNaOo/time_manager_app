@@ -47,8 +47,8 @@ const action = async(teamToChange : Team) => {
         }
     } else {
         if (teamId && currentUser.value && currentUser.value.id) {
+            console.log('Team to change:', teamToChange)
             await api.modifyTeam(Number(teamId), teamToChange.title, currentUser.value!.id);
-            store.showModal({message: 'Name modified with success', title: 'Success'});
             store.showModal({message: 'Team updated successfully', title: 'Success'});
         } else {
             console.error('Team ID is undefined');
@@ -59,6 +59,18 @@ const action = async(teamToChange : Team) => {
 
 onBeforeMount(async () => {
     try {
+        team.value = await api.getTeam(Number(teamId));
+        users.value = await api.getAllUsers();
+        teams.value = await api.getTeams();
+
+
+        if(team.value !== null) {
+            allUsersInTeam.value = await api.getTeamMember(team.value);
+        }
+        if (!teams.value) {
+            teams.value = [];
+        }
+        
         currentUser.value = await store.user;
         console.log('Full Route :', route)
         if (mode.value === 'create') {
@@ -78,36 +90,15 @@ onBeforeMount(async () => {
     }
 })
 
-onBeforeMount(async () => {
-    try {
-        team.value = await api.getTeam(Number(teamId));
-        users.value = await api.getAllUsers();
-        teams.value = await api.getTeams();
-
-        if(team.value !== null) {
-            allUsersInTeam.value = await api.getTeamMember(team.value);
-            console.log("eheeh", allUsersInTeam)
-        }
-        allUsersInTeam.value = await api.getTeamMembers(team.value as Team);
-        console.log("eheeh", allUsersInTeam.value)
-        if (!teams.value) {
-            teams.value = [];
-        }
-        console.log("teams:", teams.value)
-    } catch (e) {
-        console.log("Error fetching teams:", e)
-    }
-})
-
 const formData = ref({
     userId: '',
     teamId: '',
-    isTeamLeader : true,
+    isTeamLeader : '',
 });
 
 const addUserInTeams = async() => {
     try {
-        await api.addTeamMember(Number(formData.value.userId), Number(team.value?.id), true);
+        await api.addTeamMember(Number(formData.value.userId), Number(team.value?.id), Boolean(formData.value.isTeamLeader));
         store.showModal({message: "User add successfully", title: 'Success'});
     }
     catch(e:any) {
@@ -132,10 +123,14 @@ function deleteTeam() {
         console.log('Delete team:', team.value)
         api.deleteTeam(Number(teamId));
         store.showModal({message: 'Team deleted successfully', title: 'Success'});
+        router.push('/');
     } else {
         console.error('Team ID is undefined');
     }
 }
+
+
+
 </script>
 
 <template>

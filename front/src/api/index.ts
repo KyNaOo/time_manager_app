@@ -308,7 +308,7 @@ async function addTeamMember(userId: number, teamId: number, isTeamLeader: boole
       team_member: {
         team_id : teamId,
         user_id: userId,
-        is_team_leader: true
+        is_team_leader: isTeamLeader
       }
     });
     console.log(`TEAM MEMBER:`, team_member);

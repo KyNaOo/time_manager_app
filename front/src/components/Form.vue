@@ -59,24 +59,16 @@ function deleteContent() {
                     <label for="email">Email:</label>
                     <input type="email" id="email" v-model="user.email" />
                 </div>
-                <!-- <div class="form-field">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" v-model="user.password" />
-                </div> -->
-                <!-- <div class="form-field">
-                    <label for="role">Rôle:</label>
-                    <input type="text" id="role" v-model="user.role" />
-                </div> -->
                 <div class="form-field">
                     <label for="role">Rôle:</label>
                     <select id="role" v-model="user.role">
                         <option value="user">User</option>
                         <option value="manager">Manager</option>
-                        <option v-if="userisAdmin" value="admin">Admin</option>
+                        <option value="admin">Admin</option>
                     </select>
                 </div>
             </div>
-            <div v-else-if="team">
+            <div v-if="team">
                 <div class="form-field">
                     <label for="name">Name:</label>
                     <input type="text" id="name" v-model="team.title" />
