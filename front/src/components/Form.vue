@@ -2,8 +2,6 @@
 import { ref } from 'vue';
 import { defineProps, defineEmits, computed } from 'vue';
 import type { User, Team } from '@/types/crudTypes';
-import { store } from '@/api/store';
-
 
 interface Props {
     user?: User ;
@@ -11,9 +9,6 @@ interface Props {
     context: string;
     mode: string;
 }
-
-// const test = await store.user;
-// console.log('Test:', test);
 
 const emit = defineEmits<{
     (e: 'submit', value : any): void;
@@ -24,17 +19,17 @@ const userisAdmin = computed( () => {
   return user.value?.role === 'admin';
 });
 
-
 const props = defineProps<Props>();
 
 const user = ref(props.user);
 const team = ref(props.team);
-
+console.log('TEAM in TEAMVIEW:', team.value)
 const formData = computed(() => {
     if (props.context === 'user' && user.value) {
         return {
             username: user.value.username,
             email: user.value.email,
+            password: user.value.password,
             role: user.value.role
         };
     } else if (props.context === 'team' && team.value) {
@@ -64,7 +59,15 @@ function deleteContent() {
                     <label for="email">Email:</label>
                     <input type="email" id="email" v-model="user.email" />
                 </div>
-                <div v-if="userisAdmin" class="form-field">
+                <!-- <div class="form-field">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" v-model="user.password" />
+                </div> -->
+                <!-- <div class="form-field">
+                    <label for="role">Rôle:</label>
+                    <input type="text" id="role" v-model="user.role" />
+                </div> -->
+                <div class="form-field">
                     <label for="role">Rôle:</label>
                     <select id="role" v-model="user.role">
                         <option value="user">User</option>
@@ -81,7 +84,7 @@ function deleteContent() {
             </div>
             <div class="buts">
                 <button class="save" type="submit">Save</button>
-                <button v-if="props.mode !== 'create' " class="delete" @click.prevent="deleteContent">Delete</button>
+                <button v-if="props.mode !== 'create'" class="delete" @click.prevent="deleteContent">Delete</button>
             </div>
         </form>
 </template>

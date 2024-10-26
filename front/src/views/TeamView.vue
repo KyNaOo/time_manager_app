@@ -85,8 +85,11 @@ onBeforeMount(async () => {
         teams.value = await api.getTeams();
 
         if(team.value !== null) {
-            allUsersInTeam.value = await api.getTeamMembers(team.value);
+            allUsersInTeam.value = await api.getTeamMember(team.value);
+            console.log("eheeh", allUsersInTeam)
         }
+        allUsersInTeam.value = await api.getTeamMembers(team.value as Team);
+        console.log("eheeh", allUsersInTeam.value)
         if (!teams.value) {
             teams.value = [];
         }
@@ -133,9 +136,6 @@ function deleteTeam() {
         console.error('Team ID is undefined');
     }
 }
-
-
-
 </script>
 
 <template>
