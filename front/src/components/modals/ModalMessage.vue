@@ -24,7 +24,6 @@ const isVisible = ref(true);
 function closeModal() {
     isVisible.value = false;
     store.hideModal();
-    router.go(0)
 }
 </script>
 
