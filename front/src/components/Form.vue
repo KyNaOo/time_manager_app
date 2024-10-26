@@ -74,7 +74,6 @@ function deleteContent() {
                 <button class="save" type="submit">Save</button>
                 <button v-if="props.mode !== 'create' " class="delete" @click.prevent="deleteContent">Delete</button>
             </div>
-
         </form>
 </template>
 

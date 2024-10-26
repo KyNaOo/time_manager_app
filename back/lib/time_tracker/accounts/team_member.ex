@@ -37,6 +37,7 @@ defmodule TimeTracker.Accounts.TeamMember do
         where: tm.team_id == ^team_id and tm.user_id == ^user_id and tm.is_team_leader == true
       )
     )
+
   end
 
   def remove_user_from_team(team_id, user_id) do

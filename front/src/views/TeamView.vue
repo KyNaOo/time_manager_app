@@ -79,6 +79,7 @@ onBeforeMount(async () => {
 
 onBeforeMount(async () => {
     try {
+        team.value = await api.getTeam(Number(teamId));
         users.value = await api.getAllUsers();
         teams.value = await api.getTeams();
         allUsersInTeam.value = await api.getTeamMembers(team.value as Team);
@@ -95,12 +96,12 @@ onBeforeMount(async () => {
 const formData = ref({
     userId: '',
     teamId: '',
-    isTeamLeader : '',
+    isTeamLeader : true,
 });
 
 const addUserInTeams = async() => {
     try {
-        await api.addUserToTeam(Number(formData.value.userId), Number(team.value?.id), Boolean(formData.value.isTeamLeader));
+        await api.addUserToTeam(Number(formData.value.userId), Number(team.value?.id), true);
         store.showModal({message: "User add successfully", title: 'Success'});
     }
     catch(e:any) {
@@ -163,13 +164,13 @@ function deleteTeam() {
                     <option v-for="user in users" :key="user.id" :value="user.id">{{ user.username }}</option>
                 </select>
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label for="managerSelect">Est-il manager :</label>
                 <select id="managerSelect" v-model="formData.isTeamLeader">
                     <option value="true">Oui</option>
                     <option value="false">Non</option>
                 </select>
-            </div>
+            </div> -->
             <button type="submit" class="add-button">Ajouter</button>
         </form>
     </div>

@@ -145,13 +145,14 @@ async function getTeamMembers(team: Team) {
 }
 
 // Modify team member role
-async function modifyTeamMemberRole(user: User, team: Team, isTeamLeader: boolean) {
+async function modifyTeamMemberRole(user: User, team: Team, is_team_leader: boolean) {
   try {
       console.log(`Modify team member role`);
       // Modify team member role
       await instance.put(`/api/team/user/role/${user.id}/${team.id}`, {
-        isTeamLeader: isTeamLeader
+        isTeamLeader: is_team_leader
     });
+    
       console.log(`Modified team member role`);
   } catch (e) {
       console.log(`Error modifying team member role`, e);
@@ -186,7 +187,7 @@ async function getTeamMember(team: Team) {
   try {
       // get all teams from user
       const res = await instance.get(`/api/team/users/${team.id}`);
-      console.log('Team users:', res.data);
+      console.log('eheh Team users:', res.data);
       return res.data.users;
   } catch (e) {
       console.log("Error fetching user teams:", e);
@@ -255,14 +256,15 @@ async function createTeam(name: string, managerId: number) {
 }
 
 // Modify team
-async function modifyTeam(id: number, title: string, managerId: number) {
+async function modifyTeam(id: number, name: string, managerId: number) {
   try {
       console.log(`Modify team with ID:`, id);
       // Modify team
       await instance.put(`/api/team/${id}`, {
         team: {
-          title: title,
-        }
+          name: name,
+          managerId: managerId
+      }
       });
       console.log(`Modified team with ID: ${id}`);
   } catch (e) {
@@ -305,7 +307,7 @@ async function addTeamMember(userId: number, teamId: number, isTeamLeader: boole
       team_member: {
         team_id : teamId,
         user_id: userId,
-        is_team_leader: isTeamLeader
+        is_team_leader: true
       }
     });
     console.log(`TEAM MEMBER:`, team_member);
