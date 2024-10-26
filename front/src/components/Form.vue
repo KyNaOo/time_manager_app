@@ -2,6 +2,8 @@
 import { ref } from 'vue';
 import { defineProps, defineEmits, computed } from 'vue';
 import type { User, Team } from '@/types/crudTypes';
+import { store } from '@/api/store';
+
 
 interface Props {
     user?: User ;
@@ -10,22 +12,31 @@ interface Props {
     mode: string;
 }
 
+const test = store.user;
+console.log('Test:', test);
+
 const emit = defineEmits<{
     (e: 'submit', value : any): void;
     (e: 'delete'): void;
 }>();
 
+const userisAdmin = computed( () => {
+  return user.value?.role === 'admin';
+});
+const userisManager = computed( () => {
+  return user.value?.role === 'manager';
+});
+
 const props = defineProps<Props>();
 
 const user = ref(props.user);
 const team = ref(props.team);
-console.log('TEAM in TEAMVIEW:', team.value)
+
 const formData = computed(() => {
     if (props.context === 'user' && user.value) {
         return {
             username: user.value.username,
             email: user.value.email,
-            password: user.value.password,
             role: user.value.role
         };
     } else if (props.context === 'team' && team.value) {
@@ -55,13 +66,13 @@ function deleteContent() {
                     <label for="email">Email:</label>
                     <input type="email" id="email" v-model="user.email" />
                 </div>
-                <!-- <div class="form-field">
-                    <label for="password">Password:</label>
-                    <input type="password" id="password" v-model="user.password" />
-                </div> -->
-                <div class="form-field">
+                <div  class="form-field">
                     <label for="role">Rôle:</label>
-                    <input type="text" id="role" v-model="user.role" />
+                    <select id="role" v-model="user.role">
+                        <option value="user">User</option>
+                        <option value="manager">Manager</option>
+                        <option v-if="userisAdmin" value="admin">Admin</option>
+                    </select>
                 </div>
             </div>
             <div v-else-if="team">
@@ -92,6 +103,13 @@ form {
 }
 
 input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 14px;
+}
+
+select {
     padding: 0.5rem;
     border: 1px solid #ccc;
     border-radius: 0.25rem;
