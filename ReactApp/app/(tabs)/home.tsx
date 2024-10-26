@@ -103,7 +103,6 @@ export default function HomePage() {
             });
 
             setTeams(response.data.teams);
-            console.warn(response.data.teams);
         } catch (error) {
             Alert.alert('Erreur', 'Erreur lors de la récupération des teams');
         }
@@ -124,7 +123,6 @@ export default function HomePage() {
         } catch (error) {
             Alert.alert('Erreur', 'Erreur lors de la récupération des working times');
         }
-        console.warn(token[1]);
     };
 
     const handleDelete = async (id: any) => {
@@ -211,9 +209,6 @@ export default function HomePage() {
     return (
         <View>
         <View style={styles.header}>
-            <View style={styles.logoContainer}>
-                <Text style={styles.logo}>MonLogo</Text>
-            </View>
             <View style={styles.buttonsContainer}>
                 <TouchableOpacity onPress={handleProfile} style={styles.headerButton}>
                     <Text style={styles.buttonText}>Profil</Text>

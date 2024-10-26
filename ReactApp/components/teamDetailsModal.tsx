@@ -32,7 +32,6 @@ export default function TeamDetailsModal({ teamId, visible, onClose }: TeamDetai
                 }
             });
         setTeam(responseTeam.data.data);
-        console.warn(response.data)
         setTeamMembers(response.data.users);
     };
 

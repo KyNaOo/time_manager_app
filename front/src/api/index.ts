@@ -134,11 +134,13 @@ async function modifyUser (user: User) {
 // Get teamMembers
 async function getTeamMembers(team: Team) {
   try {
+    console.log(`Get team members for team with ID:`, team.id);
       // get all teams from user
-      const res = await instance.get(`/api/team/user/${team.id}`);
-      return res.data.data;
+      const res = await instance.get(`/api/team/users/${team.id}`);
+      console.log('Team members:', res.data) 
+      return res.data.users;
   } catch (e) {
-      console.log("Error fetching teams:", e);
+      console.log("Error fetching team members:", e);
   }
 }
 
@@ -181,7 +183,7 @@ async function getUserTeams(user: User) {
 }
 
 // Get user teams
-async function getUserInTeam(team: Team) {
+async function getTeamMember(team: Team) {
   try {
       // get all teams from user
       const res = await instance.get(`/api/team/users/${team.id}`);
@@ -245,18 +247,6 @@ async function createTeam(name: string, managerId: number) {
       }
       console.log(`Created team`, teamCreated.data.data);
 
-
-      const teamMember = await instance.post(`/api/team/user/addUser/${managerId}/${teamCreated.data.data.id}`, {
-       team_member : {
-        userId: managerId,
-        isTeamLeader: true}
-      });
-
-      if (!teamMember) {
-        return null;
-      }
-
-      console.log(`Team leader added to team`, teamCreated.data.data);
       return teamCreated.data.data;
       
   } catch (e) {
@@ -307,19 +297,31 @@ async function deleteTeam(id: number) {
 }
 
 // Add user to team
-async function addUserToTeam(userId: number, teamId: number, isTeamLeader: boolean) {
+async function addTeamMember(userId: number, teamId: number, isTeamLeader: boolean) {
   try {
+
+    console.log(`Add user ${userId} to team ${teamId} as team leader: ${isTeamLeader}`);
+
     // Add user to team
-    await instance.post(`/api/team/user/addUser/${userId}/${teamId}`, {
+    const team_member = await instance.post(`/api/team/user/addUser/${userId}/${teamId}`, {
       team_member: {
         team_id : teamId,
         user_id: userId,
         is_team_leader: true
       }
     });
+    console.log(`TEAM MEMBER:`, team_member);
+
+    console.log(`Added user ${userId} to team ${teamId} `);
+
+    return team_member.data;
   } catch (e) {
+    throw e;
   }
 }
+
+
+
 
 ///////////////////// WORKING TIMES ///////////////////////
 
@@ -462,7 +464,8 @@ export const useApi = () => {
     modifyTeamMemberRole,
     isUserTeamLeader,
     deleteMemberFromTeam,
-    addUserToTeam,
-    getUserInTeam
+    // TeamMembers
+    addTeamMember,
+    getTeamMember
   };
 };

@@ -12,7 +12,6 @@ defmodule TimeTracker.Accounts.TeamMember do
     field :is_team_leader, :boolean
     belongs_to :user, TimeTracker.Accounts.User
     belongs_to :team, TimeTracker.Accounts.Team
-
     timestamps()
   end
 
@@ -38,14 +37,7 @@ defmodule TimeTracker.Accounts.TeamMember do
         where: tm.team_id == ^team_id and tm.user_id == ^user_id and tm.is_team_leader == true
       )
     )
-  end
 
-  def update_team_member(team_id, user_id, is_team_leader) do
-    team_member = Repo.get_by(TeamMember, team_id: team_id, user_id: user_id)
-
-    team_member
-    |> TeamMember.changeset(%{is_team_leader: is_team_leader})
-    |> Repo.update()
   end
 
   def remove_user_from_team(team_id, user_id) do
