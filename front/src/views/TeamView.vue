@@ -24,7 +24,6 @@ const currentUser = ref<User | null>(null);
 const router = useRouter();
 const users = ref<User[] | null>(null);
 const teamMembers = ref<TeamMember[]>([]); 
-const teamMembers = ref<User[] | null>(null)
 
 const action = async(teamToChange : Team) => {
     if (team.value === null) {
