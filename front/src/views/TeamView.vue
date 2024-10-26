@@ -24,7 +24,7 @@ const currentUser = ref<User | null>(null);
 const router = useRouter();
 const users = ref<User[] | null>(null);
 const teamMembers = ref<TeamMember[]>([]); 
-const allUsersInTeam = ref<User[] | null>(null)
+const teamMembers = ref<User[] | null>(null)
 
 const action = async(teamToChange : Team) => {
     if (team.value === null) {
@@ -79,10 +79,11 @@ onBeforeMount(async () => {
 
 onBeforeMount(async () => {
     try {
+        team.value = await api.getTeam(Number(teamId));
         users.value = await api.getAllUsers();
         teams.value = await api.getTeams();
-        allUsersInTeam.value = await api.getTeamMembers(team.value as Team);
-        console.log("eheeh", allUsersInTeam.value)
+        teamMembers.value = await api.getTeamMembers(team.value as Team);
+        console.log("Team Members", teamMembers.value)
         if (!teams.value) {
             teams.value = [];
         }
@@ -95,12 +96,12 @@ onBeforeMount(async () => {
 const formData = ref({
     userId: '',
     teamId: '',
-    isTeamLeader : '',
+    isTeamLeader : true,
 });
 
 const addUserInTeams = async() => {
     try {
-        await api.addUserToTeam(Number(formData.value.userId), Number(team.value?.id));
+        await api.addTeamMember(Number(formData.value.userId), Number(team.value?.id), true);
         store.showModal({message: "User add successfully", title: 'Success'});
     }
     catch(e:any) {
@@ -148,7 +149,7 @@ function deleteTeam() {
     </div>
 
     <div v-if="mode !== 'create'" class="teamArray">
-        <SuperTable class="arrayTeam" v-if="allUsersInTeam" :tableData="allUsersInTeam" tableType="user" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
+        <SuperTable class="arrayTeam" v-if="teamMembers" :tableData="teamMembers" tableType="user" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
     </div>
 
     <div v-if="mode !== 'create'" class="teams">
@@ -163,13 +164,13 @@ function deleteTeam() {
                     <option v-for="user in users" :key="user.id" :value="user.id">{{ user.username }}</option>
                 </select>
             </div>
-            <div class="form-group">
+            <!-- <div class="form-group">
                 <label for="managerSelect">Est-il manager :</label>
                 <select id="managerSelect" v-model="formData.isTeamLeader">
                     <option value="true">Oui</option>
                     <option value="false">Non</option>
                 </select>
-            </div>
+            </div> -->
             <button type="submit" class="add-button">Ajouter</button>
         </form>
     </div>

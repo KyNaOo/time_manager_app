@@ -53,8 +53,8 @@ onBeforeMount(async () => {
         
         <SuperTable class="arrayAllTeams" :tableData="teams" tableType="team" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
     </div>
-    <div v-else>
-        <p>Il n'y a pas encore d'équipe</p>
+    <div class="noteam" v-else>
+        <p>Il n'y a pas encore d'équipe...</p>
         <RouterLink class="button-create-team" v-if="userisAdmin" to="/app/team/?create=true" >Créer une équipe</RouterLink>
 
     </div>
@@ -67,6 +67,20 @@ onBeforeMount(async () => {
     background-color: #353535;
     padding: 30px 60px;
     border-radius: 10px;
+}
+
+.noteam {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: #353535;
+    padding: 30px 60px;
+    border-radius: 10px;
+}
+
+.noteam p {
+    color: white;
+    font-size: 28px;
 }
 
 .teams h1 {
@@ -86,7 +100,7 @@ onBeforeMount(async () => {
 }
 
 .button-create-team {
-    width: 110px;
+    width: 180px;
     font-size: 16px;
 }
 
