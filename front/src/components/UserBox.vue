@@ -23,6 +23,7 @@ const props = defineProps<{
     user?: User | null;
 }>();
 
+
 const action = async() => {
     if (user.value === null) {
         console.error('User is null')
@@ -30,6 +31,7 @@ const action = async() => {
     }
     if (user.value.id) {
             await api.modifyUser(user.value);
+            console.log('User modified:', user.value);
             store.showModal({message: 'User edit with success', title: 'Success'});
         } else {
             console.error('Team ID is undefined');

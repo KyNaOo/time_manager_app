@@ -114,7 +114,8 @@ async function modifyUser (user: User) {
       const resp = await instance.put(`/api/users/${user.id}`, {
           user: {
               username: user?.username,
-              email: user?.email
+              email: user?.email, 
+              role: user?.role
           }
       });
       if (resp.data.data) {
@@ -187,7 +188,7 @@ async function getTeamMember(team: Team) {
   try {
       // get all teams from user
       const res = await instance.get(`/api/team/users/${team.id}`);
-      console.log('eheh Team users:', res.data);
+      console.log('Team users:', res.data);
       return res.data.users;
   } catch (e) {
       console.log("Error fetching user teams:", e);
@@ -307,7 +308,7 @@ async function addTeamMember(userId: number, teamId: number, isTeamLeader: boole
       team_member: {
         team_id : teamId,
         user_id: userId,
-        is_team_leader: true
+        is_team_leader: isTeamLeader
       }
     });
     console.log(`TEAM MEMBER:`, team_member);

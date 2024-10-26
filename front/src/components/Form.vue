@@ -15,6 +15,10 @@ const emit = defineEmits<{
   (e: 'delete'): void;
 }>();
 
+const userisAdmin = computed( () => {
+  return user.value?.role === 'admin';
+});
+
 const props = defineProps<Props>();
 
 const detectInjection = (input: string): boolean => {
@@ -65,33 +69,36 @@ function deleteContent() {
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit">
-    <div class="formu" v-if="props.context === 'user' && user">
-      <div class="form-field">
-        <label for="username">Username:</label>
-        <input type="text" id="username" v-model="user.username" />
-        <p v-if="usernameError" class="error-message">{{ usernameError }}</p> <!-- Message d'erreur -->
-      </div>
-      <div class="form-field">
-        <label for="email">Email:</label>
-        <input type="email" id="email" v-model="user.email" />
-      </div>
-      <div class="form-field">
-        <label for="role">Rôle:</label>
-        <input type="text" id="role" v-model="user.role" />
-      </div>
-    </div>
-    <div v-else-if="team">
-      <div class="form-field">
-        <label for="name">Name:</label>
-        <input type="text" id="name" v-model="team.title" />
-      </div>
-    </div>
-    <div class="buts">
-      <button class="save" type="submit">Save</button>
-      <button v-if="props.mode !== 'create'" class="delete" @click.prevent="deleteContent">Delete</button>
-    </div>
-  </form>
+    <form @submit.prevent="handleSubmit">
+            <div class="formu" v-if="props.context === 'user' && user">
+                <div class="form-field">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" v-model="user.username" />
+                </div>
+                <div class="form-field">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" v-model="user.email" />
+                </div>
+                <div class="form-field">
+                    <label for="role">Rôle:</label>
+                    <select id="role" v-model="user.role">
+                        <option value="user">User</option>
+                        <option value="manager">Manager</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+            </div>
+            <div v-if="team">
+                <div class="form-field">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" v-model="team.title" />
+                </div>
+            </div>
+            <div class="buts">
+                <button class="save" type="submit">Save</button>
+                <button v-if="props.mode !== 'create'" class="delete" @click.prevent="deleteContent">Delete</button>
+            </div>
+        </form>
 </template>
 
 <style scoped>
@@ -111,6 +118,13 @@ input {
   border: 1px solid #ccc;
   border-radius: 0.25rem;
   font-size: 14px;
+}
+
+select {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    font-size: 14px;
 }
 
 .save, .delete {
