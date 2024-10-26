@@ -1,112 +1,98 @@
 <script setup lang="ts">
 import { ref, defineProps, watch } from 'vue';
-import { useValidators } from '@/api/validators';
 import FieldLayout from './FieldLayout.vue';
-
-const validators = useValidators();
-
-const error = ref<string | null>(null);
-// const isFormValid = ref(true);
 
 const emit = defineEmits(['update:modelValue', 'form-validity']);
 
 const props = defineProps<{
-    type: 'text' | 'password' | 'email';
-    name: string;
-    label: string;
-    required: boolean;
+  type: 'text' | 'password' | 'email';
+  name: string;
+  label: string;
+  required: boolean;
 }>();
 
-const fieldContext = ref({
-    name : props.name,
-    isValid : false
-});
-
 const inputValue = ref('');
+const error = ref<string | null>(null);
+const isValid = ref(false);
 
-
-const validateInput = () => {
-    if (!inputValue.value) {
-        error.value = 'Input is required';
-        fieldContext.value.isValid = false;
-    }
-    if (!props.name) {
-        console.error('No name prop provided');
-        error.value = 'No name prop provided';
-        fieldContext.value.isValid = false;
-    }
-    if (props.name === 'email') {
-        const validated = validators.validateEmail(inputValue.value);
-        if (!validated) {
-            error.value = 'Invalid email';
-            fieldContext.value.isValid= false;
-        } else {
-            fieldContext.value.isValid = true;
-
-        }
-
-    }
-    if (props.name === 'username') {
-        const validated = validators.validateUsername(inputValue.value);
-        if (!validated) {
-            error.value = 'Invalid username';
-            fieldContext.value.isValid = false;
-        } else {
-            fieldContext.value.isValid = true;
-        }
-
-    }
-    error.value = null;
-    // fieldContext.value.isValid = true; 
-    emit('form-validity', fieldContext.value); 
-    return;
-
+// Regex pour valider l'email
+const validateEmail = (email: string): boolean => {
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailPattern.test(email);
 };
 
+// Fonction pour détecter des tentatives XSS/SQL
+const detectInjection = (input: string): boolean => {
+  const dangerousPatterns = [
+    /<script.*?>.*?<\/script>/gi, // Balises script
+    /\b(on\w+=|javascript:|alert\(|eval\(|document\.cookie|window\.location)/gi, // Attributs ou méthodes XSS
+    /(--|\b(SELECT|UPDATE|DELETE|INSERT|DROP|ALTER|CREATE|TRUNCATE)\b)/gi, // SQL injection keywords
+    /[<>;'"]/
+  ];
 
+  return dangerousPatterns.some((pattern) => pattern.test(input));
+};
+
+const validateInput = () => {
+  if (!inputValue.value && props.required) {
+    error.value = 'This field is required';
+    isValid.value = false;
+  }
+  else if (props.name === 'email' && !validateEmail(inputValue.value)) {
+    error.value = 'Invalid email address';
+    isValid.value = false;
+  }
+  else if (detectInjection(inputValue.value)) {
+    error.value = 'Input contains invalid characters';
+    isValid.value = false;
+  }
+  else {
+    error.value = null;
+    isValid.value = true;
+  }
+
+  emit('form-validity', { name: props.name, isValid: isValid.value });
+};
 
 watch(inputValue, (newValue) => {
-    emit('update:modelValue', newValue);
-    validateInput();
+  emit('update:modelValue', newValue);
+  validateInput();
 });
 </script>
 
 <template>
-    <FieldLayout :name="props.name" :label="props.label">
-        <input
-            :type="props.type"
-            :name="props.name"
-            v-model="inputValue"
-            @input="validateInput"
-            class="input-field"
-        />
-        <span class="error" v-if="error">{{ error }}</span>
-    </FieldLayout>
+  <FieldLayout :name="props.name" :label="props.label">
+    <input
+        :type="props.type"
+        :name="props.name"
+        v-model="inputValue"
+        @input="validateInput"
+        class="input-field"
+    />
+    <span class="error" v-if="error">{{ error }}</span>
+  </FieldLayout>
 </template>
 
 <style scoped>
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
 .input-field {
-    box-sizing: border-box;
-    width: 100%;
-    height: 40px;
-    border: 1px solid white;
-    background-color: #353535;
-    color: white;
-    border-radius: 4px;
-    font-size: 16px;
-    padding: 5px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  border: 1px solid white;
+  background-color: #353535;
+  color: white;
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 5px;
 }
 
 .input-field:focus {
-    outline: red;
+  outline: none;
+  border-color: red;
 }
 
 .error {
-    color: red;
+  color: red;
+  font-size: 12px;
 }
 </style>
