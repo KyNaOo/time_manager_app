@@ -7,11 +7,7 @@ import type { User,Team, WorkingTime } from '@/types/crudTypes'
 import { useApi } from '@/api';
 import { store } from '@/api/store';
 import SuperTable from '@/components/SuperTable.vue';
-export interface TeamMember {
-    userId: number;
-    teamId: number;
-    isTeamLeader: boolean; 
-}
+import type { TeamMember } from '@/types/crudTypes';
 const route = useRoute();
 const user = ref<User | null>(null);
 const teams = ref<Team[] | null>(null);
@@ -24,6 +20,12 @@ const currentUser = ref<User | null>(null);
 const router = useRouter();
 const users = ref<User[] | null>(null);
 const teamMembers = ref<TeamMember[]>([]); 
+const usersNotInTeam = ref<User[]>([]);
+const tableHeaders = computed(() => {
+const headers = user.value ? Object.keys(user.value) : ['ID', 'Username', 'Is Manager', 'Actions'];
+  return headers;
+});
+
 
 const action = async(teamToChange : Team) => {
     if (team.value === null) {
@@ -55,23 +57,28 @@ const action = async(teamToChange : Team) => {
     }
 };
 
+const isCurrentUserAdmin = computed(() => {
+    return currentUser.value?.role === 'admin';
+});
+
 
 onBeforeMount(async () => {
     try {
         team.value = await api.getTeam(Number(teamId));
         users.value = await api.getAllUsers();
+        console.log('ALL users', users.value)
         teams.value = await api.getTeams();
-
-
         if(team.value !== null) {
-            allUsersInTeam.value = await api.getTeamMember(team.value);
-        }
-        if (!teams.value) {
+            if (team.value) {
+                teamMembers.value = (await api.getTeamMembers(team.value as Team)) || [];
+            }
+            usersNotInTeam.value = users.value?.filter(user => !teamMembers.value.some(member => member.id === user.id));
+            console.log('Users not in team:', usersNotInTeam.value)
+        }else {
             teams.value = [];
         }
         
         currentUser.value = await store.user;
-        console.log('Full Route :', route)
         if (mode.value === 'create') {
             team.value = {
                 title: '',
@@ -80,28 +87,10 @@ onBeforeMount(async () => {
             return
         }
         team.value = await api.getTeam(Number(teamId));
-
-        console.log('Team:', team.value)
-        
+        console.log('Team:', team.value)           
       
     } catch (error) {
         console.error('Error fetching user data:', error)
-    }
-})
-
-onBeforeMount(async () => {
-    try {
-        team.value = await api.getTeam(Number(teamId));
-        users.value = await api.getAllUsers();
-        teams.value = await api.getTeams();
-        teamMembers.value = await api.getTeamMembers(team.value as Team);
-        console.log("Team Members", teamMembers.value)
-        if (!teams.value) {
-            teams.value = [];
-        }
-        console.log("teams:", teams.value)
-    } catch (e) {
-        console.log("Error fetching teams:", e)
     }
 })
 
@@ -111,27 +100,21 @@ const formData = ref({
     isTeamLeader : '',
 });
 
-const addUserInTeams = async() => {
+async function addUserInTeams()  {
     try {
         await api.addTeamMember(Number(formData.value.userId), Number(team.value?.id), Boolean(formData.value.isTeamLeader));
         store.showModal({message: "User add successfully", title: 'Success'});
+        teamMembers.value = (await api.getTeamMembers(team.value as Team)) || [];
+        formData.value = {
+            userId: '',
+            teamId: '',
+            isTeamLeader: ''
+        }
     }
     catch(e:any) {
         store.showModal({message: e.response.data.error, title: 'Error'});
     }
 }
-
-const userisAdmin = computed( () => {
-  return user.value?.role === 'admin';
-});
-
-const tableHeaders = computed(() => {
-  const headers = user.value ? Object.keys(user.value) : ['ID', 'Username', 'Is Manager'];
-  if (userisAdmin.value) {
-    headers.push('Actions');
-  }
-  return headers;
-});
 
 function deleteTeam() {
     if (team.value && teamId) {
@@ -149,44 +132,49 @@ function deleteTeam() {
 </script>
 
 <template>
-    <div class="TeamView" v-if="currentUser">
+    <div class="TeamView" v-if="team">
         <div class="flexWrapper">
-            <div class="formUser">
-            <h2>{{mode === 'create' ? 'Créer une équipe' : 'Modifies ton équipe'}} </h2>
-            <Form v-if="team" :context="'team'" :team="team" :mode="mode" @submit="action($event)" @delete="deleteTeam" />
+            <div class="formUser" v-if="isCurrentUserAdmin">
+                <h2>{{mode === 'create' ? 'Créer une équipe' : 'Modifies ton équipe'}} </h2>
+                <Form  :context="'team'" :team="team" :mode="mode" @submit="action($event)" @delete="deleteTeam" />
+            </div>  
+            <div v-else>
+                <h2>Équipe {{ team?.title }}</h2>
             </div>
         </div>
-    </div>
-    <div v-else>
-        <p>Team not found</p>
-    </div>
-
-    <div v-if="mode !== 'create'" class="teamArray">
-        <SuperTable class="arrayTeam" v-if="teamMembers" :tableData="teamMembers" tableType="user" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
+        <div v-if="mode !== 'create'" class="teamArray">
+            <h2 class="titleArray">Membres de l'équipe</h2>
+            <SuperTable class="arrayTeam" v-if="teamMembers" :tableData="teamMembers" tableType="user" :tableHeaders="tableHeaders" showActions/>
     </div>
 
-    <div v-if="mode !== 'create'" class="teams">
+    <div v-if="mode !== 'create' && isCurrentUserAdmin" class="teams">
         <div class="usersTitle">
             <h2>Ajoute un membre à une team</h2>
         </div>
         
-        <form @submit.prevent="addUserInTeams()">
+        <form  @submit.prevent="addUserInTeams()">
             <div class="form-group">
                 <label for="userSelect">Choisir un utilisateur:</label>
                 <select id="userSelect" v-model="formData.userId">
-                    <option v-for="user in users" :key="user.id" :value="user.id">{{ user.username }}</option>
+                    <option v-for="user in usersNotInTeam" :key="user.id" :value="user.id">{{ user.username }}</option>
                 </select>
             </div>
-            <!-- <div class="form-group">
+            <div class="form-group">
                 <label for="managerSelect">Est-il manager :</label>
                 <select id="managerSelect" v-model="formData.isTeamLeader">
                     <option value="true">Oui</option>
                     <option value="false">Non</option>
                 </select>
-            </div> -->
+            </div>
             <button type="submit" class="add-button">Ajouter</button>
         </form>
     </div>
+    </div>
+    <div v-else>
+        <p>Team not found</p>
+    </div>
+
+
 </template>
 
 
@@ -221,6 +209,7 @@ form {
     flex-direction: column;
     font-size: 18px;
     gap: 20px;
+    width: 100%;
 }
 .form-group {
     display: flex;
@@ -242,7 +231,7 @@ select {
 }
 
 .teamArray {
-    width: 40%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 20px;

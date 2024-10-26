@@ -1,8 +1,7 @@
 import instance from "./axios";
 import { ref , shallowRef} from "vue";
 import { store } from "./store"
-import type { User, WorkingTime, AuthMode, Team } from "@/types/crudTypes";
-
+import type { User, WorkingTime, AuthMode, Team,TeamMember} from "@/types/crudTypes";
 
 const hasErrorOccured = ref<boolean>(false);
 const errorMessage = ref<string | null>(null);
@@ -107,7 +106,7 @@ async function getUser(id: number): Promise<User | null> {
 }
 
 // Modify user
-async function modifyUser (user: User) {
+async function modifyUser (user: User): Promise<User | null> {
   try {
       console.log(`Modify user with ID:`, user.id);
       // Change in the database
@@ -120,20 +119,20 @@ async function modifyUser (user: User) {
       });
       if (resp.data.data) {
           // Change in local storage
-          localStorage.setItem("user", JSON.stringify(resp.data.data));
-          // Show success message in frontend
-          alert("User modified successfully");
-          
+          localStorage.setItem("user", JSON.stringify(resp.data.data));          
       }
       console.log(`Modified user with ID: ${user.id}`);
       // Add your logic to handle the response here
+
+      return resp.data.data;
   } catch (e) {
       console.log(`Error modifying user with ID: ${user.id}`, e);
+      return null;
   }
   };
 
 // Get teamMembers
-async function getTeamMembers(team: Team) {
+async function getTeamMembers(team: Team): Promise<TeamMember[] | null> {
   try {
     console.log(`Get team members for team with ID:`, team.id);
       // get all teams from user
@@ -142,6 +141,7 @@ async function getTeamMembers(team: Team) {
       return res.data.users;
   } catch (e) {
       console.log("Error fetching team members:", e);
+      return null;
   }
 }
 
@@ -183,17 +183,6 @@ async function getUserTeams(user: User) {
   }
 }
 
-// Get user teams
-async function getTeamMember(team: Team) {
-  try {
-      // get all teams from user
-      const res = await instance.get(`/api/team/users/${team.id}`);
-      console.log('Team users:', res.data);
-      return res.data.users;
-  } catch (e) {
-      console.log("Error fetching user teams:", e);
-  }
-}
 
 // Delete user
 async function deleteUser(userId: number) {
@@ -480,6 +469,5 @@ export const useApi = () => {
     deleteMemberFromTeam,
     // TeamMembers
     addTeamMember,
-    getTeamMember
   };
 };

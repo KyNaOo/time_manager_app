@@ -35,7 +35,7 @@ export interface Team {
     updatedAt?: Date;
 }
 
-export interface TeamMembers {
+export interface TeamMember {
     id?: number;
     userId: number;
     teamId: number;
