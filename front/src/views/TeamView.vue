@@ -100,7 +100,7 @@ const formData = ref({
 
 const addUserInTeams = async() => {
     try {
-        await api.addUserToTeam(Number(formData.value.userId), Number(team.value?.id), Boolean(formData.value.isTeamLeader));
+        await api.addUserToTeam(Number(formData.value.userId), Number(team.value?.id));
         store.showModal({message: "User add successfully", title: 'Success'});
     }
     catch(e:any) {

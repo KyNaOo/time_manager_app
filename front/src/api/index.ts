@@ -280,6 +280,18 @@ async function deleteMemberFromTeam(userId: number, teamId: number) {
   } catch (e) {
       console.log(`Error deleting member from team with ID: ${userId}`, e);
   }
+
+}
+
+async function addUserToTeam(userId: number, teamId: number) {
+  try {
+    console.log(`Add user to team with ID:`, userId);
+    // Add user to team
+    await instance.post(`/api/team/user/addUser/${userId}/${teamId}`);
+    console.log(`Added user with ID: ${userId} to team with ID: ${teamId}`);
+  } catch (e) {
+    console.log(`Error adding user with ID: ${userId} to team with ID: ${teamId}`, e);
+  }
 }
 
 // Delete team
@@ -456,6 +468,7 @@ export const useApi = () => {
     getTeam,
     modifyTeam,
     deleteTeam,
+    addUserToTeam,
     // UserTeams
     getUserTeams,
     getTeamMembers,
