@@ -85,11 +85,8 @@ onBeforeMount(async () => {
         teams.value = await api.getTeams();
 
         if(team.value !== null) {
-            allUsersInTeam.value = await api.getUserInTeam(team.value);
-            console.log("eheeh", allUsersInTeam)
+            allUsersInTeam.value = await api.getTeamMembers(team.value);
         }
-        allUsersInTeam.value = await api.getTeamMembers(team.value as Team);
-        console.log("eheeh", allUsersInTeam.value)
         if (!teams.value) {
             teams.value = [];
         }

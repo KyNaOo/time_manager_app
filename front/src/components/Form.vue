@@ -12,8 +12,8 @@ interface Props {
     mode: string;
 }
 
-const test = store.user;
-console.log('Test:', test);
+// const test = await store.user;
+// console.log('Test:', test);
 
 const emit = defineEmits<{
     (e: 'submit', value : any): void;
@@ -23,9 +23,7 @@ const emit = defineEmits<{
 const userisAdmin = computed( () => {
   return user.value?.role === 'admin';
 });
-const userisManager = computed( () => {
-  return user.value?.role === 'manager';
-});
+
 
 const props = defineProps<Props>();
 
@@ -66,7 +64,7 @@ function deleteContent() {
                     <label for="email">Email:</label>
                     <input type="email" id="email" v-model="user.email" />
                 </div>
-                <div  class="form-field">
+                <div v-if="userisAdmin" class="form-field">
                     <label for="role">Rôle:</label>
                     <select id="role" v-model="user.role">
                         <option value="user">User</option>
