@@ -137,7 +137,6 @@ async function getTeamMembers(team: Team): Promise<TeamMember[] | null> {
     console.log(`Get team members for team with ID:`, team.id);
       // get all teams from user
       const res = await instance.get(`/api/team/users/${team.id}`);
-      console.log('Team members:', res.data) 
       return res.data.users;
   } catch (e) {
       console.log("Error fetching team members:", e);
@@ -149,7 +148,6 @@ async function getTeamMembers(team: Team): Promise<TeamMember[] | null> {
 async function modifyTeamMemberRole(user: User, team: Team, is_team_leader: boolean) {
   try {
       console.log(`Modify team member role`);
-      // Modify team member role
       await instance.put(`/api/team/user/role/${user.id}/${team.id}`, {
         isTeamLeader: is_team_leader
     });
@@ -212,7 +210,6 @@ async function getTeams() {
 // Get team by id
 async function getTeam(id: number): Promise<Team | null> {
   try {
-      // get team by id
       const response = await instance.get(`/api/team/${id}`);
       return response.data.data as Team;
   } catch (e) {
@@ -262,19 +259,6 @@ async function modifyTeam(id: number, name: string, managerId: number) {
   }
 }
 
-// Delete member from team
-async function deleteMemberFromTeam(userId: number, teamId: number) {
-  try {
-      console.log(`Delete member from team with ID:`, userId);
-      // Delete member from team
-      await instance.delete(`/api/team/user/remove/${userId}/${teamId}`);
-      console.log(`Deleted member with ID: ${userId} from team with ID: ${teamId}`);
-  } catch (e) {
-      console.log(`Error deleting member from team with ID: ${userId}`, e);
-  }
-
-}
-
 async function addUserToTeam(userId: number, teamId: number) {
   try {
     console.log(`Add user to team with ID:`, userId);
@@ -298,6 +282,7 @@ async function deleteTeam(id: number) {
   }
 }
 
+
 // Add user to team
 async function addTeamMember(userId: number, teamId: number, isTeamLeader: boolean) {
   try {
@@ -319,6 +304,19 @@ async function addTeamMember(userId: number, teamId: number, isTeamLeader: boole
     return team_member.data;
   } catch (e) {
     throw e;
+  }
+}
+
+
+// Delete Team member
+async function deleteTeamMember(userId: number, teamId: number) {
+  try {
+    console.log(`Delete member from team with ID:`, userId);
+    // Delete member from team
+    await instance.delete(`/api/team/user/remove/${userId}/${teamId}`);
+    console.log(`Deleted member with ID: ${userId} from team with ID: ${teamId}`);
+  } catch (e) {
+      console.log(`Error deleting member from team with ID: ${userId}`, e);
   }
 }
 
@@ -361,6 +359,24 @@ async function getWorkingTimes(user: User): Promise<WorkingTime[]> {
       // get all working times from user
       const res = await instance.get(`/api/workingtime/${user.id}`);
       return res.data.data;
+  } catch (e) {
+      console.log("Error fetching working times:", e);
+      throw e; // rethrow the error to handle it outside if needed
+  }
+}
+
+async function getTeamWorkingTimes(teamId: number, teamMembers : TeamMember[]): Promise<WorkingTime[]> {
+  try {
+      console.log(`Get team working times for team with ID:`, teamId);
+      console.log(`Team members:`, teamMembers);
+      const userIds = teamMembers.map((teamMember) => teamMember.user_id);
+      const users: User[] = (await Promise.all(userIds.map((userId) => getUser(Number(userId))))).filter((user): user is User => user !== null);
+      const workingTimes: WorkingTime[] = [];      
+      for (const user of users) {
+        const userWorkingTimes = await getWorkingTimes(user as User);
+        workingTimes.push(...userWorkingTimes);
+      }
+      return workingTimes;
   } catch (e) {
       console.log("Error fetching working times:", e);
       throw e; // rethrow the error to handle it outside if needed
@@ -461,13 +477,15 @@ export const useApi = () => {
     modifyTeam,
     deleteTeam,
     addUserToTeam,
-    // UserTeams
+    getTeamWorkingTimes,
+    // User Teams
     getUserTeams,
+
+    // TeamMembers
+    addTeamMember,
+    deleteTeamMember,
     getTeamMembers,
     modifyTeamMemberRole,
     isUserTeamLeader,
-    deleteMemberFromTeam,
-    // TeamMembers
-    addTeamMember,
   };
 };
