@@ -40,7 +40,6 @@ async function reallyDelete(id: number) {
     console.log(id)
     try {
         if (props.tableType === 'team') {
-            console.log("massi", id)
             await api.deleteTeam(id);            
         } else if (props.tableType === 'user') {
             await api.deleteUser(id);
