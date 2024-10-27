@@ -36,9 +36,9 @@ const userCanModify = computed(() => {
 
 const detectInjection = (input: string): boolean => {
   const dangerousPatterns = [
-    /<script.*?>.*?<\/script>/gi, // Balises script
-    /\b(on\w+=|javascript:|alert\(|eval\(|document\.cookie|window\.location)/gi, // Attributs ou méthodes XSS
-    /(--|\b(SELECT|UPDATE|DELETE|INSERT|DROP|ALTER|CREATE|TRUNCATE)\b)/gi, // SQL injection keywords
+    /<script.*?>.*?<\/script>/gi, 
+    /\b(on\w+=|javascript:|alert\(|eval\(|document\.cookie|window\.location)/gi,
+    /(--|\b(SELECT|UPDATE|DELETE|INSERT|DROP|ALTER|CREATE|TRUNCATE)\b)/gi, 
     /[<>;'"]/
   ];
   return dangerousPatterns.some((pattern) => pattern.test(input));
@@ -50,7 +50,7 @@ const formData = computed(() => {
     return {
       username: user.value.username,
       email: user.value.email,
-      role: user.value.role // Enlever le mot de passe
+      role: user.value.role 
     };
   } else if (props.context === 'team' && team.value) {
     return team.value;
@@ -62,7 +62,7 @@ const handleSubmit = () => {
   usernameError.value = '';
 
   if (detectInjection(user.value?.username || '')) {
-    usernameError.value = 'Username is not valid'; //
+    usernameError.value = 'Username is not valid'; 
     return;
   }
 

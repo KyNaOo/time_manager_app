@@ -32,7 +32,6 @@ const action = async() => {
         console.error('User is null')
         return
     }
-    // Modify user
     await api.modifyUser(user.value);
     store.showModal({message: 'User edited', title: 'Success'});
 };
