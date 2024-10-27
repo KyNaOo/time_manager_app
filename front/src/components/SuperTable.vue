@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { toRefs, defineProps } from 'vue';
+import { toRefs, defineProps, onBeforeMount } from 'vue';
 import { useApi } from '@/api';
 import moment from 'moment';
 import { ref } from 'vue';
 import type { Modal } from '@/types/crudTypes';
 import ModalAction from './modals/ModalAction.vue';
 import { store } from '@/api/store';
+import { computed } from 'vue';
+import type { User } from '@/types/crudTypes';
 
 const api = useApi();
 
@@ -26,7 +28,7 @@ const props = defineProps({
     },
     showActions: {
         type: Boolean,
-        default: false
+        default: true
     }
 });
 
@@ -36,6 +38,15 @@ const modal = ref<Modal>({
     message: ''
 });
 
+const { tableHeaders, tableData } = toRefs(props);
+
+
+
+const currentUser = ref<User | null>(null);
+
+const isUserAdmin = computed(() => {
+return currentUser.value?.role === 'admin';
+});
 async function reallyDelete(id: number) {
     console.log(id)
     try {
@@ -64,11 +75,19 @@ async function handleDelete (id : number)  {
     };
 };
 
-const { tableHeaders, tableData } = toRefs(props);
 
 function formatDate(date: Date) {
     return moment(date).format('MMMM Do YYYY, h:mm:ss a')
 }
+
+
+onBeforeMount(async () => {
+    try {
+        currentUser.value = await store.user;
+    } catch (error) {
+        console.error('Error fetching user data:', error)
+    }
+})
 
 </script>
 
@@ -86,12 +105,12 @@ function formatDate(date: Date) {
                     <td v-for="(cell, cellIndex) in row" :key="cellIndex">
                         {{ cell instanceof Date ? formatDate(cell): cell }}
                     </td>
-                    <td v-if="showActions" class="actionCell">
+                    <td class="actionCell">
                         <RouterLink v-if="tableType === 'workingtime'" :to="`/app/${tableType}/${tableData[0].user_id}/${tableData[rowIndex].id}`">See</RouterLink>
                         <RouterLink v-else-if="tableType === 'user'" :to="`/app/${tableType}/${tableData[rowIndex].id}`">See</RouterLink>
                         <RouterLink v-else-if="tableType === 'team'" :to="`/app/${tableType}/${tableData[rowIndex].id}`">See</RouterLink>
                         <!-- Add your action buttons or elements here -->
-                        <button class="deleteBtn" @click="handleDelete(tableData[rowIndex].id)">Delete</button>
+                        <button v-if="isUserAdmin" class="deleteBtn" @click="handleDelete(tableData[rowIndex].id)">Delete</button>
                         <ModalAction v-if="modal.isVisible" :title=modal.title :message="modal.message" 
                         @confirm="reallyDelete(idToDelete)" @close="modal.isVisible = false" />
                     </td>

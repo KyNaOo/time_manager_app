@@ -14,7 +14,7 @@ onBeforeMount(async () => {
     try {
         console.log('Fetching user in profile view...')
         user.value = await store.user;
-        console.log('Stored User:', user.value)    
+        console.log('Stored User:', user.value)
     } catch (error) {
         console.error('Error fetching user data:', error)
     }

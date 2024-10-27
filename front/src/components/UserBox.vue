@@ -1,11 +1,8 @@
  
 <script setup lang="ts">
 import { ref, onBeforeMount, computed } from 'vue'
-import axios from 'axios'
 import { useRoute } from 'vue-router'
 import Form from '@/components/Form.vue'
-import WorkingTimes from '@/components/WorkingTimes.vue';
-import ChartManager from '@/components/ChartManager.vue';
 import type { User, WorkingTime } from '@/types/crudTypes'
 import { useApi } from '@/api';
 import { store } from '@/api/store';
@@ -15,8 +12,14 @@ import router from "../router";
 const user = ref<User | null>(null)
 const route = useRoute()
 const workingTimes = ref<WorkingTime[] | null>(null);
-const mode = computed(() => route.query.create ? 'create' : 'edition');
+const mode = ref('edition')
 const api = useApi();
+const currentRoute = router.currentRoute.value.name;
+
+const isProfile = computed(() => {
+  return currentRoute === 'appProfile';
+});
+console.log('Current Route:', currentRoute);  
 
 
 const props = defineProps<{
@@ -29,13 +32,9 @@ const action = async() => {
         console.error('User is null')
         return
     }
-    if (user.value.id) {
-            await api.modifyUser(user.value);
-            console.log('User modified:', user.value);
-            store.showModal({message: 'User edit with success', title: 'Success'});
-        } else {
-            console.error('Team ID is undefined');
-        }
+    // Modify user
+    await api.modifyUser(user.value);
+    store.showModal({message: 'User edited', title: 'Success'});
 };
 
 const deleteUser = async() => {
@@ -81,7 +80,9 @@ onBeforeMount(async () => {
     <div class="UserBox" v-if="user">
         <div class="flexWrapper">
             <div class="formUser">
-            <h2>{{mode === 'create' ? 'CREER UN UTILISATEUR' : 'PROFIL DE ' +  user.username  }} </h2>
+            <h2 v-if="mode === 'create'">CREER UN UTILISATEUR</h2>
+            <h2 v-else-if="isProfile">Votre Profil</h2>
+            <h2 v-else>PROFIL DE {{ user?.username }}</h2>  
             <Form context="user" :user="user" :mode="mode" @delete="deleteUser" @submit="action" />
             </div>  
         </div>
