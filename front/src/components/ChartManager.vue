@@ -1,62 +1,75 @@
 <script setup lang="ts">
-import { onBeforeMount, ref, watchEffect } from 'vue';
+import { onBeforeMount, ref, watchEffect, watch} from 'vue';
 import { computed } from 'vue';
 import { Bar, Pie, Doughnut } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale,ArcElement, PointElement } from 'chart.js';
 import { CalendarDaysIcon } from '@heroicons/vue/24/solid'
 import moment from 'moment';
 import type { WorkingTime } from '@/types/crudTypes';
+import { usefulFunctions } from '@/api/useful';
 
-
+const useful = usefulFunctions();  
 interface Props {
     workingTimes: WorkingTime[],
 }
 
 const props = defineProps<Props>();
 const graphMode = ref('bar');
-const chosenTimelapsed = ref(props.workingTimes.length > 5 ? 5 : props.workingTimes.length);
-console.log('Chosen timeElapsed:', chosenTimelapsed.value)
+const filterBy = ref<string>('week');
+const totalWorkingTimes = ref<any[]>([]);
 
-console.log('All Working times:', props.workingTimes)
+
+
+const chosenTimelapsed = computed(() => {
+    const value = filterBy.value === 'day' ? 1 : filterBy.value === 'week' ? 7 : filterBy.value === 'month' ? 30 : 365;
+    console.log('Chosen timelapsed:', value);
+    return value;
+});
+
+
 const chosenWorkingTimes = computed(() => 
-    props.workingTimes.length < chosenTimelapsed.value 
+totalWorkingTimes.value.length < chosenTimelapsed.value 
         ? props.workingTimes.slice(-chosenTimelapsed.value) 
-        : props.workingTimes
+        : totalWorkingTimes.value
 );
 
-console.log('Chosen working times:', chosenWorkingTimes.value)
+console.log('Chosen working times:', chosenWorkingTimes.value);
 
 
 const labels = computed(() => {
     const newLabels :any = [];
-    if (chosenWorkingTimes.value.length < chosenTimelapsed.value) {
-        const lastWorkingTime = moment(chosenWorkingTimes.value[chosenWorkingTimes.value.length - 1].start);
-        for (let i = chosenWorkingTimes.value.length; i < chosenTimelapsed.value; i++) {
-            newLabels.unshift(lastWorkingTime.subtract(1, 'days').format('dddd, D'));
-        }
+    // Get todays date and add add the number of chosenTimelapsed days passed
+    const today = moment();
+    if (chosenTimelapsed.value === 1) {
+        newLabels.push(today.format('dddd, D'));
+        return newLabels;
     }
-    chosenWorkingTimes.value
-        .map(workingTime => {
-            const start = moment(workingTime.start);
-            newLabels.push(start.format('dddd, D'));
-        });
-    
+    for (let i = 0; i < chosenTimelapsed.value; i++) {
+        const date = today.subtract(1, 'days').format('dddd, D');
+        newLabels.unshift(date);
+    }
+    newLabels.push(moment().format('dddd, D')); // Add today
+    console.log('Labels:', newLabels);
+
     return newLabels;
 });
 
 const durations = computed(() => {
-    const shiftedWorkingTimes = chosenWorkingTimes.value.slice(1).concat(chosenWorkingTimes.value.slice(0, 1));
-    const durationValues = shiftedWorkingTimes.map((workingTime: WorkingTime) => {
-        const start = moment(workingTime.start);
-        const end = moment(workingTime.end);
-        return end.diff(start, 'seconds');
+    const durationMap: { [key: string]: number } = {};
+    totalWorkingTimes.value.forEach((workingTime: any) => {
+        console.log('Working time in loop:', workingTime);  
+        const date = moment(workingTime.date).format('dddd, D');
+        console.log('Start Date from workig time:', date);
+        if (workingTime.totalWorkingTime !== undefined) {
+            durationMap[date] = workingTime.totalWorkingTime;
+            console.log('Duration map:', durationMap);
+        }
     });
+    return labels.value.map((label: string | number) => durationMap[label] || 0);
+});
 
-    while (durationValues.length < labels.value.length) {
-        durationValues.unshift(0);
-    }
-
-    return durationValues;
+onBeforeMount(async () => {
+    totalWorkingTimes.value = await useful.calculateWorkingTime(chosenWorkingTimes.value);
 });
 
 const colors = computed(() => {
@@ -68,7 +81,7 @@ const colors = computed(() => {
 const chartData = computed(() => ({
     labels: labels.value,
     datasets: [{
-        label: 'Seconds',
+        label: 'Total Seconds',
         data: durations.value,
         backgroundColor: colors.value,
     }],
@@ -148,6 +161,13 @@ watchEffect(() => {
     } else if (graphMode.value  === 'doughnut') {
         ChartJS.register(ArcElement, Tooltip, Legend)    }
 });
+
+
+watch(filterBy, (newValue, oldValue) => {
+    console.log(`filterBy changed from ${oldValue} to ${newValue}`);
+    console.log('Chosen timelapsed:', chosenTimelapsed.value);
+});
+
 </script>
 
 <template>
@@ -158,21 +178,23 @@ watchEffect(() => {
                 <div class="chartTitle">
                     <h2>TIME TRACKER</h2>
                 </div>
-                <p>
-                    <strong>Again ?</strong> Choisi un utilisateur parmis la liste suivante afin de tracker ses temps
-                </p>
             </div>
             <div class="chartright">
                 <div class="chartSelector">
+                    <label for="graphMode">Graph mode:</label>
                     <select v-model="graphMode">
                         <option value="bar">Bar</option>
                         <option value="doughnut">Doughnut</option>
                         <option value="pie">Pie</option>
                     </select> 
                 </div>
-                <div class="daysSelector">
-                    <label for="days">Days:</label>
-                    <input type="number" id="days" v-model="chosenTimelapsed" min="1" max="30" />
+                <div class="filterSelector">
+                    <label for="filterBy">Filter by:</label>
+                    <select id="filterBy" v-model="filterBy">
+                        <option value="day">Day</option>
+                        <option value="week">Week</option>
+                        <option value="month">Month</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -191,6 +213,10 @@ watchEffect(() => {
     flex-direction: column;
     gap: 20px;
     color: white;
+    background-color: #353535;
+    padding: 30px 60px;
+    border-radius: 10px;
+    
 }
 strong {
     color: black;
@@ -219,6 +245,11 @@ p {
 }
 .chartright {
     margin-top: 15px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+
 }
 .daysSelector {
     width: 20px;
