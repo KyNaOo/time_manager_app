@@ -61,10 +61,9 @@ const turnOffError = () => {
 
 
 ///////////////////// USERS ///////////////////////
-// Get all users
+// recup all users
 async function getAllUsers(): Promise<User[]> {
   try {
-    // get all users
     const response = await instance.get('/api/users');
     return response.data.data as User[];
   } catch (e) {
@@ -73,7 +72,7 @@ async function getAllUsers(): Promise<User[]> {
   }
 }
 
-  // Create user
+  // créer un user
   async function createUser (user: User) {
     try {
       console.log(`Create user`);
@@ -86,16 +85,14 @@ async function getAllUsers(): Promise<User[]> {
         }
       });
       console.log(`Created user: ${resp.data.data}`);
-      // Add your logic to handle the response here
     } catch (e) {
       console.log(`Error creating user: ${user.username}`, e);
     }
   };
 
-// Get user by id
+// recup user par id
 async function getUser(id: number): Promise<User | null> {
   try {
-      // get user by id
       const response = await instance.get(`/api/users/${id}`);
       console.log('User data:', response.data);
       return response.data.data as User;
@@ -105,11 +102,10 @@ async function getUser(id: number): Promise<User | null> {
   }
 }
 
-// Modify user
+// modifier user
 async function modifyUser (user: User): Promise<User | null> {
   try {
       console.log(`Modify user with ID:`, user.id);
-      // Change in the database
       const resp = await instance.put(`/api/users/${user.id}`, {
           user: {
               username: user?.username,
@@ -118,11 +114,9 @@ async function modifyUser (user: User): Promise<User | null> {
           }
       });
       if (resp.data.data) {
-          // Change in local storage
-          localStorage.setItem("user", JSON.stringify(resp.data.data));          
+¨          localStorage.setItem("user", JSON.stringify(resp.data.data));          
       }
       console.log(`Modified user with ID: ${user.id}`);
-      // Add your logic to handle the response here
 
       return resp.data.data;
   } catch (e) {
@@ -131,11 +125,10 @@ async function modifyUser (user: User): Promise<User | null> {
   }
   };
 
-// Get teamMembers
+// recup membre team
 async function getTeamMembers(team: Team): Promise<TeamMember[] | null> {
   try {
     console.log(`Get team members for team with ID:`, team.id);
-      // get all teams from user
       const res = await instance.get(`/api/team/users/${team.id}`);
       console.log('Team members:', res.data) 
       return res.data.users;
@@ -145,11 +138,10 @@ async function getTeamMembers(team: Team): Promise<TeamMember[] | null> {
   }
 }
 
-// Modify team member role
+// modidifer role d'un team member
 async function modifyTeamMemberRole(user: User, team: Team, is_team_leader: boolean) {
   try {
       console.log(`Modify team member role`);
-      // Modify team member role
       await instance.put(`/api/team/user/role/${user.id}/${team.id}`, {
         isTeamLeader: is_team_leader
     });
@@ -160,10 +152,9 @@ async function modifyTeamMemberRole(user: User, team: Team, is_team_leader: bool
   }
 }
 
-// get user team leader
+// recup leader d'une team
 async function isUserTeamLeader(user: User, team: Team) {
   try {
-      // get all teams from user
       const res = await instance.get(`/api/team/user/isAdmin/${user.id}/${team.id}`);
       return res.data.data;
   } catch (e) {
@@ -171,10 +162,9 @@ async function isUserTeamLeader(user: User, team: Team) {
   }
 }
 
-// Get user teams
+// recup membre team
 async function getUserTeams(user: User) {
   try {
-      // get all teams from user
       const res = await instance.get(`/api/user/teams/${user.id}`);
       console.log('User teams:', res.data);
       return res.data.teams;
@@ -184,11 +174,10 @@ async function getUserTeams(user: User) {
 }
 
 
-// Delete user
+// suppr un user
 async function deleteUser(userId: number) {
   try {
       console.log(`Delete user with ID:`, userId);
-      // Delete user
       await instance.delete(`/api/users/${userId}`);
       console.log(`Deleted user with ID: ${userId}`);
   } catch (e) {
@@ -198,10 +187,9 @@ async function deleteUser(userId: number) {
 
 //////////////////// TEAMS ///////////////////////
 
-// Get all teams
+// recup toute les teams
 async function getTeams() {
   try {
-      // get all teams
       const res = await instance.get(`/api/teams`);
       return res.data.data;
   } catch (e) {
@@ -209,10 +197,9 @@ async function getTeams() {
   }
 }
 
-// Get team by id
+// recup team par id
 async function getTeam(id: number): Promise<Team | null> {
   try {
-      // get team by id
       const response = await instance.get(`/api/team/${id}`);
       return response.data.data as Team;
   } catch (e) {
@@ -221,11 +208,10 @@ async function getTeam(id: number): Promise<Team | null> {
   }
 }
 
-// Create team
+// créer une team
 async function createTeam(name: string, managerId: number) {
   try {
       console.log(`Create team`);
-      // Create team
       const teamCreated = await instance.post(`/api/team`, {
         team: {
           title: name,
@@ -245,11 +231,10 @@ async function createTeam(name: string, managerId: number) {
   }
 }
 
-// Modify team
+// modif une team
 async function modifyTeam(id: number, name: string, managerId: number) {
   try {
       console.log(`Modify team with ID:`, id);
-      // Modify team
       await instance.put(`/api/team/${id}`, {
         team: {
           name: name,
@@ -262,23 +247,22 @@ async function modifyTeam(id: number, name: string, managerId: number) {
   }
 }
 
-// Delete member from team
+// suppr un membre d'une team
 async function deleteMemberFromTeam(userId: number, teamId: number) {
   try {
       console.log(`Delete member from team with ID:`, userId);
-      // Delete member from team
       await instance.delete(`/api/team/user/remove/${userId}/${teamId}`);
       console.log(`Deleted member with ID: ${userId} from team with ID: ${teamId}`);
   } catch (e) {
       console.log(`Error deleting member from team with ID: ${userId}`, e);
   }
 
-}
+} 
 
+// ajouter un user a une team
 async function addUserToTeam(userId: number, teamId: number) {
   try {
     console.log(`Add user to team with ID:`, userId);
-    // Add user to team
     await instance.post(`/api/team/user/addUser/${userId}/${teamId}`);
     console.log(`Added user with ID: ${userId} to team with ID: ${teamId}`);
   } catch (e) {
@@ -286,11 +270,10 @@ async function addUserToTeam(userId: number, teamId: number) {
   }
 }
 
-// Delete team
+// supprr une team
 async function deleteTeam(id: number) {
   try {
       console.log(`Delete team with ID:`, id);
-      // Delete team
       await instance.delete(`/api/team/${id}`);
       console.log(`Deleted team with ID: ${id}`);
   } catch (e) {
@@ -298,13 +281,12 @@ async function deleteTeam(id: number) {
   }
 }
 
-// Add user to team
+// ajouter un membre a une team
 async function addTeamMember(userId: number, teamId: number, isTeamLeader: boolean) {
   try {
 
     console.log(`Add user ${userId} to team ${teamId} as team leader: ${isTeamLeader}`);
 
-    // Add user to team
     const team_member = await instance.post(`/api/team/user/addUser/${userId}/${teamId}`, {
       team_member: {
         team_id : teamId,
@@ -327,11 +309,10 @@ async function addTeamMember(userId: number, teamId: number, isTeamLeader: boole
 
 ///////////////////// WORKING TIMES ///////////////////////
 
-// Create working time
+// créer un working time
 async function createWorkingTime(user: User, now: string) {
   try {
       console.log(`Create working time`);
-      // Create working time
       await instance.post(`/api/workingtime/${user.id}`, {
         start: now,
         end: now
@@ -341,37 +322,33 @@ async function createWorkingTime(user: User, now: string) {
       console.log(`Error creating working time`, e);
   }
 }
-// Get all working times from user
 async function getWorkingTime(userId: number, workingTimeId : number): Promise<WorkingTime> {
   try {
-      // get all working times from user
 
       const res = await instance.get(`/api/workingtime/${userId}/${workingTimeId}`);
       return res.data.data;
   } catch (e) {
       console.log("Error fetching working times:", e);
-      throw e; // rethrow the error to handle it outside if needed
+      throw e; 
   }
 }
 
 
-// Get all working times from user
+// recup all working times
 async function getWorkingTimes(user: User): Promise<WorkingTime[]> {
   try {
-      // get all working times from user
       const res = await instance.get(`/api/workingtime/${user.id}`);
       return res.data.data;
   } catch (e) {
       console.log("Error fetching working times:", e);
-      throw e; // rethrow the error to handle it outside if needed
+      throw e;
   }
 }
 
-// Modifuy modifyWorkingTime  
+// modifier working time  
 async function modifyWorkingTime(now: string, lastWorkingTime: WorkingTime) {
   try {
       console.log(`Modify Woking time`);
-      // Modify clock
       await instance.put(`/api/workingtime/${lastWorkingTime.id}`, {
         workingtime: { end: now }
     });
@@ -381,11 +358,10 @@ async function modifyWorkingTime(now: string, lastWorkingTime: WorkingTime) {
   }
 }
 
-// Delete working time
+// suppr un working time
 async function deleteWorkingTime(id: number): Promise<boolean> {
   try {
       console.log(`Delete working time with ID:`, id);
-      // Delete working time
       await instance.delete(`/api/workingtime/${id}`);
       console.log(`Deleted working time with ID: ${id}`);
       return true;
@@ -396,10 +372,9 @@ async function deleteWorkingTime(id: number): Promise<boolean> {
 }
 
 ///////////////// CLOCKS////////////////////
-// Get all clocks from user
+// recup all clocks d'un user
 async function getClocks(user: User) {
   try {
-      // get all clocks from user
       const res =  await instance.get(`/api/clocks/${user.id}`);
       return res.data.data;
   } catch (e) {
@@ -407,11 +382,10 @@ async function getClocks(user: User) {
   }
 }
 
-// Create clock
+// créer un clock
 async function createClock(user: User, now: string, status: boolean) {
   try {
       console.log(`Create clock`);
-      // Create clock
       await instance.post(`/api/clocks/${user.id}`, {
             time: now,
             status: status,

@@ -15,18 +15,16 @@ const inputValue = ref('');
 const error = ref<string | null>(null);
 const isValid = ref(false);
 
-// Regex pour valider l'email
 const validateEmail = (email: string): boolean => {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailPattern.test(email);
 };
 
-// Fonction pour détecter des tentatives XSS/SQL
 const detectInjection = (input: string): boolean => {
   const dangerousPatterns = [
-    /<script.*?>.*?<\/script>/gi, // Balises script
-    /\b(on\w+=|javascript:|alert\(|eval\(|document\.cookie|window\.location)/gi, // Attributs ou méthodes XSS
-    /(--|\b(SELECT|UPDATE|DELETE|INSERT|DROP|ALTER|CREATE|TRUNCATE)\b)/gi, // SQL injection keywords
+    /<script.*?>.*?<\/script>/gi, 
+    /\b(on\w+=|javascript:|alert\(|eval\(|document\.cookie|window\.location)/gi, 
+    /(--|\b(SELECT|UPDATE|DELETE|INSERT|DROP|ALTER|CREATE|TRUNCATE)\b)/gi, 
     /[<>;'"]/
   ];
 

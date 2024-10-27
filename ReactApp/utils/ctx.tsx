@@ -13,7 +13,6 @@ const AuthContext = createContext<{
     isLoading: false,
 });
 
-// This hook can be used to access the user info.
 export function useSession() {
     const value = useContext(AuthContext);
     if (process.env.NODE_ENV !== 'production') {
@@ -32,7 +31,6 @@ export function SessionProvider({ children }: PropsWithChildren) {
         <AuthContext.Provider
             value={{
                 signIn: () => {
-                    // Perform sign-in logic here
                     setSession('xxx');
                 },
                 signOut: () => {

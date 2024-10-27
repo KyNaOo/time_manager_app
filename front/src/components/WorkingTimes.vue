@@ -37,7 +37,6 @@ onBeforeMount(async () => {
     workingTimes.value = props.workingTimes;
     
     if (workingTimes.value) {
-      // Format the date for further treatment in SuperTable
       workingTimes.value = workingTimes.value.map(workingTime => ({
         ...workingTime,
         start: new Date(workingTime.start),

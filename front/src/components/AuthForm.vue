@@ -26,7 +26,6 @@ const isStrongPassword = ref(false);
 
 
 
-// Computed property to validate the entire form
 const isFormValid = computed(() => {
   console.log("Is form valid ? ", isUserNameValid.value && isEmailValid.value && isStrongPassword.value)
     return isUserNameValid.value && isEmailValid.value
@@ -79,8 +78,6 @@ const handleAuth = async () => {
     } else {
       console.log('Attempting to register...');
       delete user.value.confirmPassword;
-      // const hashedPassword = await bcrypt.hash(user.value.password!, 10);
-      // user.value.password = hashedPassword;
       console.log('User Data:', user.value);
       await auth.register({
         email: user.value.email!,

@@ -43,7 +43,6 @@ async function clock() {
     console.log("Last clock:", lastClock)
 
     if (lastClock && lastClock.status === true) {
-        // clock out
         console.log("Clocking out...");
         console.log("Last clock:", lastClock);
         console.log("Working times:", workingTimes.value);
@@ -51,14 +50,11 @@ async function clock() {
         working.value = false;
 
     } else {
-        // clock in
         console.log("Clocking in...")
         console.log("now:", now);
         await useful.clockIn(now, user.value);
         working.value = true;
     }
-
-    // // // Reload page
     updateWorkingStatus(user.value);
 
       } catch (e) {

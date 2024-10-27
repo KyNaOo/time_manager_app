@@ -48,7 +48,6 @@ const isUserAdmin = computed(() => {
 return currentUser.value?.role === 'admin';
 });
 async function reallyDelete(id: number) {
-    console.log(id)
     try {
         if (props.tableType === 'team') {
             await api.deleteTeam(id);            
@@ -66,7 +65,6 @@ async function reallyDelete(id: number) {
 
 async function handleDelete (id : number)  {
     console.log(`Delete row`);
-    console.log(id)
     idToDelete.value = id;
     modal.value = {
         isVisible: true,

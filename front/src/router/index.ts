@@ -15,7 +15,6 @@ import TeamView from '@/views/TeamView.vue'
 import CreationView from '@/views/CreationView.vue'
 
 const router = createRouter({
-  // history: createMemoryHistory(),
   history: createWebHistory(),
   routes: [
     {
@@ -106,7 +105,6 @@ router.beforeEach(async (to, from, next) => {
   try {
 
     console.log('Before each route');
-    // Check if the user is authenticated
     const authenticated = is_authenticated();
     console.log('User is autenticated ? ', authenticated); 
     console.log('from: ', from);
@@ -114,13 +112,11 @@ router.beforeEach(async (to, from, next) => {
 
     if ((to.path === "/login" || to.path === "/register" || to.path === "/") && authenticated) {
       console.log('Redirecting to app, user is already authenticated');
-      // User is authenticated and trying to access login, redirect to dashboard
       return next("/app");
     }
 
     if (to.meta.requiresAuth && !authenticated) {
       console.log('Redirecting to login, user is not authenticated');
-      // User is not authenticated, redirect to login
       return next("/login");
     }
 

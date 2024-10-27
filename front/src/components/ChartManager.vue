@@ -52,7 +52,6 @@ const durations = computed(() => {
         return end.diff(start, 'seconds');
     });
 
-    // Fill durations with '0' values if there is a difference in length
     while (durationValues.length < labels.value.length) {
         durationValues.unshift(0);
     }
