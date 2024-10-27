@@ -38,7 +38,6 @@ console.log('Chosen working times:', chosenWorkingTimes.value);
 
 const labels = computed(() => {
     const newLabels :any = [];
-    // Get todays date and add add the number of chosenTimelapsed days passed
     const today = moment();
     if (chosenTimelapsed.value === 1) {
         newLabels.push(today.format('dddd, D'));
@@ -48,7 +47,7 @@ const labels = computed(() => {
         const date = today.subtract(1, 'days').format('dddd, D');
         newLabels.unshift(date);
     }
-    newLabels.push(moment().format('dddd, D')); // Add today
+    newLabels.push(moment().format('dddd, D'));
     console.log('Labels:', newLabels);
 
     return newLabels;
