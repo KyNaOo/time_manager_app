@@ -3,16 +3,17 @@ import { toRefs, defineProps, onBeforeMount } from 'vue';
 import { useApi } from '@/api';
 import moment from 'moment';
 import { ref } from 'vue';
-import type { Modal } from '@/types/crudTypes';
+import type { Modal, Team } from '@/types/crudTypes';
 import ModalAction from './modals/ModalAction.vue';
 import { store } from '@/api/store';
 import { computed } from 'vue';
 import type { User } from '@/types/crudTypes';
+import { useRouter } from 'vue-router';
 
 const api = useApi();
-
+const router = useRouter();
 const idToDelete = ref(0)
-
+const team = ref<Team | null>(null);
 const props = defineProps({
     tableType: {
         type: String,
@@ -40,7 +41,8 @@ const modal = ref<Modal>({
 
 const { tableHeaders, tableData } = toRefs(props);
 
-
+const currentRoute = router.currentRoute.value.name;
+console.log('Current Route:', currentRoute);
 
 const currentUser = ref<User | null>(null);
 
@@ -52,7 +54,13 @@ async function reallyDelete(id: number) {
         if (props.tableType === 'team') {
             await api.deleteTeam(id);            
         } else if (props.tableType === 'user') {
-            await api.deleteUser(id);
+            if (currentRoute === 'team') {
+                await api.deleteTeamMember(id, Number(team.value!.id));
+                store.showModal({message: `User with Id: ${id}, has been successfully deleted from team`, title: 'Success'});
+                tableData.value = tableData.value.filter((row: any) => row.id !== id);
+            } else {
+                await api.deleteUser(id);
+            }
         } else if (props.tableType === 'workingtime') {
             await api.deleteWorkingTime(id);
         }
@@ -69,7 +77,7 @@ async function handleDelete (id : number)  {
     modal.value = {
         isVisible: true,
         title: `${props.tableType.charAt(0).toUpperCase() + props.tableType.slice(1)} deletion?`,
-        message: `Are you sure you want to delete this ${props.tableType}= ${id} ?`
+        message: `Are you sure you want to do this ?`
     };
 };
 
@@ -82,6 +90,11 @@ function formatDate(date: Date) {
 onBeforeMount(async () => {
     try {
         currentUser.value = await store.user;
+        if( currentRoute === 'team') {
+            console.log('Current Route:', currentRoute);
+            const teamId = router.currentRoute.value.params.id;
+            team.value = await api.getTeam(Number(teamId));
+        }
     } catch (error) {
         console.error('Error fetching user data:', error)
     }

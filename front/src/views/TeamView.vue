@@ -8,6 +8,8 @@ import { useApi } from '@/api';
 import { store } from '@/api/store';
 import SuperTable from '@/components/SuperTable.vue';
 import type { TeamMember } from '@/types/crudTypes';
+import ChartManager from '@/components/ChartManager.vue';
+import { usefulFunctions } from '@/api/useful';
 const route = useRoute();
 const user = ref<User | null>(null);
 const teams = ref<Team[] | null>(null);
@@ -21,10 +23,9 @@ const router = useRouter();
 const users = ref<User[] | null>(null);
 const teamMembers = ref<TeamMember[]>([]); 
 const usersNotInTeam = ref<User[]>([]);
-const tableHeaders = computed(() => {
-const headers = user.value ? Object.keys(user.value) : ['ID', 'Username', 'Is Manager', 'Actions'];
-  return headers;
-});
+const tableHeaders = ref<string[]>(user.value ? Object.keys(user.value) : ['Username', 'Is Manager', 'ID', 'Actions']);
+
+const workingTimes = ref<WorkingTime[] | null>(null);
 
 
 const action = async(teamToChange : Team) => {
@@ -61,23 +62,20 @@ const isCurrentUserAdmin = computed(() => {
     return currentUser.value?.role === 'admin';
 });
 
+async function getTeamWorkingTimes(team: Team, teamMembers: TeamMember[]) {
+    try {
+        if (team && teamMembers) {
+            return await api.getTeamWorkingTimes(team.id!, teamMembers);
+        }
+    } catch (error) {
+        console.error('Error fetching team working times:', error);
+        return null;
+    }
+}
+
 
 onBeforeMount(async () => {
     try {
-        team.value = await api.getTeam(Number(teamId));
-        users.value = await api.getAllUsers();
-        console.log('ALL users', users.value)
-        teams.value = await api.getTeams();
-        if(team.value !== null) {
-            if (team.value) {
-                teamMembers.value = (await api.getTeamMembers(team.value as Team)) || [];
-            }
-            usersNotInTeam.value = users.value?.filter(user => !teamMembers.value.some(member => member.id === user.id));
-            console.log('Users not in team:', usersNotInTeam.value)
-        }else {
-            teams.value = [];
-        }
-        
         currentUser.value = await store.user;
         if (mode.value === 'create') {
             team.value = {
@@ -85,10 +83,31 @@ onBeforeMount(async () => {
                 is_team_leader: true
             }
             return
-        }
+        }       
         team.value = await api.getTeam(Number(teamId));
-        console.log('Team:', team.value)           
-      
+        users.value = await api.getAllUsers();
+        console.log('ALL users', users.value)
+        teams.value = await api.getTeams();
+        if(team.value !== null) {
+            if (team.value) {
+                teamMembers.value = (await api.getTeamMembers(team.value as Team)) || [];
+                // Add id key to object being displayed in the table
+                teamMembers.value = teamMembers.value.map(member => ({...member, id: member.user_id}));
+                // set table headers to match the team members object keys
+                tableHeaders.value = teamMembers.value.length > 0 ? Object.keys(teamMembers.value[0]) : [];
+                
+                // add actions to the table headers
+                tableHeaders.value.push('Actions');
+                console.log('Team members:', teamMembers.value);
+                workingTimes.value = await api.getTeamWorkingTimes(team.value.id!, teamMembers.value);
+                console.log('Total working times:', workingTimes);
+            }
+            usersNotInTeam.value = users.value?.filter(user => !teamMembers.value.some(member => member.id === user.id));
+            console.log('Users not in team:', usersNotInTeam.value)
+        }else {
+            teams.value = [];
+        }
+        
     } catch (error) {
         console.error('Error fetching user data:', error)
     }
@@ -97,18 +116,23 @@ onBeforeMount(async () => {
 const formData = ref({
     userId: '',
     teamId: '',
-    isTeamLeader : '',
+    isTeamLeader : false,
 });
 
 async function addUserInTeams()  {
     try {
-        await api.addTeamMember(Number(formData.value.userId), Number(team.value?.id), Boolean(formData.value.isTeamLeader));
+        if (team.value === null) {
+            console.error('Team is null')
+            return
+        }
+        console.log('Add user in team:', formData.value) 
+        await api.addTeamMember(Number(formData.value.userId), Number(team.value?.id), formData.value.isTeamLeader);
         store.showModal({message: "User add successfully", title: 'Success'});
-        teamMembers.value = (await api.getTeamMembers(team.value as Team)) || [];
+        teamMembers.value = (await api.getTeamMembers(team.value)) || [];
         formData.value = {
             userId: '',
             teamId: '',
-            isTeamLeader: ''
+            isTeamLeader: false
         }
     }
     catch(e:any) {
@@ -129,11 +153,14 @@ function deleteTeam() {
 
 
 
+
 </script>
 
 <template>
     <div class="TeamView" v-if="team">
         <div class="flexWrapper">
+            <div class="left">
+                <div class="formWrapper">
             <div class="formUser" v-if="isCurrentUserAdmin">
                 <h2>{{mode === 'create' ? 'Créer une équipe' : 'Modifies ton équipe'}} </h2>
                 <Form  :context="'team'" :team="team" :mode="mode" @submit="action($event)" @delete="deleteTeam" />
@@ -142,33 +169,41 @@ function deleteTeam() {
                 <h2>Équipe {{ team?.title }}</h2>
             </div>
         </div>
-        <div v-if="mode !== 'create'" class="teamArray">
-            <h2 class="titleArray">Membres de l'équipe</h2>
-            <SuperTable class="arrayTeam" v-if="teamMembers" :tableData="teamMembers" tableType="user" :tableHeaders="tableHeaders" showActions/>
-    </div>
 
-    <div v-if="mode !== 'create' && isCurrentUserAdmin" class="teams">
-        <div class="usersTitle">
-            <h2>Ajoute un membre à une team</h2>
+        <div v-if="mode !== 'create' && isCurrentUserAdmin" class="teamForm">
+            <div class="usersTitle">
+                <h2>Ajoute un membre à une team</h2>
+            </div>
+            
+            <form v-if="usersNotInTeam.length > 0" @submit.prevent="addUserInTeams()">
+                <div class="form-group">
+                    <label for="userSelect">Choisir un utilisateur:</label>
+                    <select id="userSelect" v-model="formData.userId">
+                        <option v-for="user in usersNotInTeam" :key="user.id" :value="user.id">{{ user.username }}</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="managerSelect">Est-il manager :</label>
+                    <select id="managerSelect" v-model="formData.isTeamLeader">
+                        <option :value="true">Oui</option>
+                        <option :value="false">Non</option>
+                    </select>
+                </div>
+                <button type="submit" class="add-button">Ajouter</button>            
+            </form>
+            <div v-else>
+                <p>Il n'y a plus d'utilisateurs à ajouter.</p>
+            </div>
         </div>
-        
-        <form  @submit.prevent="addUserInTeams()">
-            <div class="form-group">
-                <label for="userSelect">Choisir un utilisateur:</label>
-                <select id="userSelect" v-model="formData.userId">
-                    <option v-for="user in usersNotInTeam" :key="user.id" :value="user.id">{{ user.username }}</option>
-                </select>
             </div>
-            <div class="form-group">
-                <label for="managerSelect">Est-il manager :</label>
-                <select id="managerSelect" v-model="formData.isTeamLeader">
-                    <option value="true">Oui</option>
-                    <option value="false">Non</option>
-                </select>
-            </div>
-            <button type="submit" class="add-button">Ajouter</button>
-        </form>
-    </div>
+            <div class="right">
+                <div v-if="mode !== 'create'" class="teamArray">
+                    <h2 >Membres de l'équipe</h2>
+                    <SuperTable class="arrayTeam" v-if="teamMembers" :tableData="teamMembers" tableType="user" :tableHeaders="tableHeaders" showActions/>
+                </div>
+                <ChartManager  v-if="workingTimes" :workingTimes="workingTimes" />
+            </div> 
+        </div>
     </div>
     <div v-else>
         <p>Team not found</p>
@@ -180,7 +215,7 @@ function deleteTeam() {
 
 <style scoped >
 .TeamView {
-    width: 40%;
+    width: 100%;
 }
 
 .flexWrapper {
@@ -191,8 +226,14 @@ function deleteTeam() {
     background-color: #353535;
     border-radius: 15px;
     padding: 40px 80px;
-    justify-content: space-between;
     width: 100%;
+    gap: 30px;
+}
+.left, .right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    flex: 1;
 }
 
 .formUser {

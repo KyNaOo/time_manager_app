@@ -130,7 +130,6 @@ async function getTeamMembers(team: Team): Promise<TeamMember[] | null> {
   try {
     console.log(`Get team members for team with ID:`, team.id);
       const res = await instance.get(`/api/team/users/${team.id}`);
-      console.log('Team members:', res.data) 
       return res.data.users;
   } catch (e) {
       console.log("Error fetching team members:", e);
@@ -305,6 +304,19 @@ async function addTeamMember(userId: number, teamId: number, isTeamLeader: boole
 }
 
 
+// Delete Team member
+async function deleteTeamMember(userId: number, teamId: number) {
+  try {
+    console.log(`Delete member from team with ID:`, userId);
+    // Delete member from team
+    await instance.delete(`/api/team/user/remove/${userId}/${teamId}`);
+    console.log(`Deleted member with ID: ${userId} from team with ID: ${teamId}`);
+  } catch (e) {
+      console.log(`Error deleting member from team with ID: ${userId}`, e);
+  }
+}
+
+
 
 
 ///////////////////// WORKING TIMES ///////////////////////
@@ -339,6 +351,24 @@ async function getWorkingTimes(user: User): Promise<WorkingTime[]> {
   try {
       const res = await instance.get(`/api/workingtime/${user.id}`);
       return res.data.data;
+  } catch (e) {
+      console.log("Error fetching working times:", e);
+      throw e;
+  }
+}
+
+async function getTeamWorkingTimes(teamId: number, teamMembers : TeamMember[]): Promise<WorkingTime[]> {
+  try {
+      console.log(`Get team working times for team with ID:`, teamId);
+      console.log(`Team members:`, teamMembers);
+      const userIds = teamMembers.map((teamMember) => teamMember.user_id);
+      const users: User[] = (await Promise.all(userIds.map((userId) => getUser(Number(userId))))).filter((user): user is User => user !== null);
+      const workingTimes: WorkingTime[] = [];      
+      for (const user of users) {
+        const userWorkingTimes = await getWorkingTimes(user as User);
+        workingTimes.push(...userWorkingTimes);
+      }
+      return workingTimes;
   } catch (e) {
       console.log("Error fetching working times:", e);
       throw e;
@@ -435,13 +465,15 @@ export const useApi = () => {
     modifyTeam,
     deleteTeam,
     addUserToTeam,
-    // UserTeams
+    getTeamWorkingTimes,
+    // User Teams
     getUserTeams,
+
+    // TeamMembers
+    addTeamMember,
+    deleteTeamMember,
     getTeamMembers,
     modifyTeamMemberRole,
     isUserTeamLeader,
-    deleteMemberFromTeam,
-    // TeamMembers
-    addTeamMember,
   };
 };
