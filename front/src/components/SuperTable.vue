@@ -72,7 +72,6 @@ async function reallyDelete(id: number) {
 };
 
 async function handleDelete (id : number)  {
-    console.log(`Delete row`);
     idToDelete.value = id;
     modal.value = {
         isVisible: true,
