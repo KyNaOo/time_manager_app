@@ -372,9 +372,11 @@ async function getTeamWorkingTimes(teamId: number, teamMembers : TeamMember[]): 
       return workingTimes;
   } catch (e) {
       console.log("Error fetching working times:", e);
-      throw e; // rethrow the error to handle it outside if needed
+      throw e;
   }
 }
+
+// modifier working time  
 async function modifyWorkingTime(now: string, lastWorkingTime: WorkingTime) {
   try {
       console.log(`Modify Woking time`);
