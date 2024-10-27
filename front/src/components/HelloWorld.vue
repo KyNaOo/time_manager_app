@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { RouterLink } from 'vue-router'
-
 </script>
 
 <template>
   <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
   <div class="accueil">
-    <h1>Bienvenue sur TimeTrack</h1>
+    <h1>Bienvenue sur Time Manager</h1>
     <h3>GEREZ VOTRE TEMPS COMME CLOCK TIME</h3>
     <nav>
         <RouterLink class="login" to="/login">Login</RouterLink>
