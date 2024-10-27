@@ -37,9 +37,9 @@ export interface Team {
 
 export interface TeamMember {
     id?: number;
-    userId: number;
-    teamId: number;
-    isTeamLeader: boolean;
+    user_id?: number;
+    teamId?: number;
+    is_team_leader: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -53,5 +53,12 @@ export interface Modal {
 
 
 
+interface filterBy {
+    day: string,
+    week: string,
+    month: string,
+    year: string,
+}
+export type Filter = keyof filterBy;
 export type Role = 'user' | 'manager' | 'admin';
 export type AuthMode = 'login' | 'register';

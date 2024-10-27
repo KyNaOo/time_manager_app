@@ -10,7 +10,7 @@ defmodule TimeTrackerWeb.TeamMemberController do
     with {:ok, %TeamMember{} = team_member} <- Accounts.create_team_member(team_member_params) do
       conn
       |> put_status(:created)
-      |> put_resp_header("location", ~p"/api/team_members/#{team_member}")
+      |> put_resp_header("location", ~p"/api/team/users/#{team_member}")
       |> render(:show, team_member: team_member)
     end
   end
