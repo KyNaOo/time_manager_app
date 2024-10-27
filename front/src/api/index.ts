@@ -114,7 +114,7 @@ async function modifyUser (user: User): Promise<User | null> {
           }
       });
       if (resp.data.data) {
-¨          localStorage.setItem("user", JSON.stringify(resp.data.data));          
+          localStorage.setItem("user", JSON.stringify(resp.data.data));          
       }
       console.log(`Modified user with ID: ${user.id}`);
 
