@@ -18,10 +18,7 @@ console.log('USER IN TEAMMMMMs:', user.value)
 
 const tableHeaders = computed(() => {
 
-const headers = ["Id", "Name"];
-  if (userisAdmin.value) {
-    headers.push('Actions');
-  }
+const headers = ["Id", "Name", 'Actions'];
   return headers;
 });
 
@@ -51,7 +48,7 @@ onBeforeMount(async () => {
             </div>
         </div>        
         
-        <SuperTable class="arrayAllTeams" :tableData="teams" tableType="team" :tableHeaders="tableHeaders" :showActions="userisAdmin"/>
+        <SuperTable class="arrayAllTeams" :tableData="teams" tableType="team" :tableHeaders="tableHeaders" :showActions="true"/>
     </div>
     <div class="noteam" v-else>
         <p>Il n'y a pas encore d'équipe...</p>

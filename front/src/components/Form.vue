@@ -1,25 +1,38 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onBeforeMount, ref } from 'vue';
 import { defineProps, defineEmits, computed } from 'vue';
 import type { User, Team } from '@/types/crudTypes';
-
+import { store } from '@/api/store';
 interface Props {
   user?: User;
   team?: Team;
   context: string;
   mode: string;
 }
+const props = defineProps<Props>();
+
 
 const emit = defineEmits<{
   (e: 'submit', value: any): void;
   (e: 'delete'): void;
 }>();
+const user = ref(props.user);
+const team = ref(props.team);
+const usernameError = ref('');
+const currentUser = ref<User | null>(null);
 
-const userisAdmin = computed( () => {
-  return user.value?.role === 'admin';
+const currentUserisAdmin = computed( () => {
+  return currentUser.value?.role === 'admin';
 });
 
-const props = defineProps<Props>();
+const isUserCurrentUser = ref(false);
+
+const userCanModify = computed(() => {
+  if (isUserCurrentUser.value === true){
+    return true;
+  }
+  return currentUserisAdmin.value === true;
+});
 
 const detectInjection = (input: string): boolean => {
   const dangerousPatterns = [
@@ -31,11 +44,6 @@ const detectInjection = (input: string): boolean => {
   return dangerousPatterns.some((pattern) => pattern.test(input));
 };
 
-const user = ref(props.user);
-const team = ref(props.team);
-console.log('TEAM in TEAMVIEW:', team.value);
-
-const usernameError = ref('');
 
 const formData = computed(() => {
   if (props.context === 'user' && user.value) {
@@ -66,39 +74,49 @@ function deleteContent() {
   console.log('Delete:');
   emit('delete');
 }
+
+onBeforeMount(async () => {
+  currentUser.value = await store.user;
+  console.log('Current User:', currentUser.value)
+  console.log('User:', user.value)
+  if (currentUser.value && user.value) {
+    isUserCurrentUser.value = currentUser.value.id === user.value.id;
+    console.log('User can modify?', isUserCurrentUser.value)
+  }
+});
 </script>
 
 <template>
     <form @submit.prevent="handleSubmit">
-            <div class="formu" v-if="props.context === 'user' && user">
-                <div class="form-field">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" v-model="user.username" />
-                </div>
-                <div class="form-field">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" v-model="user.email" />
-                </div>
-                <div class="form-field">
-                    <label for="role">Rôle:</label>
-                    <select id="role" v-model="user.role">
-                        <option value="user">User</option>
-                        <option value="manager">Manager</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-            </div>
-            <div v-if="team">
-                <div class="form-field">
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" v-model="team.title" />
-                </div>
-            </div>
-            <div class="buts">
-                <button class="save" type="submit">Save</button>
-                <button v-if="props.mode !== 'create'" class="delete" @click.prevent="deleteContent">Delete</button>
-            </div>
-        </form>
+      <div class="formu" v-if="props.context === 'user' && user">
+        <div class="form-field">
+          <label for="username">Username:</label>
+          <input type="text" id="username" v-model="user.username" :disabled="!userCanModify" />
+        </div>
+        <div class="form-field">
+          <label for="email">Email:</label>
+          <input type="email" id="email" v-model="user.email" :disabled="!userCanModify" />
+        </div>
+        <div class="form-field">
+          <label for="role">Rôle:</label>
+          <select id="role" v-model="user.role" :disabled="!currentUserisAdmin">
+            <option value="user">User</option>
+            <option value="manager">Manager</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div v-if="team">
+        <div class="form-field">
+          <label for="name">Name:</label>
+          <input type="text" id="name" v-model="team.title" :disabled="!userCanModify" />
+        </div>
+      </div>
+      <div class="buts" v-if="userCanModify">
+        <button class="save" type="submit">Save</button>
+        <button v-if="props.mode !== 'create'" class="delete" @click.prevent="deleteContent">Delete</button>
+      </div>
+    </form>
 </template>
 
 <style scoped>
