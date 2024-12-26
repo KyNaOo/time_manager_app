@@ -13,6 +13,7 @@ const AuthContext = createContext<{
     isLoading: false,
 });
 
+
 export function useSession() {
     const value = useContext(AuthContext);
     if (process.env.NODE_ENV !== 'production') {
@@ -31,6 +32,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         <AuthContext.Provider
             value={{
                 signIn: () => {
+
                     setSession('xxx');
                 },
                 signOut: () => {
