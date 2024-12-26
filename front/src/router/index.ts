@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createMemoryHistory, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import UserView from '../views/UserView.vue'
 import UsersView from '../views/UsersView.vue'
@@ -15,7 +15,7 @@ import TeamView from '@/views/TeamView.vue'
 import CreationView from '@/views/CreationView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
@@ -103,37 +103,32 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   try {
+
+    console.log('Before each route');
+    const authenticated = is_authenticated();
+    console.log('User is autenticated ? ', authenticated); 
     console.log('from: ', from);
     console.log('to: ', to);
-    // Check if the user is authenticated
-    const authenticated = await is_authenticated();
 
-    console.log('authenticated in router: ', authenticated); 
-    if (to.meta.requiresAuth && !authenticated) {
-      console.log('Redirecting to login');
-      // User is not authenticated, redirect to login
-      return next("/login");
-    }
     if ((to.path === "/login" || to.path === "/register" || to.path === "/") && authenticated) {
-      console.log('Redirecting to /')
-      // User is authenticated and trying to access login, redirect to dashboard
+      console.log('Redirecting to app, user is already authenticated');
       return next("/app");
     }
 
-    // if (authenticated && to.path === "/app") {
-    //   console.log('Redirecting to ', to.path);
-    //   return next();
-    // }
+    if (to.meta.requiresAuth && !authenticated) {
+      console.log('Redirecting to login, user is not authenticated');
+      return next("/login");
+    }
 
-    console.log('Passed controls: ');
+    console.log('Passed controls, going to: ', to.path);
 
     return next();
-  } catch (err) {
-    alert('server is down');
+  } catch (err : any) {
+    store.showModal({message: `Ann error in the router`, title: 'Error in router'});
   }
 });
 
-async function is_authenticated() {
+function is_authenticated() {
   try {
     return store.token !== null;
   } catch (err) {

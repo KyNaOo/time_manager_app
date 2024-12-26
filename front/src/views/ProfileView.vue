@@ -3,14 +3,18 @@ import { ref, onBeforeMount } from 'vue'
 import type { User } from '@/types/crudTypes'
 import { store } from '@/api/store';
 import UserBox from '@/components/UserBox.vue'
+import Loader from '@/components/Loader.vue';
 
 
-const user = ref<User | null>(null)
+const user = ref<User | null>(null);
+
+console.log('ProfileView store:', store)
 
 onBeforeMount(async () => {
     try {
+        console.log('Fetching user in profile view...')
         user.value = await store.user;
-        console.log('Stored User:', user.value)    
+        console.log('Stored User:', user.value)
     } catch (error) {
         console.error('Error fetching user data:', error)
     }
@@ -21,6 +25,7 @@ onBeforeMount(async () => {
 <template>
     <div class="ProfileView">
         <UserBox v-if="user" :user="user"/>
+        <Loader v-else/>
     </div>
 </template>
 

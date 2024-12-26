@@ -1,79 +1,77 @@
-
 <script setup lang="ts">
 import { ref, defineProps, watch } from 'vue';
-import { useValidators } from '@/api/validators';
 import FieldLayout from './FieldLayout.vue';
 
-const validators = useValidators();
-
-const error = ref<string | null>(null);
+const emit = defineEmits(['update:modelValue', 'form-validity']);
 
 const props = defineProps<{
-    type: 'text' | 'password' | 'email';
-    name: string;
-    label: string;
-    required: boolean;
+  type: 'text' | 'password' | 'email';
+  name: string;
+  label: string;
+  required: boolean;
 }>();
 
-const validateInput = () => {
-    if (!inputValue.value) {
-        error.value = 'Input is required';
-        return;
-    }
-    if (!props.name) {
-        console.error('No name prop provided');
-        error.value = 'No name prop provided';
-        return;
-    }
-    if (props.name === 'email'){
-        console.log('Email validation');
-        const validated = validators.validateEmail(inputValue.value);
-        if (!validated) {
-            error.value = 'Invalid email';
-            return;
-        }
-    }
-    if (props.name === 'username'){
-        console.log('Username validation');
-        const validated = validators.validateUsername(inputValue.value);
-        if (!validated) {
-            error.value = 'Invalid username';
-            return;
-        }
-    }
-    error.value = null;
+const inputValue = ref('');
+const error = ref<string | null>(null);
+const isValid = ref(false);
+
+const validateEmail = (email: string): boolean => {
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailPattern.test(email);
 };
 
-const inputValue = ref('');
+const detectInjection = (input: string): boolean => {
+  const dangerousPatterns = [
+    /<script.*?>.*?<\/script>/gi, 
+    /\b(on\w+=|javascript:|alert\(|eval\(|document\.cookie|window\.location)/gi, 
+    /(--|\b(SELECT|UPDATE|DELETE|INSERT|DROP|ALTER|CREATE|TRUNCATE)\b)/gi, 
+    /[<>;'"]/
+  ];
 
-const emit = defineEmits(['update:modelValue']);
+  return dangerousPatterns.some((pattern) => pattern.test(input));
+};
+
+const validateInput = () => {
+  if (!inputValue.value && props.required) {
+    error.value = 'This field is required';
+    isValid.value = false;
+  }
+  else if (props.name === 'email' && !validateEmail(inputValue.value)) {
+    error.value = 'Invalid email address';
+    isValid.value = false;
+  }
+  else if (detectInjection(inputValue.value)) {
+    error.value = 'Input contains invalid characters';
+    isValid.value = false;
+  }
+  else {
+    error.value = null;
+    isValid.value = true;
+  }
+
+  emit('form-validity', { name: props.name, isValid: isValid.value });
+};
 
 watch(inputValue, (newValue) => {
-    emit('update:modelValue', newValue);
+  emit('update:modelValue', newValue);
+  validateInput();
 });
 </script>
 
 <template>
-    <FieldLayout :name="props.name" :label="props.label">
-        <input
-            :type="props.type"
-            :name="props.name"
-            v-model="inputValue"
-            @input="validateInput"
-            class="input-field"
-        />
-        <span class="error" v-if="error">{{ error }}</span>
-    </FieldLayout>
+  <FieldLayout :name="props.name" :label="props.label">
+    <input
+        :type="props.type"
+        :name="props.name"
+        v-model="inputValue"
+        @input="validateInput"
+        class="input-field"
+    />
+    <span class="error" v-if="error">{{ error }}</span>
+  </FieldLayout>
 </template>
 
-
 <style scoped>
-
-label {
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
 .input-field {
   box-sizing: border-box;
   width: 100%;
@@ -87,10 +85,12 @@ label {
 }
 
 .input-field:focus {
-  outline: red;
+  outline: none;
+  border-color: red;
 }
 
 .error {
-    color: red;
+  color: red;
+  font-size: 12px;
 }
 </style>

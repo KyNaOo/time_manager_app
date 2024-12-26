@@ -20,6 +20,29 @@ const props = defineProps({
   },
 });
 
+const isUserNameValid = ref<boolean>(false);
+const isEmailValid = ref<boolean>(false);
+const isStrongPassword = ref(false);
+
+
+
+const isFormValid = computed(() => {
+  console.log("Is form valid ? ", isUserNameValid.value && isEmailValid.value && isStrongPassword.value)
+    return isUserNameValid.value && isEmailValid.value
+     && isStrongPassword.value;
+});
+
+const updateFormValidity = (field:any) => {
+  console.log("EMIT TRIGGGEEEEEREDDDDD:" )
+  console.log("Context:", field )
+    if ( field.name === 'email'){
+      isEmailValid.value = field.isValid;
+    }
+    if ( field.name === 'username'){
+      isUserNameValid.value = field.isValid;
+    }
+};
+
 const user = ref<Partial<User>>(
   props.authMode === 'login'
     ? {
@@ -36,7 +59,6 @@ const user = ref<Partial<User>>(
 );
 
 const router = useRouter();
-const showPassword = ref(false);
 
 const hideAllErrors = () => {
     api.turnOffError();
@@ -56,8 +78,6 @@ const handleAuth = async () => {
     } else {
       console.log('Attempting to register...');
       delete user.value.confirmPassword;
-      // const hashedPassword = await bcrypt.hash(user.value.password!, 10);
-      // user.value.password = hashedPassword;
       console.log('User Data:', user.value);
       await auth.register({
         email: user.value.email!,
@@ -68,7 +88,7 @@ const handleAuth = async () => {
     }
     router.push('/app');   
   } catch (err : any) {
-    console.log('USer not authenticated', user.value);
+    console.log('Usser not authenticated', user.value);
     console.log(err);
     const message = err.response.data.error;
     if (message === 'unauthorized') {
@@ -76,7 +96,6 @@ const handleAuth = async () => {
     } else {
       error.value = 'An error occurred';
     }
-    // store.showModal({message: err.response.data.error, title: 'Error'});
   }
 };
 
@@ -85,7 +104,6 @@ const goTo = () => {
   else router.push("/login")
 };
 
-const isStrongPassword = ref(false);
 
 const goodPassword = (isGoodPassword: boolean) => {
   console.log('Password is good:', isGoodPassword);
@@ -117,11 +135,11 @@ watch(user, (newValue) => {
         ça pourrait être toi ?
       </p>
       <div v-if="props.authMode == 'register'" class="input-group" >
-        <InputField v-model="user.username" :name="'username'" :type="'text'" :label="'Username'" required/>
+        <InputField v-model="user.username" :name="'username'" :type="'text'" :label="'Username'" required @form-validity="updateFormValidity($event)"/>
       </div>
       <div class="input-group">
         <div class="input-group" >
-        <InputField v-model="user.email" :name="'email'" :type="'text'" :label="'Email'" required/>
+        <InputField v-model="user.email" :name="'email'" :type="'text'" :label="'Email'" required @form-validity="updateFormValidity($event)"/>
         </div>
       </div>
       <div class="input-group">
@@ -130,8 +148,18 @@ watch(user, (newValue) => {
       <div v-if="props.authMode == 'register' && isStrongPassword" class="input-group">
         <PasswordField v-model="user.confirmPassword":name="'confirmPassword'" :label="'Confirm Password'" required :showRules="false"/>
       </div>
-      <button type="submit" :class="['auth-button', { 'inpError': props.authMode == 'register' && !passwordsMatch }]">
-        {{props.authMode == 'register' ? 'Register' : 'Login'}}
+      <button 
+        v-if="props.authMode === 'register'" 
+        :disabled="!isFormValid || !passwordsMatch" 
+        type="submit" 
+        :class="['auth-button', { 'inpError': !isFormValid || !passwordsMatch }]">
+        Register
+      </button>
+      <button 
+        v-else 
+        type="submit" 
+        :class="['auth-button']">
+        Login
       </button>
       <span v-if="!passwordsMatch && authMode === 'register'" class="error">Passwords do not match</span>
       <span v-if="error" class="error">{{error}}</span>

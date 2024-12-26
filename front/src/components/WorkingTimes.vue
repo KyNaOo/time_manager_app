@@ -10,6 +10,7 @@ import { ClockIcon } from '@heroicons/vue/24/solid'
 
 interface Props {
     user: User ;
+    workingTimes: WorkingTime[];
 }
 const props = defineProps<Props>();
 
@@ -24,23 +25,18 @@ const api = useApi();
 const useful = usefulFunctions();
 
 const tableHeaders = computed(() => {
-  const headers = ['ID', 'Start', 'End', 'User Id'];
-  if (showActions.value) {
-    headers.push('Actions');
-  }
+  const headers = ['ID', 'Start', 'End', 'User Id', 'Actions'];
   return headers;
 });
 
-const showActions = computed(() => {
-  return props.user.role === 'admin';
-});
+
 
 
 onBeforeMount(async () => {
   try {
-    workingTimes.value = await api.getWorkingTimes(props.user);
+    workingTimes.value = props.workingTimes;
+    
     if (workingTimes.value) {
-      // Format the date for further treatment in SuperTable
       workingTimes.value = workingTimes.value.map(workingTime => ({
         ...workingTime,
         start: new Date(workingTime.start),
@@ -74,7 +70,7 @@ onBeforeMount(async () => {
       <div class="workingTimesTitle">
         <h2>Toutes tes heures à veiller</h2>
       </div>
-      <SuperTable :tableType="'workingtime'" :tableHeaders="tableHeaders" :tableData="workingTimes" :showActions="showActions" />
+      <SuperTable :tableType="'workingtime'" :tableHeaders="tableHeaders" :tableData="workingTimes" :showActions="true" />
     </div>
     <div v-else>Commence à veiller !
   </div>

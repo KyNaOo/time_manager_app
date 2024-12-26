@@ -103,7 +103,9 @@ export default function HomePage() {
             });
 
             setTeams(response.data.teams);
+
             console.warn(response.data.teams);
+
         } catch (error) {
             Alert.alert('Erreur', 'Erreur lors de la récupération des teams');
         }
@@ -124,7 +126,9 @@ export default function HomePage() {
         } catch (error) {
             Alert.alert('Erreur', 'Erreur lors de la récupération des working times');
         }
+
         console.warn(token[1]);
+
     };
 
     const handleDelete = async (id: any) => {

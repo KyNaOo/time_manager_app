@@ -24,6 +24,7 @@ const user = ref<User | null>(null);
 const working = ref(false);
 
 
+
 async function clock() {
   try {
     
@@ -42,7 +43,6 @@ async function clock() {
     console.log("Last clock:", lastClock)
 
     if (lastClock && lastClock.status === true) {
-        // clock out
         console.log("Clocking out...");
         console.log("Last clock:", lastClock);
         console.log("Working times:", workingTimes.value);
@@ -50,15 +50,12 @@ async function clock() {
         working.value = false;
 
     } else {
-        // clock in
         console.log("Clocking in...")
         console.log("now:", now);
         await useful.clockIn(now, user.value);
         working.value = true;
     }
-
-    // // Reload page
-    window.location.reload();
+    updateWorkingStatus(user.value);
 
       } catch (e) {
     console.log("Error clocking:", e)
@@ -67,31 +64,33 @@ async function clock() {
 
 }
 
+async function updateWorkingStatus(user : User) {
+    const [workingTimesResponse, clocksResponse] = await Promise.all([
+                api.getWorkingTimes(user),
+                api.getClocks(user)
+        ]);
+    if (workingTimesResponse) {
+        console.log("Working times from Promise:", workingTimesResponse);
+        workingTimes.value = workingTimesResponse;
+    }
+
+    if (clocksResponse) {
+        console.log("All clocks:", clocksResponse);
+        clocks.value = clocksResponse;
+
+        const lastClock = useful.fetchLastClock(clocks.value!);
+        console.log("Last clock:", lastClock);
+
+        working.value = lastClock && lastClock.status ? true : false;
+        console.log(`User is ${working.value ? 'working' : 'not working'} !!`);
+    }
+}
+
 onBeforeMount(async () => {
     try {
         user.value = await store.user;
-        console.log("User in Store:", user.value);
         if (user.value) {
-            const [workingTimesResponse, clocksResponse] = await Promise.all([
-                api.getWorkingTimes(user.value),
-                api.getClocks(user.value)
-            ]);
-
-            if (workingTimesResponse) {
-                console.log("Working times from Promise:", workingTimesResponse);
-                workingTimes.value = workingTimesResponse;
-            }
-
-            if (clocksResponse) {
-                console.log("All clocks:", clocksResponse);
-                clocks.value = clocksResponse;
-
-                const lastClock = useful.fetchLastClock(clocks.value!);
-                console.log("Last clock:", lastClock);
-
-                working.value = lastClock && lastClock.status ? true : false;
-                console.log(`User is ${working.value ? 'working' : 'not working'} !!`);
-            }
+            updateWorkingStatus(user.value);
         }
     } catch (e) {
         console.log("Error mounting Dashboard:", e);
@@ -102,10 +101,10 @@ onBeforeMount(async () => {
 
 <template>
     <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
-    <div class="Dashboard">
+    <div v-if="user" class="Dashboard" >
         <div class="block user">
             <div class="flex-item user">
-                <h2>  Heyyy {{ user?.username }} !</h2>
+                <h2>Heyyy {{ user?.username }} !</h2>
               </div>
             <div class="flex-item clockBlock">
                 <div v-if="working && workingTimes" class="workingBlock">
@@ -132,10 +131,7 @@ onBeforeMount(async () => {
             <ChartManager :workingTimes="workingTimes" />
         </div>
         <div class="block currentClockWrapper">
-            <WorkingTimes v-if="user" :user="user" />
-        </div>
-        <div class="block currentClockWrapper">
-            <Teams v-if="user" :user="user" />
+            <WorkingTimes :user="user" :workingTimes="workingTimes" />
         </div>
         </template>
         <template v-else>
@@ -144,7 +140,9 @@ onBeforeMount(async () => {
                 <p>Commence a veiller pour voir tes clocks</p>
             </div>
         </template>
-
+        <div class="block TeamsBlock">
+            <Teams :user="user" />
+        </div>
         <div v-if="user?.role === 'admin'" class="block allUsers">
             <Users/>
         </div>
